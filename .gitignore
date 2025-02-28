@@ -59,4 +59,4 @@ out/
 *.rar
 
 ### yml파일 ###
-/src/main/resources/application.yml
+/src/main/resources/**
