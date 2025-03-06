@@ -1,5 +1,5 @@
 ---
-name: Refactor
+name: "\U0001F528 Refactor"
 about: 리팩토링 관련 템플릿입니다.
 title: ''
 labels: ":hammer:  Refactor"

@@ -1,5 +1,5 @@
 ---
-name: Feature
+name: "\U0001F680 Feature"
 about: 기능 개발 이슈 템플릿
 title: ''
 labels: ":sparkles: Feature"
