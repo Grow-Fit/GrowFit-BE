@@ -1,4 +1,4 @@
-package com.project.growfit.domain.auto.entity;
+package com.project.growfit.domain.auth.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;

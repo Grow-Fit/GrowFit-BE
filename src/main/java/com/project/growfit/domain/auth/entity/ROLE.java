@@ -1,4 +1,4 @@
-package com.project.growfit.domain.auto.entity;
+package com.project.growfit.domain.auth.entity;
 
 public enum ROLE {
     ROLE_ADMIN,

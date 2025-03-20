@@ -1,4 +1,4 @@
-package com.project.growfit.domain.auto.entity;
+package com.project.growfit.domain.auth.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -60,6 +60,7 @@ public class Child {
         this. childId = childId;
         this.childNickname = childNickname;
         this.childAge = childAge;
+        this.childGender = gender;
         this.childHeight = childHeight;
         this.childWeight = childWeight;
         this.childPassword = childPassword;
