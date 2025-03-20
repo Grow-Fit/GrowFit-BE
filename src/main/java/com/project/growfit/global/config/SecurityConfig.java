@@ -3,8 +3,8 @@ package com.project.growfit.global.config;
 import com.project.growfit.global.auto.jwt.JwtProvider;
 import com.project.growfit.global.auto.jwt.excpetion.CustomAccessDeniedHandler;
 import com.project.growfit.global.auto.jwt.excpetion.CustomAuthenticationEntryPoint;
-import com.project.growfit.global.auto.jwt.filter.JwtCookieAuthenticationFilter;
-import com.project.growfit.global.auto.jwt.filter.LoginFilter;
+import com.project.growfit.global.auto.filter.JwtCookieAuthenticationFilter;
+import com.project.growfit.global.auto.filter.LoginFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -64,6 +64,8 @@ public class SecurityConfig {
                         auth -> auth.requestMatchers("/api/auth/**").permitAll()
                                 .requestMatchers("/oauth/**").permitAll()
                                 .requestMatchers("/test-page/**").permitAll()
+                                .requestMatchers("/api/parent/**").permitAll()
+                                .requestMatchers("/api/child/**").permitAll()
                                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                                 .anyRequest().authenticated()
