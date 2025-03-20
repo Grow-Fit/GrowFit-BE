@@ -1,6 +1,6 @@
-package com.project.growfit.domain.auto.repository;
+package com.project.growfit.domain.auth.repository;
 
-import com.project.growfit.domain.auto.entity.Child;
+import com.project.growfit.domain.auth.entity.Child;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
