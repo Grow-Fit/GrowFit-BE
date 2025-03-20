@@ -1,11 +1,12 @@
-package com.project.growfit.global.auto.jwt.dto;
+package com.project.growfit.global.auto.dto;
 
-import com.project.growfit.domain.auto.entity.Child;
-import com.project.growfit.domain.auto.entity.Parent;
+import com.project.growfit.domain.auth.entity.Child;
+import com.project.growfit.domain.auth.entity.Parent;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
 import java.util.Collection;
 import java.util.List;
 
@@ -13,6 +14,7 @@ import java.util.List;
 public class CustomUserDetails implements UserDetails {
 
     private String userId;
+    private String userPassword;
     private String email;
     private String nickname;
     private String role;
@@ -27,6 +29,7 @@ public class CustomUserDetails implements UserDetails {
 
     public CustomUserDetails(Child child) {
         this.userId = child.userId();
+        this.userPassword = child.user_password();
         this.email = null;
         this.nickname = child.userNickname();
         this.role = "ROLE_CHILD";
@@ -39,6 +42,7 @@ public class CustomUserDetails implements UserDetails {
             this.role = "ROLE_PARENT";
         } else if (user instanceof Child child) {
             this.userId = child.userId();
+            this.userPassword = child.user_password();
             this.email = null;
             this.nickname = child.userNickname();
             this.role = "ROLE_CHILD";
@@ -62,7 +66,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getPassword() {
-        return null;
+        return userPassword;
     }
 
     @Override

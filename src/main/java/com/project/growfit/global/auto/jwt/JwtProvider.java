@@ -1,7 +1,7 @@
 package com.project.growfit.global.auto.jwt;
 
-import com.project.growfit.domain.auto.repository.ChildRepository;
-import com.project.growfit.domain.auto.repository.ParentRepository;
+import com.project.growfit.domain.auth.repository.ChildRepository;
+import com.project.growfit.domain.auth.repository.ParentRepository;
 import com.project.growfit.global.auto.dto.CustomUserDetails;
 import com.project.growfit.global.redis.entity.TokenRedis;
 import com.project.growfit.global.redis.repository.TokenRedisRepository;

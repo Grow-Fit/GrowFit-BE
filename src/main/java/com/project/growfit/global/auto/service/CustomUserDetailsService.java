@@ -1,8 +1,10 @@
 package com.project.growfit.global.auto.service;
 
-import com.project.growfit.domain.auto.entity.Child;
-import com.project.growfit.domain.auto.repository.ChildRepository;
+import com.project.growfit.domain.auth.entity.Child;
+import com.project.growfit.domain.auth.repository.ChildRepository;
 import com.project.growfit.global.auto.dto.CustomUserDetails;
+import com.project.growfit.global.exception.BusinessException;
+import com.project.growfit.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,16 +16,19 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
-
     private final ChildRepository childRepository;
 
+    @Override
     public UserDetails loadUserByUsername(String user_id) throws UsernameNotFoundException {
-        log.info("[loadUserByUsername] 사용자 id 찾는 중: {}", user_id);
+        log.info("[loadUserByUsername] 사용자 정보 조회 시도: user_id = {}", user_id);
 
-        Child child = childRepository.findByChildId(user_id)
-                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + user_id));
+        Child child = childRepository.findByChildId(user_id).orElse(null);
+        if (child != null) {
+            log.info("[loadUserByUsername] 자녀 계정 조회 성공: childId = {}", user_id);
+            return new CustomUserDetails(child);
+        }
 
-        log.info("[loadUserByUsername] 사용자 정보 조회 성공: user_id = {}", user_id);
-        return new CustomUserDetails(child);
+        log.warn("[loadUserByUsername] 사용자 정보 조회 실패: user_id = {}", user_id);
+        throw new BusinessException(ErrorCode.USER_NOT_FOUND);
     }
 }

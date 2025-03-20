@@ -1,4 +1,4 @@
-package com.project.growfit.global.auto.jwt.filter;
+package com.project.growfit.global.auto.filter;
 
 import com.project.growfit.global.auto.jwt.JwtProvider;
 import com.project.growfit.global.utils.CookieUtils;
