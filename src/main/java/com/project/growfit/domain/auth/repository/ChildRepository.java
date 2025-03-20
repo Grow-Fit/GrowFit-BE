@@ -9,6 +9,7 @@ import java.util.Optional;
 @Repository
 public interface ChildRepository extends JpaRepository<Child, Long> {
     Optional<Child> findByChildId(String child_id);
-
-    boolean existsByChildId(String child_id);
+    Optional<Child> findByPid(Long child_id);
+    Optional<Child> findByCode(String code);
+    boolean existsByCodeAndChildId(String code, String childId);
 }

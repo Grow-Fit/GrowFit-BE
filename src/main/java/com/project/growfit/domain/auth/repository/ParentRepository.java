@@ -10,6 +10,5 @@ import java.util.Optional;
 @Repository
 public interface ParentRepository extends JpaRepository<Parent, Long> {
     Optional<Parent> findByEmail(String email);
-
     Optional<List<Parent>> findParentByProviderId(String kakaoIdentifier);
 }

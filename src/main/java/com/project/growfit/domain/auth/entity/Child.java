@@ -1,12 +1,14 @@
 package com.project.growfit.domain.auto.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
 @NoArgsConstructor
+@AllArgsConstructor
 public class Child {
 
     @Id
@@ -37,18 +39,24 @@ public class Child {
     @Column(name = "child_nickname", unique = true)
     private String childNickname;
 
-    private String role;
+    @Column(name = "child_code", unique = true)
+    private String code;
+
+    @Enumerated(EnumType.STRING)
+    private ROLE role;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     private Parent parent;
 
-    public Child(String childId, String childNickname,
-                 ROLE anEnum, int childAge,
+    public Child(String childId,
+                 String childNickname,
+                 GENDER gender,
+                 int childAge,
                  long childHeight,
                  long childWeight,
                  String childPassword,
-                 String role) {
+                 ROLE role) {
         this. childId = childId;
         this.childNickname = childNickname;
         this.childAge = childAge;
@@ -58,8 +66,9 @@ public class Child {
         this.role = role;
     }
 
-    public Child(String childId, String childPassword, String childName, GENDER childGender, int childAge, int childHeight, int child_weight, String childNickname, String role) {
+    public Child(String childId, String childPassword, String childName, GENDER childGender, int childAge, int childHeight, int child_weight, String childNickname, ROLE role) {
         this.childId = childId;
+        this.code = null;
         this.childPassword = childPassword;
         this.childName = childName;
         this.childGender = childGender;
@@ -70,7 +79,7 @@ public class Child {
         this.role = role;
     }
 
-    public Child(String childId, String childNickname, String childPassword, String role) {
+    public Child(String childId, String childNickname, String childPassword, ROLE role) {
         this.childId = childId;
         this.childNickname = childNickname;
         this.childPassword = childPassword;
@@ -83,7 +92,7 @@ public class Child {
 
     public String userNickname(){return childNickname;}
 
-    public String user_role() {
+    public ROLE user_role() {
         return role;
     }
 
@@ -92,4 +101,12 @@ public class Child {
     }
 
     public void addRegister(Parent parent) {this.parent = parent;}
+    public void updateCode(String code) {this.code = code;}
+    public void updateNickname(String nickname){this.childNickname = nickname;}
+    public void updatePassword(String password){
+        this.childPassword = password;}
+    public void updateCredentials(String id, String password) {
+        this.childId = id;
+        this.childPassword = password;
+    }
 }
