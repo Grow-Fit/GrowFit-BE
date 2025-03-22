@@ -33,6 +33,7 @@ public enum ErrorCode {
     TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다."),
     INVALID_AUTHENTICATION(HttpStatus.UNAUTHORIZED, "인증 정보가 올바르지 않습니다."),
 
+    QR_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 가입코드가 발급된 아이계정입니다."),
     QR_GENERATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "QR코드 생성을 실패하였습니다.");
 
     private final HttpStatus status;
