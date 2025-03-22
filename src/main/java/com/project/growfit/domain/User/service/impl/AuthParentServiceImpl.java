@@ -11,7 +11,7 @@ import com.project.growfit.domain.auth.dto.response.ChildInfoResponseDto;
 import com.project.growfit.domain.auth.dto.response.ChildQrCodeResponseDto;
 import com.project.growfit.domain.auth.entity.Child;
 import com.project.growfit.domain.auth.entity.Parent;
-import com.project.growfit.domain.auth.entity.ROLE;
+import com.project.growfit.domain.User.entity.ROLE;
 import com.project.growfit.domain.auth.repository.ChildRepository;
 import com.project.growfit.domain.auth.repository.ParentRepository;
 import com.project.growfit.domain.auth.service.AuthParentService;
