@@ -1,7 +1,7 @@
 package com.project.growfit.global.auto.dto;
 
-import com.project.growfit.domain.auth.entity.Child;
-import com.project.growfit.domain.auth.entity.Parent;
+import com.project.growfit.domain.User.entity.Child;
+import com.project.growfit.domain.User.entity.Parent;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -23,7 +23,7 @@ public class CustomUserDetails implements UserDetails {
     public CustomUserDetails(Parent parent) {
         this.userId = parent.getEmail();
         this.email = parent.getEmail();
-        this.nickname = parent.getName();
+        this.nickname = parent.getNickname();
         this.role = "ROLE_PARENT";
     }
 
@@ -38,7 +38,7 @@ public class CustomUserDetails implements UserDetails {
         if (user instanceof Parent parent) {
             this.userId = parent.getEmail();
             this.email = parent.getEmail();
-            this.nickname = parent.getName();
+            this.nickname = parent.getNickname();
             this.role = "ROLE_PARENT";
         } else if (user instanceof Child child) {
             this.userId = child.userId();

@@ -72,7 +72,6 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         log.info("[successfulAuthentication] 로그인 성공 - 사용자 ID: {}, 역할: {}, JWT 저장 완료", user_id, role);
 
-        // 응답 JSON 설정
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         response.getWriter().write(objectMapper.writeValueAsString(new AuthenticationResponse(true, "로그인 성공", token)));
@@ -86,7 +85,6 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
-        // JSON 형식으로 실패 메시지 반환
         response.getWriter().write(objectMapper.writeValueAsString(new AuthenticationResponse(false, "아이디 또는 비밀번호가 올바르지 않습니다.", null)));
     }
 

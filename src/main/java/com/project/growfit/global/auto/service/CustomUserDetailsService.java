@@ -1,7 +1,7 @@
 package com.project.growfit.global.auto.service;
 
-import com.project.growfit.domain.auth.entity.Child;
-import com.project.growfit.domain.auth.repository.ChildRepository;
+import com.project.growfit.domain.User.entity.Child;
+import com.project.growfit.domain.User.repository.ChildRepository;
 import com.project.growfit.global.auto.dto.CustomUserDetails;
 import com.project.growfit.global.exception.BusinessException;
 import com.project.growfit.global.exception.ErrorCode;
@@ -22,7 +22,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String user_id) throws UsernameNotFoundException {
         log.info("[loadUserByUsername] 사용자 정보 조회 시도: user_id = {}", user_id);
 
-        Child child = childRepository.findByChildId(user_id).orElse(null);
+        Child child = childRepository.findByLoginId(user_id).orElse(null);
         if (child != null) {
             log.info("[loadUserByUsername] 자녀 계정 조회 성공: childId = {}", user_id);
             return new CustomUserDetails(child);

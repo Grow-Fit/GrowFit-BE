@@ -1,7 +1,7 @@
 package com.project.growfit.global.auto.jwt;
 
-import com.project.growfit.domain.auth.repository.ChildRepository;
-import com.project.growfit.domain.auth.repository.ParentRepository;
+import com.project.growfit.domain.User.repository.ChildRepository;
+import com.project.growfit.domain.User.repository.ParentRepository;
 import com.project.growfit.global.auto.dto.CustomUserDetails;
 import com.project.growfit.global.redis.entity.TokenRedis;
 import com.project.growfit.global.redis.repository.TokenRedisRepository;
@@ -124,7 +124,7 @@ public class JwtProvider {
             user = parentRepository.findByEmail(userId)
                     .orElseThrow(() -> new UsernameNotFoundException("부모를 찾을 수 없습니다: " + userId));
         } else {
-            user = childRepository.findByChildId(userId)
+            user = childRepository.findByLoginId(userId)
                     .orElseThrow(() -> new UsernameNotFoundException("자식을 찾을 수 없습니다: " + userId));
         }
         CustomUserDetails userDetails = new CustomUserDetails(user);
@@ -172,8 +172,8 @@ public class JwtProvider {
         if (parentRepository.findByEmail(userId).isPresent()) {
             role = parentRepository.findByEmail(userId).get().getRole().toString();
             login_type = "SOCIAL_KAKAO";
-        } else if (childRepository.findByChildId(userId).isPresent()) {
-            role = childRepository.findByChildId(userId).get().getRole().toString();
+        } else if (childRepository.findByLoginId(userId).isPresent()) {
+            role = childRepository.findByLoginId(userId).get().getRole().toString();
             login_type = "LOCAL";
         } else {
             throw new UsernameNotFoundException("User not found: " + userId);
