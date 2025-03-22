@@ -1,26 +1,26 @@
-package com.project.growfit.domain.auth.dto.response;
+package com.project.growfit.domain.User.dto.response;
 
-import com.project.growfit.domain.auth.entity.Child;
-import com.project.growfit.domain.auth.entity.GENDER;
+import com.project.growfit.domain.User.entity.Child;
+import com.project.growfit.domain.User.entity.ChildBodyInfo;
+import com.project.growfit.domain.User.entity.ChildGender;
 
 public record ChildInfoResponseDto(
         Long id,
         String code,
         String child_name,
-        GENDER child_gender,
+        ChildGender child_gender,
         int child_age,
-        long child_height,
-        long child_weight
+        ChildBodyInfoResponseDto child_BodyInfo
+
 ) {
     public static ChildInfoResponseDto toDto(Child child) {
         return new ChildInfoResponseDto(
-                child.getPid(),
-                child.getCode(),
-                child.getChildName(),
-                child.getChildGender(),
-                child.getChildAge(),
-                child.getChildHeight(),
-                child.getChildWeight()
+                child.getId(),
+                child.getCodeNumber(),
+                child.getName(),
+                child.getGender(),
+                child.getAge(),
+                ChildBodyInfoResponseDto.toDto(child.getLatestBodyInfo())
         );
     }
 }

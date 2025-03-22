@@ -1,9 +1,9 @@
-package com.project.growfit.domain.auth.controller;
+package com.project.growfit.domain.User.controller;
 
-import com.project.growfit.domain.auth.dto.request.ChildCredentialsRequest;
-import com.project.growfit.domain.auth.dto.request.FindChildPasswordRequestDto;
-import com.project.growfit.domain.auth.dto.request.UpdateNicknameRequestDto;
-import com.project.growfit.domain.auth.service.AuthChildService;
+import com.project.growfit.domain.User.dto.request.ChildCredentialsRequest;
+import com.project.growfit.domain.User.dto.request.FindChildPasswordRequestDto;
+import com.project.growfit.domain.User.dto.request.UpdateNicknameRequestDto;
+import com.project.growfit.domain.User.service.AuthChildService;
 import com.project.growfit.global.response.ResultResponse;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,6 @@ public class AuthChildController {
     @GetMapping("/register/code")
     public ResponseEntity<?> registerChildByCode(@RequestParam String code) {
         ResultResponse<?> resultResponse = authChildService.findByCode(code);
-
         return ResponseEntity.status(HttpStatus.OK).body(resultResponse);
     }
 
@@ -40,13 +39,6 @@ public class AuthChildController {
 
         return ResponseEntity.status(HttpStatus.OK).body(resultResponse);
     }
-    /*
-    @PutMapping("/{childId}/notification")
-    public ResultResponse<?> updateChildNotification(@PathVariable Long childId,
-                                                     @RequestBody UpdateChildNotificationRequestDto request) {
-
-        return childService.updateChildNotification(childId, request.notificationEnabled());
-    }*/
 
     @PostMapping("/login")
     public ResponseEntity<?> loginChild(@RequestBody ChildCredentialsRequest request, HttpServletResponse response) {
@@ -70,4 +62,12 @@ public class AuthChildController {
 
         return ResponseEntity.status(HttpStatus.OK).body(resultResponse);
     }
+
+    /*
+    @PutMapping("/{childId}/notification")
+    public ResultResponse<?> updateChildNotification(@PathVariable Long childId,
+                                                     @RequestBody UpdateChildNotificationRequestDto request) {
+
+        return childService.updateChildNotification(childId, request.notificationEnabled());
+    }*/
 }

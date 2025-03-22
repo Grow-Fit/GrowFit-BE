@@ -13,6 +13,9 @@ import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.LocalDateTime;
 
 @Getter
 @Entity
@@ -37,4 +40,11 @@ public class ChildBodyInfo extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "child_id")
     private Child child;
+
+    public ChildBodyInfo(long height, long weight, Child child) {
+        this.height = height;
+        this.weight = weight;
+        this.child = child;
+    }
+
 }

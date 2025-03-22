@@ -1,6 +1,6 @@
-package com.project.growfit.domain.auth.repository;
+package com.project.growfit.domain.User.repository;
 
-import com.project.growfit.domain.auth.entity.Parent;
+import com.project.growfit.domain.User.entity.Parent;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

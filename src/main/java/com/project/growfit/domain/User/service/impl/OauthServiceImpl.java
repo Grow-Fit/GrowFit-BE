@@ -1,14 +1,14 @@
-package com.project.growfit.domain.auth.service.impl;
+package com.project.growfit.domain.User.service.impl;
 
 import com.nimbusds.jose.shaded.gson.JsonElement;
 import com.nimbusds.jose.shaded.gson.JsonObject;
 import com.nimbusds.jose.shaded.gson.JsonParser;
-import com.project.growfit.domain.auth.dto.request.ParentSignUpRequest;
-import com.project.growfit.domain.auth.dto.response.ParentLoginResponseDto;
-import com.project.growfit.domain.auth.dto.response.ParentResponse;
-import com.project.growfit.domain.auth.entity.Parent;
-import com.project.growfit.domain.auth.repository.ParentRepository;
-import com.project.growfit.domain.auth.service.OauthService;
+import com.project.growfit.domain.User.dto.request.ParentSignUpRequest;
+import com.project.growfit.domain.User.dto.response.ParentLoginResponseDto;
+import com.project.growfit.domain.User.dto.response.ParentResponse;
+import com.project.growfit.domain.User.entity.Parent;
+import com.project.growfit.domain.User.repository.ParentRepository;
+import com.project.growfit.domain.User.service.OauthService;
 import com.project.growfit.global.auto.jwt.JwtProvider;
 import com.project.growfit.global.exception.BusinessException;
 import com.project.growfit.global.exception.ErrorCode;

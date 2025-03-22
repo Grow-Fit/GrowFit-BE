@@ -1,6 +1,6 @@
-package com.project.growfit.domain.auth.controller;
+package com.project.growfit.domain.User.controller;
 
-import com.project.growfit.domain.auth.service.OauthService;
+import com.project.growfit.domain.User.service.OauthService;
 import com.project.growfit.global.exception.BusinessException;
 import com.project.growfit.global.response.ResultResponse;
 import io.swagger.v3.oas.annotations.Operation;

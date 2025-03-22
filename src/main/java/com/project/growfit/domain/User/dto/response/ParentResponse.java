@@ -1,6 +1,7 @@
-package com.project.growfit.domain.auth.dto.response;
+package com.project.growfit.domain.User.dto.response;
 
-import com.project.growfit.domain.auth.entity.Parent;
+
+import com.project.growfit.domain.User.entity.Parent;
 
 public record ParentResponse(
         String email,
@@ -12,9 +13,9 @@ public record ParentResponse(
     public ParentResponse(Parent parent) {
         this(
                 parent.getEmail(),
-                parent.getName(),
+                parent.getNickname(),
                 parent.getProviderId(),
-                parent.getProfileImage(),
+                parent.getPhoto(),
                 String.valueOf(parent.getRole())
         );
     }

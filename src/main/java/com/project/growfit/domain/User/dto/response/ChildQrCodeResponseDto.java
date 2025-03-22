@@ -1,6 +1,6 @@
-package com.project.growfit.domain.auth.dto.response;
+package com.project.growfit.domain.User.dto.response;
 
-import com.project.growfit.domain.auth.entity.Child;
+import com.project.growfit.domain.User.entity.Child;
 
 public record ChildQrCodeResponseDto(
         Long child_id,
@@ -9,7 +9,7 @@ public record ChildQrCodeResponseDto(
 ) {
     public static ChildQrCodeResponseDto toDto(Child child, String qr_code, String code) {
         return new ChildQrCodeResponseDto(
-                child.getPid(),
+                child.getId(),
                 qr_code,
                 code
         );

@@ -1,11 +1,11 @@
-package com.project.growfit.domain.auth.controller;
+package com.project.growfit.domain.User.controller;
 
 import com.google.zxing.WriterException;
-import com.project.growfit.domain.auth.dto.request.RegisterChildRequest;
-import com.project.growfit.domain.auth.dto.request.UpdateNicknameRequestDto;
-import com.project.growfit.domain.auth.entity.Parent;
-import com.project.growfit.domain.auth.repository.ParentRepository;
-import com.project.growfit.domain.auth.service.AuthParentService;
+import com.project.growfit.domain.User.dto.request.RegisterChildRequest;
+import com.project.growfit.domain.User.dto.request.UpdateNicknameRequestDto;
+import com.project.growfit.domain.User.entity.Parent;
+import com.project.growfit.domain.User.repository.ParentRepository;
+import com.project.growfit.domain.User.service.AuthParentService;
 import com.project.growfit.global.auto.dto.CustomUserDetails;
 import com.project.growfit.global.response.ResultResponse;
 import lombok.RequiredArgsConstructor;
@@ -53,6 +53,7 @@ public class AuthParentController {
 
     }
 
+    /* 테스트 후 삭제 될 API입니다.*/
     @GetMapping("/me")
     public ResponseEntity<?> testUserInfo(@AuthenticationPrincipal CustomUserDetails user) {
         String email = user.getUsername();

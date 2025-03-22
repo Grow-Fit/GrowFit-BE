@@ -5,14 +5,8 @@ import com.project.growfit.domain.Board.entity.Comment;
 import com.project.growfit.domain.Board.entity.Like;
 import com.project.growfit.domain.Board.entity.Post;
 import com.project.growfit.global.entity.BaseEntity;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -30,6 +24,9 @@ public class Parent extends BaseEntity {
     @Column(name = "parent_id")
     private Long id;
 
+    @Column(name = "email", nullable = false)
+    private String email;
+
     @Column(name = "nickname", nullable = false)
     private String nickname;
 
@@ -38,6 +35,15 @@ public class Parent extends BaseEntity {
 
     @Column(name = "photo")
     private String photo;
+
+    @Column(name = "provider", nullable = false)
+    private String provider;
+
+    @Column(name = "provider_id", nullable = false)
+    private String providerId;
+
+    @Enumerated(EnumType.STRING)
+    private ROLE role;
 
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Child> children = new ArrayList<>();
@@ -53,4 +59,34 @@ public class Parent extends BaseEntity {
 
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Bookmark> bookmarkList = new ArrayList<>();
+
+    public Parent(String email, String name, String profileImage, String provider, ROLE role) {
+        this.email = email;
+        this.nickname = name;
+        this.photo = profileImage;
+        this.provider = provider;
+        this.role = role;
+    }
+
+    public Parent(String email, String name, String profileImage, String provider, String providerId, ROLE role) {
+        this.email = email;
+        this.nickname = name;
+        this.photo = profileImage;
+        this.provider = provider;
+        this.providerId = providerId;
+        this.role = ROLE.ROLE_PARENT;
+    }
+
+    public boolean hasChildWithName(String childName) {
+        return children.stream()
+                .anyMatch(child -> child.getName().equals(childName));
+    }
+
+    public void updateNickname(String nickname){
+        this.nickname = nickname;
+    }
+
+    public void addChild(Child child) {
+        this.children.add(child);
+    }
 }

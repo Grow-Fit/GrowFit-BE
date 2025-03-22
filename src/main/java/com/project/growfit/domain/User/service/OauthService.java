@@ -1,7 +1,7 @@
-package com.project.growfit.domain.auth.service;
+package com.project.growfit.domain.User.service;
 
-import com.project.growfit.domain.auth.dto.request.ParentSignUpRequest;
-import com.project.growfit.domain.auth.dto.response.ParentResponse;
+import com.project.growfit.domain.User.dto.request.ParentSignUpRequest;
+import com.project.growfit.domain.User.dto.response.ParentResponse;
 import com.project.growfit.global.response.ResultResponse;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Service;

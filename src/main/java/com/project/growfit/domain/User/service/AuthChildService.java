@@ -1,6 +1,8 @@
-package com.project.growfit.domain.auth.service;
+package com.project.growfit.domain.User.service;
 
-import com.project.growfit.domain.auth.dto.request.*;
+import com.project.growfit.domain.User.dto.request.ChildCredentialsRequest;
+import com.project.growfit.domain.User.dto.request.FindChildPasswordRequestDto;
+import com.project.growfit.domain.User.dto.request.UpdateNicknameRequestDto;
 import com.project.growfit.global.response.ResultResponse;
 import jakarta.servlet.http.HttpServletResponse;
 

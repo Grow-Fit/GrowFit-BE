@@ -1,10 +1,12 @@
-package com.project.growfit.domain.auth.service.impl;
+package com.project.growfit.domain.User.service.impl;
 
-import com.project.growfit.domain.auth.dto.request.*;
-import com.project.growfit.domain.auth.dto.response.ChildInfoResponseDto;
-import com.project.growfit.domain.auth.entity.Child;
-import com.project.growfit.domain.auth.repository.ChildRepository;
-import com.project.growfit.domain.auth.service.AuthChildService;
+import com.project.growfit.domain.User.dto.request.ChildCredentialsRequest;
+import com.project.growfit.domain.User.dto.request.FindChildPasswordRequestDto;
+import com.project.growfit.domain.User.dto.request.UpdateNicknameRequestDto;
+import com.project.growfit.domain.User.dto.response.ChildInfoResponseDto;
+import com.project.growfit.domain.User.entity.Child;
+import com.project.growfit.domain.User.repository.ChildRepository;
+import com.project.growfit.domain.User.service.AuthChildService;
 import com.project.growfit.global.auto.jwt.JwtProvider;
 import com.project.growfit.global.auto.service.CustomAuthenticationProvider;
 import com.project.growfit.global.exception.BusinessException;
@@ -54,12 +56,19 @@ public class AuthChildServiceImpl implements AuthChildService {
     @Override
     public ResultResponse<?> registerChildCredentials(Long child_id, ChildCredentialsRequest request) {
         log.info("[registerChildCredentials] 아이 계정 정보 등록 요청: child_id={}, child_login_id={}", child_id, request.childId());
-        Child child = getChild(child_id);
-        child.updateCredentials(request.childId(), passwordEncoder.encode(request.childPassword()));
-        childRepository.save(child);
+        boolean isExists = childRepository.existsByLoginIdOrPassword(request.childId(), request.childPassword());
+
+        if (isExists) {
+            throw new BusinessException(ErrorCode.CHILD_ALREADY_EXISTS);
+        }
+        else {
+            Child child = getChild(child_id);
+            child.updateCredentials(request.childId(), passwordEncoder.encode(request.childPassword()));
+            childRepository.save(child);
+        }
 
         log.info("[registerChildCredentials] 아이 계정 정보 등록 완료: child_id={}", child_id);
-        return new ResultResponse<>(ResultCode.CHILD_INFO_RETRIEVAL_SUCCESS, null);
+        return new ResultResponse<>(ResultCode.CHILD_REGISTRATION_SUCCESS, null);
     }
 
 
@@ -83,10 +92,10 @@ public class AuthChildServiceImpl implements AuthChildService {
         Child child = getChildByChildId(request.childId());
         log.info("[login] 아이 정보 조회 완료: {}", child);
 
-        String newAccessToken = jwtProvider.createAccessToken(child.getChildId(), child.getRole().toString(), "LOCAL");
-        String newRefreshToken = jwtProvider.createRefreshToken(child.getChildId());
+        String newAccessToken = jwtProvider.createAccessToken(child.getLoginId(), child.getRole().toString(), "LOCAL");
+        String newRefreshToken = jwtProvider.createRefreshToken(child.getLoginId());
 
-        tokenRedisRepository.save(new TokenRedis(child.getChildId(), newAccessToken, newRefreshToken));
+        tokenRedisRepository.save(new TokenRedis(child.getLoginId(), newAccessToken, newRefreshToken));
         log.info("[login] 새 AccessToken 및 RefreshToken 저장 완료: child_login_id={}", request.childId());
 
         jwtProvider.saveAccessTokenToCookie(response, newAccessToken);
@@ -107,13 +116,14 @@ public class AuthChildServiceImpl implements AuthChildService {
     @Override
     public ResultResponse<?> findChildPassword(FindChildPasswordRequestDto request) {
         log.info("[findChildPassword] 아이 비밀번호 찾기 요청: user_id={}, code={}", request.user_id(), request.code());
-        boolean isExist = childRepository.existsByCodeAndChildId(request.code(), request.user_id());
+        boolean isExist = childRepository.existsByCodeNumberAndLoginId(request.code(), request.user_id());
         if (!isExist) {
             log.warn("[findChildPassword] 비밀번호 변경 실패: 존재하지 않는 사용자 user_id={}", request.user_id());
             throw new BusinessException(ErrorCode.CHILD_NOT_FOUND);
         }
         Child child = getChild(request.code());
-        child.updatePassword(request.new_password());
+        child.updatePassword(passwordEncoder.encode(request.new_password()));
+
         childRepository.save(child);
 
         log.info("[findChildPassword] 비밀번호 변경 완료: user_id={}", request.user_id());
@@ -121,18 +131,18 @@ public class AuthChildServiceImpl implements AuthChildService {
     }
 
     private Child getChild(Long child_id) {
-        return childRepository.findByPid(child_id)
+        return childRepository.findById(child_id)
                 .orElseThrow(() -> new BusinessException(ErrorCode.CHILD_NOT_FOUND));
     }
 
-    private Child getChildByChildId(String child_id) {
-        return childRepository.findByChildId(child_id)
+    private Child getChildByChildId(String login_id) {
+        return childRepository.findByLoginId(login_id)
                 .orElseThrow(() -> new BusinessException(ErrorCode.CHILD_NOT_FOUND));
     }
 
 
     private Child getChild(String code) {
-        return  childRepository.findByCode(code)
+        return  childRepository.findByCodeNumber(code)
                 .orElseThrow(() -> new BusinessException(ErrorCode.CHILD_NOT_FOUND));
     }
 
