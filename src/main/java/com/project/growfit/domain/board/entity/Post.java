@@ -1,4 +1,4 @@
-package com.project.growfit.domain.Board.entity;
+package com.project.growfit.domain.board.entity;
 
 import com.project.growfit.domain.User.entity.Parent;
 import com.project.growfit.global.entity.BaseEntity;
@@ -38,9 +38,13 @@ public class Post extends BaseEntity {
     @Column(name = "content", nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    @Column(name = "category")
+    @Column(name = "category", nullable = false)
     @Enumerated(EnumType.STRING)
     private Category category;
+
+    @Column(name = "age", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Age age;
 
     @Column(name = "hits", nullable = false)
     private int hits;
