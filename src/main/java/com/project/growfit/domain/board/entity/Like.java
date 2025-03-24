@@ -1,4 +1,4 @@
-package com.project.growfit.domain.Board.entity;
+package com.project.growfit.domain.board.entity;
 
 import com.project.growfit.domain.User.entity.Parent;
 import com.project.growfit.global.entity.BaseEntity;
@@ -17,26 +17,20 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@Table(name = "comment")
+@Table(name = "likes")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Comment extends BaseEntity {
+public class Like extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "comment_id")
+    @Column(name = "like_id")
     private Long id;
-
-    @Column(name = "content", columnDefinition = "TEXT", nullable = false)
-    private String content;
-
-    @Column(name = "writer_id", nullable = false)
-    private Long writerId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     private Post post;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_id")
+    @JoinColumn(name = "parent_id", nullable = false)
     private Parent parent;
 }

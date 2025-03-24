@@ -1,5 +1,6 @@
-package com.project.growfit.domain.Board.entity;
+package com.project.growfit.domain.board.entity;
 
+import com.project.growfit.domain.User.entity.Parent;
 import com.project.growfit.global.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,19 +17,26 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@Table(name = "Image")
+@Table(name = "comment")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Image extends BaseEntity {
+public class Comment extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "image_id")
+    @Column(name = "comment_id")
     private Long id;
 
-    @Column(name = "image_url", nullable = false)
-    private String imageUrl;
+    @Column(name = "content", columnDefinition = "TEXT", nullable = false)
+    private String content;
+
+    @Column(name = "writer_id", nullable = false)
+    private Long writerId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     private Post post;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
+    private Parent parent;
 }

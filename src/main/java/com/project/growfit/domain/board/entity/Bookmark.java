@@ -1,4 +1,4 @@
-package com.project.growfit.domain.Board.entity;
+package com.project.growfit.domain.board.entity;
 
 import com.project.growfit.domain.User.entity.Parent;
 import com.project.growfit.global.entity.BaseEntity;
@@ -17,13 +17,13 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@Table(name = "likes")
+@Table(name = "bookmark")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Like extends BaseEntity {
+public class Bookmark extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "like_id")
+    @Column(name = "bookmark_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -31,6 +31,6 @@ public class Like extends BaseEntity {
     private Post post;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_id", nullable = false)
+    @JoinColumn(name = "parent_id")
     private Parent parent;
 }
