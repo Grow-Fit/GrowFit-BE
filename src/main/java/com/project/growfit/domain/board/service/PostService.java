@@ -3,6 +3,7 @@ package com.project.growfit.domain.board.service;
 import com.project.growfit.domain.User.entity.Parent;
 import com.project.growfit.domain.User.repository.ParentRepository;
 import com.project.growfit.domain.board.dto.request.PostRequestDto;
+import com.project.growfit.domain.board.dto.response.PostResponseDto;
 import com.project.growfit.domain.board.entity.Image;
 import com.project.growfit.domain.board.entity.Post;
 import com.project.growfit.domain.board.repository.ImageRepository;
@@ -47,6 +48,13 @@ public class PostService {
             }
         }
         return post;
+    }
+
+    @Transactional(readOnly = true)
+    public PostResponseDto getPost(Long boardId) {
+        Post post = postRepository.findById(boardId).orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
+        Parent parent = parentRepository.findById(post.getParent().getId()).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        return PostResponseDto.from(post, parent.getNickname());
     }
 
     private String getCurrentEmail() {

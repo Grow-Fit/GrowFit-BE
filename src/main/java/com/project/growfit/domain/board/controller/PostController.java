@@ -1,6 +1,7 @@
 package com.project.growfit.domain.board.controller;
 
 import com.project.growfit.domain.board.dto.request.PostRequestDto;
+import com.project.growfit.domain.board.dto.response.PostResponseDto;
 import com.project.growfit.domain.board.entity.Post;
 import com.project.growfit.domain.board.service.PostService;
 import com.project.growfit.global.response.ResultCode;
@@ -13,6 +14,8 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -35,5 +38,12 @@ public class PostController {
     ) throws IOException {
         Post post = postService.savePost(dto, images);
         return new ResultResponse<>(ResultCode.CREATE_POST_SUCCESS, "\"" + post.getTitle() + "\" 글이 등록되었습니다.");
+    }
+
+    @Operation(summary = "커뮤니티 글 조회", description = "부모는 게시판에서 글을 조회할 수 있습니다.")
+    @GetMapping("/{postId}")
+    public ResultResponse<PostResponseDto> getPost(@PathVariable Long postId) {
+        PostResponseDto dto = postService.getPost(postId);
+        return new ResultResponse<>(ResultCode.GET_POST_SUCCESS, dto);
     }
 }
