@@ -31,4 +31,11 @@ public class Image extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     private Post post;
+
+    public static Image createImage(String imageUrl, Post post) {
+        Image image = new Image();
+        image.imageUrl = imageUrl;
+        image.post = post;
+        return image;
+    }
 }
