@@ -14,6 +14,7 @@ import com.project.growfit.global.exception.ErrorCode;
 import com.project.growfit.global.s3.service.S3UploadService;
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -61,14 +62,63 @@ public class PostService {
     @Transactional
     public int deletePost(Long postId) {
         Post post = postRepository.findById(postId).orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
-        int imageCnt = 0;
+        checkPostOwnership(post);
 
+        int imageCnt = 0;
         for (Image image : post.getImageList()) {
             s3UploadService.deleteFile(image.getImageUrl());
             imageCnt++;
         }
         postRepository.delete(post);
         return imageCnt;
+    }
+
+    @Transactional
+    public Post updatePost(PostRequestDto dto, List<MultipartFile> images, Long postId) throws IOException {
+        Post post = postRepository.findById(postId).orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
+        checkPostOwnership(post);
+
+        post.updatePostContent(dto);
+        handleDeleteImages(post, imageIds(post));
+        
+        if (images != null && !images.isEmpty()) {
+            handleImageUpdate(post, images);
+        }
+        return post;
+    }
+
+    private void handleImageUpdate(Post post, List<MultipartFile> images) throws IOException {
+        int currentOrderIndex = post.getImageList().size();
+
+        for (MultipartFile image : images) {
+            String imageUrl = s3UploadService.saveFile(image);
+            Image newImage = Image.createImage(imageUrl, post, currentOrderIndex++);
+            imageRepository.save(newImage);
+        }
+    }
+
+    private void handleDeleteImages(Post post, List<Long> deletedImageIds) {
+        if (deletedImageIds != null && !deletedImageIds.isEmpty()) {
+            for (Long imageId : deletedImageIds) {
+                Image image = imageRepository.findByIdAndPostId(imageId, post.getId()).orElseThrow(() -> new BusinessException(ErrorCode.IMAGE_NOT_FOUND));
+                s3UploadService.deleteFile(image.getImageUrl());
+                post.getImageList().remove(image);
+                imageRepository.delete(image);
+            }
+        }
+    }
+
+    private static List<Long> imageIds(Post post) {
+        return post.getImageList().stream()
+                .map(Image::getId)
+                .collect(Collectors.toList());
+    }
+
+    private void checkPostOwnership(Post post) {
+        Parent parent = parentRepository.findByEmail(getCurrentEmail()).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        if (!post.getParent().getEmail().equals(parent.getEmail())) {
+            throw new BusinessException(ErrorCode.FORBIDDEN_ACCESS);
+        }
     }
 
     private String getCurrentEmail() {

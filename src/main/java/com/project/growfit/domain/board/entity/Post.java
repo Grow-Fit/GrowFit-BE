@@ -79,4 +79,11 @@ public class Post extends BaseEntity {
         post.isPublish = true;
         return post;
     }
+
+    public void updatePostContent(PostRequestDto dto) {
+        this.title = dto.getTitle();
+        this.content = dto.getContent();
+        this.category = dto.getCategory();
+        this.age = dto.getAge();
+    }
 }

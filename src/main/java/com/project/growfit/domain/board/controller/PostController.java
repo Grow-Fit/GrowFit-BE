@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -53,5 +54,15 @@ public class PostController {
     public ResultResponse<String> deletePost(@PathVariable Long postId) {
         int imageCnt = postService.deletePost(postId);
         return new ResultResponse<>(ResultCode.DELETE_POST_SUCCESS, "사진 " + imageCnt + "장을 포함하여 글이 삭제되었습니다.");
+    }
+
+    @Operation(summary = "글 수정", description = "글 작성자는 글을 수정할 수 있습니다. 글 조회 후, 내용 및 이미지 수정 후 수정하는 용도로 사용합니다.")
+    @PutMapping(value = "/{postId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResultResponse<String> updatePost(@RequestPart("dto") @Valid PostRequestDto dto,
+                                             @RequestPart(value = "images", required = false)List<MultipartFile> images,
+                                             @PathVariable Long postId
+    ) throws IOException {
+        Post post = postService.updatePost(dto, images, postId);
+        return new ResultResponse<>(ResultCode.CREATE_POST_SUCCESS, "id: " + post.getId() + " 글이 수정되었습니다.");
     }
 }
