@@ -57,6 +57,19 @@ public class PostService {
         return PostResponseDto.from(post, parent.getNickname());
     }
 
+    @Transactional
+    public int deletePost(Long postId) {
+        Post post = postRepository.findById(postId).orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
+        int imageCnt = 0;
+
+        for (Image image : post.getImageList()) {
+            s3UploadService.deleteFile(image.getImageUrl());
+            imageCnt++;
+        }
+        postRepository.delete(post);
+        return imageCnt;
+    }
+
     private String getCurrentEmail() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         CustomUserDetails details = (CustomUserDetails) authentication.getPrincipal();

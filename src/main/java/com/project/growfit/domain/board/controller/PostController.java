@@ -14,6 +14,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -45,5 +46,12 @@ public class PostController {
     public ResultResponse<PostResponseDto> getPost(@PathVariable Long postId) {
         PostResponseDto dto = postService.getPost(postId);
         return new ResultResponse<>(ResultCode.GET_POST_SUCCESS, dto);
+    }
+
+    @Operation(summary = "글 삭제", description = "글 작성자는 글을 삭제할 수 있다.")
+    @DeleteMapping("/{postId}")
+    public ResultResponse<String> deletePost(@PathVariable Long postId) {
+        int imageCnt = postService.deletePost(postId);
+        return new ResultResponse<>(ResultCode.DELETE_POST_SUCCESS, "사진 " + imageCnt + "장을 포함하여 글이 삭제되었습니다.");
     }
 }

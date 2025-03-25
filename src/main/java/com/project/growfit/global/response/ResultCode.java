@@ -19,7 +19,8 @@ public enum ResultCode {
 
     // Community
     CREATE_POST_SUCCESS(HttpStatus.OK, "글 등록 성공."),
-    GET_POST_SUCCESS(HttpStatus.OK, "글 조회 성공");
+    GET_POST_SUCCESS(HttpStatus.OK, "글 조회 성공"),
+    DELETE_POST_SUCCESS(HttpStatus.OK, "글 삭제 성공");
 
     private final HttpStatus status;
     private final String message;
