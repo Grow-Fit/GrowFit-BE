@@ -9,6 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OrderColumn;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -32,10 +33,14 @@ public class Image extends BaseEntity {
     @JoinColumn(name = "post_id")
     private Post post;
 
-    public static Image createImage(String imageUrl, Post post) {
+    @OrderColumn(name = "order_index")
+    private int orderIndex;
+
+    public static Image createImage(String imageUrl, Post post, int orderIndex) {
         Image image = new Image();
         image.imageUrl = imageUrl;
         image.post = post;
+        image.orderIndex = orderIndex;
         return image;
     }
 }

@@ -41,9 +41,10 @@ public class PostService {
         postRepository.save(post);
 
         if (images != null && !images.isEmpty()) {
+            int index = 0;
             for (MultipartFile image : images) {
                 String imageUrl = s3UploadService.saveFile(image);
-                Image imageEntity = Image.createImage(imageUrl, post);
+                Image imageEntity = Image.createImage(imageUrl, post, index++);
                 imageRepository.save(imageEntity);
             }
         }
