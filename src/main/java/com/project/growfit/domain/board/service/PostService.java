@@ -65,7 +65,8 @@ public class PostService {
         Parent parent = parentRepository.findById(post.getParent().getId()).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
         int likeCount = likeRepository.countByPostId(post.getId());
         boolean isLike = likeRepository.existsByPostIdAndParentId(post.getId(), parent.getId());
-        return PostResponseDto.from(post, parent.getNickname(), likeCount, isLike);
+        boolean isBookmark = bookmarkRepository.existsByPostIdAndParentId(post.getId(), parent.getId());
+        return PostResponseDto.from(post, parent.getNickname(), likeCount, isLike, isBookmark);
     }
 
     @Transactional

@@ -20,10 +20,11 @@ public record PostResponseDto(
     int hits,
     List<String> imageUrls,
     int likeCount,
-    boolean isLike
+    boolean isLike,
+    boolean isBookmark
 ){
 
-    public static PostResponseDto from(Post post, String writer, int likeCount, boolean isLike) {
+    public static PostResponseDto from(Post post, String writer, int likeCount, boolean isLike, boolean isBookmark) {
         return new PostResponseDto(
                 post.getId(),
                 writer,
@@ -35,7 +36,8 @@ public record PostResponseDto(
                 post.getHits(),
                 getImageUrls(post),
                 likeCount,
-                isLike
+                isLike,
+                isBookmark
         );
     }
 
