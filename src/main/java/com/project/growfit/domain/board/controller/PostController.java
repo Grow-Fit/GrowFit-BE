@@ -73,4 +73,12 @@ public class PostController {
         if (isLike) return new ResultResponse<>(ResultCode.LIKE_POST_SUCCESS, "id: " + postId + " 번 글이 좋아요 처리되었습니다.");
         else return new ResultResponse<>(ResultCode.DISLIKE_POST_SUCCESS, "id: " + postId + " 번 글 좋아요 취소 처리되었습니다.");
     }
+
+    @Operation(summary = "북마크", description = "글을 북마크에 등록할 수 있습니다. 북마크가 비활성화된 상태에서 요청을 하면 북마크가 활성화되고, 활성화된 상태에서 요청을 하면 북마크가 비활성화 됩니다.")
+    @PostMapping("/{postId}/bookmark")
+    public ResultResponse<String> bookmarkPost(@PathVariable Long postId) {
+        boolean isBookmark = postService.bookmarkPost(postId);
+        if (isBookmark) return new ResultResponse<>(ResultCode.BOOKMARK_POST_SUCCESS, "id: " + postId + " 번 글을 북마크 등록했습니다.");
+        else return new ResultResponse<>(ResultCode.CANCEL_BOOKMARK_POST_SUCCESS, "id: " + postId + " 번 글을 북마크 취소했습니다.");
+    }
 }

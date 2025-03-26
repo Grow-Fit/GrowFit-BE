@@ -4,9 +4,11 @@ import com.project.growfit.domain.User.entity.Parent;
 import com.project.growfit.domain.User.repository.ParentRepository;
 import com.project.growfit.domain.board.dto.request.PostRequestDto;
 import com.project.growfit.domain.board.dto.response.PostResponseDto;
+import com.project.growfit.domain.board.entity.Bookmark;
 import com.project.growfit.domain.board.entity.Image;
 import com.project.growfit.domain.board.entity.Like;
 import com.project.growfit.domain.board.entity.Post;
+import com.project.growfit.domain.board.repository.BookmarkRepository;
 import com.project.growfit.domain.board.repository.ImageRepository;
 import com.project.growfit.domain.board.repository.LikeRepository;
 import com.project.growfit.domain.board.repository.PostRepository;
@@ -37,6 +39,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final ImageRepository imageRepository;
     private final LikeRepository likeRepository;
+    private final BookmarkRepository bookmarkRepository;
     private final S3UploadService s3UploadService;
 
     @Transactional
@@ -131,6 +134,21 @@ public class PostService {
         } else {
             Post post = postRepository.findById(postId).orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
             likeRepository.save(new Like(post, parent));
+            return true;
+        }
+    }
+
+    @Transactional
+    public boolean bookmarkPost(Long postId) {
+        Parent parent = parentRepository.findByEmail(getCurrentEmail()).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        Optional<Bookmark> existingBookmark = bookmarkRepository.findByPostIdAndParentId(postId, parent.getId());
+
+        if (existingBookmark.isPresent()) {
+            bookmarkRepository.delete(existingBookmark.get());
+            return false;
+        } else {
+            Post post = postRepository.findById(postId).orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
+            bookmarkRepository.save(new Bookmark(post, parent));
             return true;
         }
     }
