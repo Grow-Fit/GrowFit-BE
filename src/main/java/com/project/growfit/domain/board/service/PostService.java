@@ -5,8 +5,10 @@ import com.project.growfit.domain.User.repository.ParentRepository;
 import com.project.growfit.domain.board.dto.request.PostRequestDto;
 import com.project.growfit.domain.board.dto.response.PostResponseDto;
 import com.project.growfit.domain.board.entity.Image;
+import com.project.growfit.domain.board.entity.Like;
 import com.project.growfit.domain.board.entity.Post;
 import com.project.growfit.domain.board.repository.ImageRepository;
+import com.project.growfit.domain.board.repository.LikeRepository;
 import com.project.growfit.domain.board.repository.PostRepository;
 import com.project.growfit.global.auto.dto.CustomUserDetails;
 import com.project.growfit.global.exception.BusinessException;
@@ -14,6 +16,7 @@ import com.project.growfit.global.exception.ErrorCode;
 import com.project.growfit.global.s3.service.S3UploadService;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +36,7 @@ public class PostService {
     private final ParentRepository parentRepository;
     private final PostRepository postRepository;
     private final ImageRepository imageRepository;
+    private final LikeRepository likeRepository;
     private final S3UploadService s3UploadService;
 
     @Transactional
@@ -112,6 +116,21 @@ public class PostService {
         return post.getImageList().stream()
                 .map(Image::getId)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public boolean postLike(Long postId) {
+        Parent parent = parentRepository.findByEmail(getCurrentEmail()).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        Optional<Like> existingLike = likeRepository.findByPostIdAndParentId(postId, parent.getId());
+
+        if (existingLike.isPresent()) {
+            likeRepository.delete(existingLike.get());
+            return false;
+        } else {
+            Post post = postRepository.findById(postId).orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
+            likeRepository.save(new Like(post, parent));
+            return true;
+        }
     }
 
     private void checkPostOwnership(Post post) {

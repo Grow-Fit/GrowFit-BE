@@ -65,4 +65,12 @@ public class PostController {
         Post post = postService.updatePost(dto, images, postId);
         return new ResultResponse<>(ResultCode.CREATE_POST_SUCCESS, "id: " + post.getId() + " 글이 수정되었습니다.");
     }
+
+    @Operation(summary = "글 좋아요", description = "글에 좋아요를 할 수 있습니다. 좋아요가 비활성화된 상태에서 요청을 하면 좋아요가 활성화 되고, 활성화된 상태에서 요청을 하면 좋아요가 비활성화 됩니다.")
+    @PostMapping("/{postId}/like")
+    public ResultResponse<String> likePost(@PathVariable Long postId) {
+        boolean isLike = postService.postLike(postId);
+        if (isLike) return new ResultResponse<>(ResultCode.LIKE_POST_SUCCESS, "id: " + postId + " 번 글이 좋아요 처리되었습니다.");
+        else return new ResultResponse<>(ResultCode.DISLIKE_POST_SUCCESS, "id: " + postId + " 번 글 좋아요 취소 처리되었습니다.");
+    }
 }
