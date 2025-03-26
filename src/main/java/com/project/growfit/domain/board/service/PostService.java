@@ -60,7 +60,9 @@ public class PostService {
     public PostResponseDto getPost(Long boardId) {
         Post post = postRepository.findById(boardId).orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
         Parent parent = parentRepository.findById(post.getParent().getId()).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
-        return PostResponseDto.from(post, parent.getNickname());
+        int likeCount = likeRepository.countByPostId(post.getId());
+        boolean isLike = likeRepository.existsByPostIdAndParentId(post.getId(), parent.getId());
+        return PostResponseDto.from(post, parent.getNickname(), likeCount, isLike);
     }
 
     @Transactional

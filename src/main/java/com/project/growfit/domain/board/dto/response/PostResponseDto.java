@@ -18,10 +18,12 @@ public record PostResponseDto(
     String content,
     String createdAt,
     int hits,
-    List<String> imageUrls
+    List<String> imageUrls,
+    int likeCount,
+    boolean isLike
 ){
 
-    public static PostResponseDto from(Post post, String writer) {
+    public static PostResponseDto from(Post post, String writer, int likeCount, boolean isLike) {
         return new PostResponseDto(
                 post.getId(),
                 writer,
@@ -31,7 +33,9 @@ public record PostResponseDto(
                 post.getContent(),
                 getFormattedDate(post.getCreatedAt()),
                 post.getHits(),
-                getImageUrls(post)
+                getImageUrls(post),
+                likeCount,
+                isLike
         );
     }
 
