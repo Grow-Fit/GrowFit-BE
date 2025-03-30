@@ -40,9 +40,9 @@ public class Diet extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private MealType mealType;
 
-    @Column(name = "sticker")
-    @Enumerated(EnumType.STRING)
-    private Sticker sticker;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "daily_diet_id")
+    private DailyDiet dailyDiet;
 
     @Column(name = "photo")
     private String photo;
