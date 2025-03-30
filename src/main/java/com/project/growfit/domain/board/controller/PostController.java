@@ -1,8 +1,11 @@
 package com.project.growfit.domain.board.controller;
 
+import com.project.growfit.domain.board.dto.request.CommentRequestDto;
 import com.project.growfit.domain.board.dto.request.PostRequestDto;
 import com.project.growfit.domain.board.dto.response.PostResponseDto;
+import com.project.growfit.domain.board.entity.Comment;
 import com.project.growfit.domain.board.entity.Post;
+import com.project.growfit.domain.board.service.CommentService;
 import com.project.growfit.domain.board.service.PostService;
 import com.project.growfit.global.response.ResultCode;
 import com.project.growfit.global.response.ResultResponse;
@@ -19,6 +22,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,6 +36,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class PostController {
 
     private final PostService postService;
+    private final CommentService commentService;
 
     @Operation(summary = "커뮤니티 글 등록", description = "부모는 게시판, 연령대, 제목, 내용, 사진(0~4)을 입력하여 글을 등록합니다. MultipartFile 형식으로 요청을 해야 합니다.")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -80,5 +85,12 @@ public class PostController {
         boolean isBookmark = postService.bookmarkPost(postId);
         if (isBookmark) return new ResultResponse<>(ResultCode.BOOKMARK_POST_SUCCESS, "id: " + postId + " 번 글을 북마크 등록했습니다.");
         else return new ResultResponse<>(ResultCode.CANCEL_BOOKMARK_POST_SUCCESS, "id: " + postId + " 번 글을 북마크 취소했습니다.");
+    }
+
+    @Operation(summary = "댓글 작성", description = "특정 글에 대한 댓글을 작성합니다.")
+    @PostMapping("/{postId}/comment")
+    public ResultResponse<String> saveComment(@PathVariable Long postId, @RequestBody @Valid CommentRequestDto dto) {
+        Comment comment = commentService.saveComment(postId, dto);
+        return new ResultResponse<>(ResultCode.COMMENT_POST_SUCCESS, "id: " + comment.getPost().getId() + " 글에 대한 댓글 \"" + comment.getContent() + "\" 이 등록되었습니다.");
     }
 }

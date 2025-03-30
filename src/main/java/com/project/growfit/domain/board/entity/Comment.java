@@ -1,6 +1,7 @@
 package com.project.growfit.domain.board.entity;
 
 import com.project.growfit.domain.User.entity.Parent;
+import com.project.growfit.domain.board.dto.request.CommentRequestDto;
 import com.project.growfit.global.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -29,9 +30,6 @@ public class Comment extends BaseEntity {
     @Column(name = "content", columnDefinition = "TEXT", nullable = false)
     private String content;
 
-    @Column(name = "writer_id", nullable = false)
-    private Long writerId;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     private Post post;
@@ -39,4 +37,12 @@ public class Comment extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     private Parent parent;
+
+    public static Comment createComment(CommentRequestDto dto, Post post, Parent parent) {
+        Comment comment = new Comment();
+        comment.content = dto.getComment();
+        comment.post = post;
+        comment.parent = parent;
+        return comment;
+    }
 }
