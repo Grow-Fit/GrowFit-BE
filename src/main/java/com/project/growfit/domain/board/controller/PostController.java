@@ -2,6 +2,7 @@ package com.project.growfit.domain.board.controller;
 
 import com.project.growfit.domain.board.dto.request.CommentRequestDto;
 import com.project.growfit.domain.board.dto.request.PostRequestDto;
+import com.project.growfit.domain.board.dto.response.CommentResponseListDto;
 import com.project.growfit.domain.board.dto.response.PostResponseDto;
 import com.project.growfit.domain.board.entity.Comment;
 import com.project.growfit.domain.board.entity.Post;
@@ -92,5 +93,12 @@ public class PostController {
     public ResultResponse<String> saveComment(@PathVariable Long postId, @RequestBody @Valid CommentRequestDto dto) {
         Comment comment = commentService.saveComment(postId, dto);
         return new ResultResponse<>(ResultCode.COMMENT_POST_SUCCESS, "id: " + comment.getPost().getId() + " 글에 대한 댓글 \"" + comment.getContent() + "\" 이 등록되었습니다.");
+    }
+
+    @Operation(summary = "댓글 조회", description = "특정 글에 대한 댓글들을 리스트로 조회합니다.")
+    @GetMapping("/{postId}/comments")
+    public ResultResponse<List<CommentResponseListDto>> getComments(@PathVariable Long postId) {
+        List<CommentResponseListDto> list = commentService.getComments(postId);
+        return new ResultResponse<>(ResultCode.GET_COMMENTS_SUCCESS, list);
     }
 }

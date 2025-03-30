@@ -3,6 +3,7 @@ package com.project.growfit.domain.board.service;
 import com.project.growfit.domain.User.entity.Parent;
 import com.project.growfit.domain.User.repository.ParentRepository;
 import com.project.growfit.domain.board.dto.request.CommentRequestDto;
+import com.project.growfit.domain.board.dto.response.CommentResponseListDto;
 import com.project.growfit.domain.board.entity.Comment;
 import com.project.growfit.domain.board.entity.Post;
 import com.project.growfit.domain.board.repository.CommentRepository;
@@ -10,6 +11,8 @@ import com.project.growfit.domain.board.repository.PostRepository;
 import com.project.growfit.global.auto.dto.CustomUserDetails;
 import com.project.growfit.global.exception.BusinessException;
 import com.project.growfit.global.exception.ErrorCode;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -37,5 +40,10 @@ public class CommentService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         CustomUserDetails details = (CustomUserDetails) authentication.getPrincipal();
         return details.getEmail();
+    }
+
+    public List<CommentResponseListDto> getComments(Long postId) {
+        List<Comment> comments = commentRepository.findCommentsByPostId(postId);
+        return comments.stream().map(CommentResponseListDto::from).collect(Collectors.toList());
     }
 }
