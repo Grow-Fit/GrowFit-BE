@@ -4,16 +4,16 @@ import com.project.growfit.domain.board.entity.Post;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-public record BookmarkResponseListDto(
+public record MyPageResponseListDto(
         Long postId,
         String title,
         String content,
         String createdAt,
-        String imgUrl,
+        String firstImgUrl,
         int remainImgCnt
 ) {
-    public static BookmarkResponseListDto from(Post post, int imgCnt, String imgUrl) {
-        return new BookmarkResponseListDto(
+    public static MyPageResponseListDto from(Post post, int imgCnt, String imgUrl) {
+        return new MyPageResponseListDto(
                 post.getId(),
                 post.getTitle(),
                 post.getContent(),

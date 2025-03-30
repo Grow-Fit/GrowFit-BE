@@ -1,6 +1,6 @@
 package com.project.growfit.domain.board.controller;
 
-import com.project.growfit.domain.board.dto.response.BookmarkResponseListDto;
+import com.project.growfit.domain.board.dto.response.MyPageResponseListDto;
 import com.project.growfit.domain.board.service.UserPostService;
 import com.project.growfit.global.response.ResultCode;
 import com.project.growfit.global.response.ResultResponse;
@@ -25,8 +25,15 @@ public class UserPostController {
 
     @Operation(summary = "북마크 글 리스트 조회", description = "로그인 한 본인은 본인이 북마크한 글들을 조회할 수 있습니다.")
     @GetMapping("/{userId}/bookmarks")
-    public ResultResponse<List<BookmarkResponseListDto>> getBookmarks(@PathVariable Long userId) {
-        List<BookmarkResponseListDto> list = userPostService.getBookmarks(userId);
+    public ResultResponse<List<MyPageResponseListDto>> getBookmarks(@PathVariable Long userId) {
+        List<MyPageResponseListDto> list = userPostService.getBookmarks(userId);
         return new ResultResponse<>(ResultCode.GET_BOOKMARKS_SUCCESS, list);
+    }
+
+    @Operation(summary = "작성 글 리스트 조회", description = "본인 또는 다른 회원의 글들을 조회할 수 있습니다.")
+    @GetMapping("/{userId}/posts")
+    public ResultResponse<List<MyPageResponseListDto>> getMyPosts(@PathVariable Long userId) {
+        List<MyPageResponseListDto> list = userPostService.getMyPosts(userId);
+        return new ResultResponse<>(ResultCode.GET_MY_POST_SUCCESS, list);
     }
 }

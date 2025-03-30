@@ -10,4 +10,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     @Query("SELECT p FROM Post p WHERE p.id IN (SELECT b.post.id FROM Bookmark b WHERE b.parent.id = :userId)")
     List<Post> findBookmarkPostsByUserId(@Param("userId") Long userId);
+
+    @Query("SELECT p FROM Post p WHERE p.parent.id = :userId")
+    List<Post> findPostsByUserId(@Param("userId") Long userId);
 }

@@ -25,7 +25,8 @@ public enum ResultCode {
     DISLIKE_POST_SUCCESS(HttpStatus.OK, "좋아요 취소 성공"),
     BOOKMARK_POST_SUCCESS(HttpStatus.OK, "북마크 등록 성공"),
     CANCEL_BOOKMARK_POST_SUCCESS(HttpStatus.OK, "북마크 등록 취소 성공"),
-    GET_BOOKMARKS_SUCCESS(HttpStatus.OK, "북마크한 글 리스트 조회 성공");
+    GET_BOOKMARKS_SUCCESS(HttpStatus.OK, "북마크한 글 리스트 조회 성공"),
+    GET_MY_POST_SUCCESS(HttpStatus.OK, "나의 작성 글 리스트 조회 성공");
 
     private final HttpStatus status;
     private final String message;
