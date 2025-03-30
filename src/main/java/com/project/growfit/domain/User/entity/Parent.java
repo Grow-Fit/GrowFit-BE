@@ -1,9 +1,9 @@
 package com.project.growfit.domain.User.entity;
 
-import com.project.growfit.domain.Board.entity.Bookmark;
-import com.project.growfit.domain.Board.entity.Comment;
-import com.project.growfit.domain.Board.entity.Like;
-import com.project.growfit.domain.Board.entity.Post;
+import com.project.growfit.domain.board.entity.Bookmark;
+import com.project.growfit.domain.board.entity.Comment;
+import com.project.growfit.domain.board.entity.Like;
+import com.project.growfit.domain.board.entity.Post;
 import com.project.growfit.global.entity.BaseEntity;
 import jakarta.persistence.*;
 

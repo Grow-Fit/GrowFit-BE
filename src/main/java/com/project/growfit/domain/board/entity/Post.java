@@ -1,6 +1,7 @@
-package com.project.growfit.domain.Board.entity;
+package com.project.growfit.domain.board.entity;
 
 import com.project.growfit.domain.User.entity.Parent;
+import com.project.growfit.domain.board.dto.request.PostRequestDto;
 import com.project.growfit.global.entity.BaseEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -38,12 +39,19 @@ public class Post extends BaseEntity {
     @Column(name = "content", nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    @Column(name = "category")
+    @Column(name = "category", nullable = false)
     @Enumerated(EnumType.STRING)
     private Category category;
 
+    @Column(name = "age", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Age age;
+
     @Column(name = "hits", nullable = false)
-    private int hits;
+    private int hits = 0;
+
+    @Column(name = "is_publish", nullable = false)
+    private boolean isPublish;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
@@ -60,4 +68,22 @@ public class Post extends BaseEntity {
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Bookmark> bookmarkList = new ArrayList<>();
+
+    public static Post createPost(PostRequestDto dto, Parent parent) {
+        Post post = new Post();
+        post.title = dto.getTitle();
+        post.content = dto.getContent();
+        post.category = dto.getCategory();
+        post.age = dto.getAge();
+        post.parent = parent;
+        post.isPublish = true;
+        return post;
+    }
+
+    public void updatePostContent(PostRequestDto dto) {
+        this.title = dto.getTitle();
+        this.content = dto.getContent();
+        this.category = dto.getCategory();
+        this.age = dto.getAge();
+    }
 }
