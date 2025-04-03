@@ -46,8 +46,8 @@ public class Post extends BaseEntity {
     @Column(name = "hits", nullable = false)
     private int hits = 0;
 
-    @Column(name = "is_publish", nullable = false)
-    private boolean isPublish;
+    @Column(name = "is_delete", nullable = false)
+    private boolean isDelete;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostAge> ages = new ArrayList<>();
@@ -74,7 +74,7 @@ public class Post extends BaseEntity {
         post.content = dto.getContent();
         post.category = dto.getCategory();
         post.parent = parent;
-        post.isPublish = true;
+        post.isDelete = false;
 
         for (Age age : dto.getAges()) {
             post.ages.add(new PostAge(post, age));
