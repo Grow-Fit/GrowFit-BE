@@ -64,4 +64,12 @@ public class CommentService {
             throw new BusinessException(ErrorCode.FORBIDDEN_ACCESS);
         }
     }
+
+    @Transactional
+    public Comment deleteComment(Long commentId) {
+        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new BusinessException(ErrorCode.COMMENT_NOT_FOUND));
+        checkPostOwnership(comment.getParent());
+        commentRepository.delete(comment);
+        return comment;
+    }
 }

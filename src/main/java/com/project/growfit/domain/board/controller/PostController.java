@@ -109,4 +109,11 @@ public class PostController {
         Comment comment = commentService.updateComment(commentId, dto);
         return new ResultResponse<>(ResultCode.COMMENT_POST_SUCCESS, "id: " + comment.getPost().getId() + " 글에 대한 댓글 \"" + comment.getContent() + "\" 이 수정되었습니다.");
     }
+
+    @Operation(summary = "댓글 삭제", description = "특정 글에 대하여 본인이 작성한 댓글을 삭제합니다.")
+    @DeleteMapping("/comment/{commentId}")
+    public ResultResponse<String> deleteComment(@PathVariable Long commentId) {
+        Comment comment = commentService.deleteComment(commentId);
+        return new ResultResponse<>(ResultCode.COMMENT_POST_SUCCESS, "id: " + comment.getPost().getId() + " 글에 대한 댓글 \"" + comment.getContent() + "\" 이 삭제되었습니다.");
+    }
 }
