@@ -4,7 +4,9 @@ import com.project.growfit.domain.User.entity.Parent;
 import com.project.growfit.domain.User.repository.ParentRepository;
 import com.project.growfit.domain.board.dto.request.PostRequestDto;
 import com.project.growfit.domain.board.dto.response.PostResponseDto;
+import com.project.growfit.domain.board.entity.Age;
 import com.project.growfit.domain.board.entity.Bookmark;
+import com.project.growfit.domain.board.entity.Category;
 import com.project.growfit.domain.board.entity.Image;
 import com.project.growfit.domain.board.entity.Like;
 import com.project.growfit.domain.board.entity.Post;
@@ -12,6 +14,7 @@ import com.project.growfit.domain.board.repository.BookmarkRepository;
 import com.project.growfit.domain.board.repository.ImageRepository;
 import com.project.growfit.domain.board.repository.LikeRepository;
 import com.project.growfit.domain.board.repository.PostRepository;
+import com.project.growfit.domain.board.repository.PostSpecification;
 import com.project.growfit.global.auto.dto.CustomUserDetails;
 import com.project.growfit.global.exception.BusinessException;
 import com.project.growfit.global.exception.ErrorCode;
@@ -22,6 +25,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -165,5 +171,28 @@ public class PostService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         CustomUserDetails details = (CustomUserDetails) authentication.getPrincipal();
         return details.getEmail();
+    }
+
+    public List<PostResponseDto> getPosts(Category category, List<Age> ages, String sort) {
+        Specification<Post> spec = Specification.where(PostSpecification.hasCategory(category)).and(PostSpecification.hasAnyAge(ages));
+
+        if ("hits".equals(sort)) {
+            spec = spec.and(PostSpecification.orderByHits());
+        } else if ("like".equals(sort)) {
+            spec = spec.and(PostSpecification.orderByLikes());
+        } else{
+            spec = spec.and(PostSpecification.orderByCreatedAt());
+        }
+
+        List<Post> posts = postRepository.findAll(spec);
+
+        Parent parent = parentRepository.findByEmail(getCurrentEmail()).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+
+        return posts.stream()
+                .map(post -> {
+                    boolean isLike = likeRepository.existsByPostIdAndParentId(post.getId(), parent.getId());
+                    boolean isBookmark = bookmarkRepository.existsByPostIdAndParentId(post.getId(), parent.getId());
+                    return PostResponseDto.from(post, post.getParent().getNickname(), post.getLikeList().size(), isLike, isBookmark);
+                }).collect(Collectors.toList());
     }
 }

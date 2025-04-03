@@ -41,7 +41,7 @@ public record PostResponseDto(
     private static List<String> getCategoriesAndAges(Post post) {
         List<String> result = new ArrayList<>();
         result.add(post.getCategory().name());
-        result.addAll(post.getAges().stream()
+        result.addAll(post.getPostAges().stream()
                 .map(postAge -> postAge.getAge().name())
                 .toList());
         return result;

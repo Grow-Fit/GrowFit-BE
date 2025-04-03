@@ -4,6 +4,8 @@ import com.project.growfit.domain.board.dto.request.CommentRequestDto;
 import com.project.growfit.domain.board.dto.request.PostRequestDto;
 import com.project.growfit.domain.board.dto.response.CommentResponseListDto;
 import com.project.growfit.domain.board.dto.response.PostResponseDto;
+import com.project.growfit.domain.board.entity.Age;
+import com.project.growfit.domain.board.entity.Category;
 import com.project.growfit.domain.board.entity.Comment;
 import com.project.growfit.domain.board.entity.Post;
 import com.project.growfit.domain.board.service.CommentService;
@@ -26,6 +28,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -115,5 +118,16 @@ public class PostController {
     public ResultResponse<String> deleteComment(@PathVariable Long commentId) {
         Comment comment = commentService.deleteComment(commentId);
         return new ResultResponse<>(ResultCode.COMMENT_POST_SUCCESS, "id: " + comment.getPost().getId() + " 글에 대한 댓글 \"" + comment.getContent() + "\" 이 삭제되었습니다.");
+    }
+
+    @Operation(summary = "글 전체 조회", description = "특정 글에 대하여 본인이 작성한 댓글을 삭제합니다.")
+    @GetMapping
+    public ResultResponse<List<PostResponseDto>> getPosts(
+            @RequestParam(required = false) Category category,
+            @RequestParam(required = false) List<Age> ages,
+            @RequestParam(defaultValue = "createdAt") String sort
+            ) {
+        List<PostResponseDto> posts = postService.getPosts(category, ages, sort);
+        return new ResultResponse<>(ResultCode.GET_POST_SUCCESS, posts);
     }
 }

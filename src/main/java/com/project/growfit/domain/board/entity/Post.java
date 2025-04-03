@@ -50,7 +50,7 @@ public class Post extends BaseEntity {
     private boolean isDelete;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PostAge> ages = new ArrayList<>();
+    private List<PostAge> postAges = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
@@ -77,7 +77,7 @@ public class Post extends BaseEntity {
         post.isDelete = false;
 
         for (Age age : dto.getAges()) {
-            post.ages.add(new PostAge(post, age));
+            post.postAges.add(new PostAge(post, age));
         }
         return post;
     }
@@ -86,9 +86,9 @@ public class Post extends BaseEntity {
         this.title = dto.getTitle();
         this.content = dto.getContent();
         this.category = dto.getCategory();
-        this.ages.clear();
+        this.postAges.clear();
         for (Age age : dto.getAges()) {
-            this.ages.add(new PostAge(this, age));
+            this.postAges.add(new PostAge(this, age));
         }
     }
 }
