@@ -43,15 +43,14 @@ public class Post extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Category category;
 
-    @Column(name = "age", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private Age age;
-
     @Column(name = "hits", nullable = false)
     private int hits = 0;
 
     @Column(name = "is_publish", nullable = false)
     private boolean isPublish;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PostAge> ages = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
@@ -74,9 +73,12 @@ public class Post extends BaseEntity {
         post.title = dto.getTitle();
         post.content = dto.getContent();
         post.category = dto.getCategory();
-        post.age = dto.getAge();
         post.parent = parent;
         post.isPublish = true;
+
+        for (Age age : dto.getAges()) {
+            post.ages.add(new PostAge(post, age));
+        }
         return post;
     }
 
@@ -84,6 +86,9 @@ public class Post extends BaseEntity {
         this.title = dto.getTitle();
         this.content = dto.getContent();
         this.category = dto.getCategory();
-        this.age = dto.getAge();
+        this.ages.clear();
+        for (Age age : dto.getAges()) {
+            this.ages.add(new PostAge(this, age));
+        }
     }
 }

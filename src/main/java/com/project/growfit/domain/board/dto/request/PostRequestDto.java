@@ -4,7 +4,9 @@ import com.project.growfit.domain.board.entity.Age;
 import com.project.growfit.domain.board.entity.Category;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,9 +22,9 @@ public class PostRequestDto {
     @Schema(description = "게시판", type = "Category")
     private Category category;
 
-    @NotNull(message = "연령대를 선택해주세요.")
-    @Schema(description = "연령대", type = "Age")
-    private Age age;
+    @NotEmpty(message = "연령대를 선택해주세요. ex) [\"TODDLER\", \"ELEMENTARY_LOW\"]")
+    @Schema(description = "연령대 목록", type = "Age")
+    private List<Age> ages;
 
     @NotBlank(message = "내용을 작성해주세요.")
     @Schema(description = "내용", type = "String")
