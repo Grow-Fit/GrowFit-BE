@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -100,5 +101,12 @@ public class PostController {
     public ResultResponse<List<CommentResponseListDto>> getComments(@PathVariable Long postId) {
         List<CommentResponseListDto> list = commentService.getComments(postId);
         return new ResultResponse<>(ResultCode.GET_COMMENTS_SUCCESS, list);
+    }
+
+    @Operation(summary = "댓글 수정", description = "특정 글에 대하여 본인이 작성한 댓글을 수정합니다.")
+    @PatchMapping("/comment/{commentId}")
+    public ResultResponse<String> updateComment(@PathVariable Long commentId, @RequestBody @Valid CommentRequestDto dto) {
+        Comment comment = commentService.updateComment(commentId, dto);
+        return new ResultResponse<>(ResultCode.COMMENT_POST_SUCCESS, "id: " + comment.getPost().getId() + " 글에 대한 댓글 \"" + comment.getContent() + "\" 이 수정되었습니다.");
     }
 }

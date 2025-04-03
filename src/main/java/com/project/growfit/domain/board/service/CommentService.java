@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
@@ -28,6 +29,7 @@ public class CommentService {
     private final ParentRepository parentRepository;
     private final PostRepository postRepository;
 
+    @Transactional
     public Comment saveComment(Long postId, CommentRequestDto dto) {
         Parent parent = parentRepository.findByEmail(getCurrentEmail()).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
         Post post = postRepository.findById(postId).orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
@@ -42,8 +44,24 @@ public class CommentService {
         return details.getEmail();
     }
 
+    @Transactional(readOnly = true)
     public List<CommentResponseListDto> getComments(Long postId) {
         List<Comment> comments = commentRepository.findCommentsByPostId(postId);
         return comments.stream().map(CommentResponseListDto::from).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public Comment updateComment(Long commentId, CommentRequestDto dto) {
+        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new BusinessException(ErrorCode.COMMENT_NOT_FOUND));
+        checkPostOwnership(comment.getParent());
+        comment.updateComment(dto);
+        return comment;
+    }
+
+    private void checkPostOwnership(Parent writer) {
+        Parent loginParent = parentRepository.findByEmail(getCurrentEmail()).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        if (!writer.getEmail().equals(loginParent.getEmail())) {
+            throw new BusinessException(ErrorCode.FORBIDDEN_ACCESS);
+        }
     }
 }
