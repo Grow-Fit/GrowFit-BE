@@ -85,6 +85,7 @@ public class PostService {
             imageCnt++;
         }
         postRepository.delete(post);
+        redisPostService.deletePostLikeCount(postId);
         return imageCnt;
     }
 

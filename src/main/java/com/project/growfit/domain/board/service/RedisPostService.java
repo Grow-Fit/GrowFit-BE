@@ -100,6 +100,10 @@ public class RedisPostService {
         }
     }
 
+    public void deletePostLikeCount(Long postId) {
+        redisTemplate.delete(PREFIX + postId);
+    }
+
     private String getCurrentEmail() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         CustomUserDetails details = (CustomUserDetails) authentication.getPrincipal();
