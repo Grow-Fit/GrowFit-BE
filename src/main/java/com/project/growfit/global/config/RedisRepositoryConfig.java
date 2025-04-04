@@ -1,6 +1,5 @@
 package com.project.growfit.global.config;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
@@ -43,8 +42,8 @@ public class RedisRepositoryConfig {
     }
 
     // 1번 db: 좋아요 수 집계
-    @Bean(name = "likeCountRedisTemplate")
-    public StringRedisTemplate likeCountRedisTemplate() {
+    @Bean(name = "communityStatsRedisTemplate")
+    public StringRedisTemplate communityStatsRedisTemplate() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(host, port);
         config.setPassword(password);
         config.setDatabase(1);

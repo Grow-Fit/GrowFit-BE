@@ -11,8 +11,8 @@ import com.project.growfit.global.exception.BusinessException;
 import com.project.growfit.global.exception.ErrorCode;
 import java.util.Optional;
 import java.util.function.Supplier;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,13 +21,24 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
 public class PostLikeService {
 
     private final ParentRepository parentRepository;
     private final PostRepository postRepository;
     private final LikeRepository likeRepository;
     private final StringRedisTemplate redisTemplate;
+
+    public PostLikeService(
+            ParentRepository parentRepository,
+            PostRepository postRepository,
+            LikeRepository likeRepository,
+            @Qualifier("communityStatsRedisTemplate") StringRedisTemplate redisTemplate) {
+
+        this.parentRepository = parentRepository;
+        this.postRepository = postRepository;
+        this.likeRepository = likeRepository;
+        this.redisTemplate = redisTemplate;
+    }
 
     private final static String PREFIX = "like:count:";
 
