@@ -63,10 +63,11 @@ public class PostService {
         return post;
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public PostResponseDto getPost(Long boardId) {
         Post post = postRepository.findById(boardId).orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
         Parent parent = parentRepository.findById(post.getParent().getId()).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        post.increaseHit();
         int likeCount = postLikeService.getOrInit(boardId, () -> likeRepository.countByPostId(boardId));  // redis에서 조회
         boolean isLike = likeRepository.existsByPostIdAndParentId(post.getId(), parent.getId());
         boolean isBookmark = bookmarkRepository.existsByPostIdAndParentId(post.getId(), parent.getId());

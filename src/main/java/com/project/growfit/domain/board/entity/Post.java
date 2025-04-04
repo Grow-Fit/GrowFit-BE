@@ -21,10 +21,12 @@ import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Getter
 @Entity
 @Table(name = "post")
+@Slf4j
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Post extends BaseEntity {
 
@@ -90,5 +92,10 @@ public class Post extends BaseEntity {
         for (Age age : dto.getAges()) {
             this.postAges.add(new PostAge(this, age));
         }
+    }
+
+    public void increaseHit() {
+        this.hits++;
+        log.debug("Post 조회수 증가: postId={}, hits={}", this.id, this.hits);
     }
 }
