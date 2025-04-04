@@ -9,6 +9,7 @@ import com.project.growfit.domain.board.entity.Category;
 import com.project.growfit.domain.board.entity.Comment;
 import com.project.growfit.domain.board.entity.Post;
 import com.project.growfit.domain.board.service.CommentService;
+import com.project.growfit.domain.board.service.PostLikeService;
 import com.project.growfit.domain.board.service.PostService;
 import com.project.growfit.global.response.ResultCode;
 import com.project.growfit.global.response.ResultResponse;
@@ -42,6 +43,7 @@ public class PostController {
 
     private final PostService postService;
     private final CommentService commentService;
+    private final PostLikeService postLikeService;
 
     @Operation(summary = "커뮤니티 글 등록", description = "부모는 게시판, 연령대, 제목, 내용, 사진(0~4)을 입력하여 글을 등록합니다. MultipartFile 형식으로 요청을 해야 합니다.")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -79,7 +81,7 @@ public class PostController {
     @Operation(summary = "글 좋아요", description = "글에 좋아요를 할 수 있습니다. 좋아요가 비활성화된 상태에서 요청을 하면 좋아요가 활성화 되고, 활성화된 상태에서 요청을 하면 좋아요가 비활성화 됩니다.")
     @PostMapping("/{postId}/like")
     public ResultResponse<String> likePost(@PathVariable Long postId) {
-        boolean isLike = postService.postLike(postId);
+        boolean isLike = postLikeService.postLike(postId);
         if (isLike) return new ResultResponse<>(ResultCode.LIKE_POST_SUCCESS, "id: " + postId + " 번 글이 좋아요 처리되었습니다.");
         else return new ResultResponse<>(ResultCode.DISLIKE_POST_SUCCESS, "id: " + postId + " 번 글 좋아요 취소 처리되었습니다.");
     }

@@ -47,6 +47,7 @@ public class PostService {
     private final LikeRepository likeRepository;
     private final BookmarkRepository bookmarkRepository;
     private final S3UploadService s3UploadService;
+    private final PostLikeService postLikeService;
 
     @Transactional
     public Post savePost(PostRequestDto dto, List<MultipartFile> images) throws IOException {
@@ -69,7 +70,8 @@ public class PostService {
     public PostResponseDto getPost(Long boardId) {
         Post post = postRepository.findById(boardId).orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
         Parent parent = parentRepository.findById(post.getParent().getId()).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
-        int likeCount = likeRepository.countByPostId(post.getId());
+        //int likeCount = likeRepository.countByPostId(post.getId());  // db에서 조회
+        int likeCount = postLikeService.getOrInit(boardId, () -> likeRepository.countByPostId(boardId));  // redis에서 조회
         boolean isLike = likeRepository.existsByPostIdAndParentId(post.getId(), parent.getId());
         boolean isBookmark = bookmarkRepository.existsByPostIdAndParentId(post.getId(), parent.getId());
         return PostResponseDto.from(post, parent.getNickname(), likeCount, isLike, isBookmark);
@@ -128,21 +130,6 @@ public class PostService {
         return post.getImageList().stream()
                 .map(Image::getId)
                 .collect(Collectors.toList());
-    }
-
-    @Transactional
-    public boolean postLike(Long postId) {
-        Parent parent = parentRepository.findByEmail(getCurrentEmail()).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
-        Optional<Like> existingLike = likeRepository.findByPostIdAndParentId(postId, parent.getId());
-
-        if (existingLike.isPresent()) {
-            likeRepository.delete(existingLike.get());
-            return false;
-        } else {
-            Post post = postRepository.findById(postId).orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
-            likeRepository.save(new Like(post, parent));
-            return true;
-        }
     }
 
     @Transactional
