@@ -9,7 +9,7 @@ import com.project.growfit.domain.board.entity.Category;
 import com.project.growfit.domain.board.entity.Comment;
 import com.project.growfit.domain.board.entity.Post;
 import com.project.growfit.domain.board.service.CommentService;
-import com.project.growfit.domain.board.service.PostLikeService;
+import com.project.growfit.domain.board.service.RedisPostService;
 import com.project.growfit.domain.board.service.PostService;
 import com.project.growfit.global.response.ResultCode;
 import com.project.growfit.global.response.ResultResponse;
@@ -43,7 +43,7 @@ public class PostController {
 
     private final PostService postService;
     private final CommentService commentService;
-    private final PostLikeService postLikeService;
+    private final RedisPostService postLikeService;
 
     @Operation(summary = "커뮤니티 글 등록", description = "부모는 게시판, 연령대, 제목, 내용, 사진(0~4)을 입력하여 글을 등록합니다. MultipartFile 형식으로 요청을 해야 합니다.")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

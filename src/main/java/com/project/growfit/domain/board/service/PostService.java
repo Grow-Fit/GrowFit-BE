@@ -44,7 +44,7 @@ public class PostService {
     private final LikeRepository likeRepository;
     private final BookmarkRepository bookmarkRepository;
     private final S3UploadService s3UploadService;
-    private final PostLikeService postLikeService;
+    private final RedisPostService redisPostService;
 
     @Transactional
     public Post savePost(PostRequestDto dto, List<MultipartFile> images) throws IOException {
@@ -67,8 +67,8 @@ public class PostService {
     public PostResponseDto getPost(Long boardId) {
         Post post = postRepository.findById(boardId).orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
         Parent parent = parentRepository.findById(post.getParent().getId()).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
-        post.increaseHit();
-        int likeCount = postLikeService.getOrInit(boardId, () -> likeRepository.countByPostId(boardId));  // redis에서 조회
+        redisPostService.increaseHitIfNotViewed(post, parent.getId());
+        int likeCount = redisPostService.getOrInit(boardId, () -> likeRepository.countByPostId(boardId));  // redis에서 조회
         boolean isLike = likeRepository.existsByPostIdAndParentId(post.getId(), parent.getId());
         boolean isBookmark = bookmarkRepository.existsByPostIdAndParentId(post.getId(), parent.getId());
         return PostResponseDto.from(post, parent.getNickname(), likeCount, isLike, isBookmark);
@@ -176,7 +176,7 @@ public class PostService {
                 .map(post -> {
                     boolean isLike = likeRepository.existsByPostIdAndParentId(post.getId(), parent.getId());
                     boolean isBookmark = bookmarkRepository.existsByPostIdAndParentId(post.getId(), parent.getId());
-                    int likeCount = postLikeService.getOrInit(post.getId(), () -> likeRepository.countByPostId(post.getId()));  // redis에서 조회
+                    int likeCount = redisPostService.getOrInit(post.getId(), () -> likeRepository.countByPostId(post.getId()));  // redis에서 조회
                     return PostResponseDto.from(post, post.getParent().getNickname(), likeCount, isLike, isBookmark);
                 }).collect(Collectors.toList());
     }

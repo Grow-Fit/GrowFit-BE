@@ -9,6 +9,7 @@ import com.project.growfit.domain.board.repository.PostRepository;
 import com.project.growfit.global.auto.dto.CustomUserDetails;
 import com.project.growfit.global.exception.BusinessException;
 import com.project.growfit.global.exception.ErrorCode;
+import java.time.Duration;
 import java.util.Optional;
 import java.util.function.Supplier;
 import lombok.extern.slf4j.Slf4j;
@@ -21,14 +22,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
-public class PostLikeService {
+public class RedisPostService {
 
     private final ParentRepository parentRepository;
     private final PostRepository postRepository;
     private final LikeRepository likeRepository;
     private final StringRedisTemplate redisTemplate;
 
-    public PostLikeService(
+    public RedisPostService(
             ParentRepository parentRepository,
             PostRepository postRepository,
             LikeRepository likeRepository,
@@ -88,6 +89,15 @@ public class PostLikeService {
         Integer countFromDb = dbCountSupplier.get();
         redisTemplate.opsForValue().set(key, String.valueOf(countFromDb));
         return countFromDb;
+    }
+
+    public void increaseHitIfNotViewed(Post post, Long parentId) {
+        String key = "post:view:" + post.getId() + ":" + parentId;
+
+        Boolean isNew = redisTemplate.opsForValue().setIfAbsent(key, "1", Duration.ofMinutes(30));
+        if (Boolean.TRUE.equals(isNew)) {
+            post.increaseHit();
+        }
     }
 
     private String getCurrentEmail() {
