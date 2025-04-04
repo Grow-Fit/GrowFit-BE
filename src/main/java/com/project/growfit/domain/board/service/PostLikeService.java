@@ -11,8 +11,8 @@ import com.project.growfit.global.exception.BusinessException;
 import com.project.growfit.global.exception.ErrorCode;
 import java.util.Optional;
 import java.util.function.Supplier;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,24 +21,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class PostLikeService {
 
     private final ParentRepository parentRepository;
     private final PostRepository postRepository;
     private final LikeRepository likeRepository;
     private final StringRedisTemplate redisTemplate;
-
-    public PostLikeService(
-            ParentRepository parentRepository,
-            PostRepository postRepository,
-            LikeRepository likeRepository,
-            @Qualifier("likeCountRedisTemplate") StringRedisTemplate redisTemplate
-    ) {
-        this.parentRepository = parentRepository;
-        this.postRepository = postRepository;
-        this.likeRepository = likeRepository;
-        this.redisTemplate = redisTemplate;
-    }
 
     private final static String PREFIX = "like:count:";
 
@@ -74,9 +63,15 @@ public class PostLikeService {
 
     public Integer getOrInit(Long postId, Supplier<Integer> dbCountSupplier) {
         String key = getKey(postId);
-        String value = redisTemplate.opsForValue().get(key);
+        Object value = redisTemplate.opsForValue().get(key);
 
-        if (value != null) return Integer.parseInt(value);
+        if (value != null) {
+            try {
+                return Integer.parseInt(value.toString());
+            } catch (NumberFormatException e) {
+                log.warn("Redis에 저장된 값이 숫자가 아닙니다: {}", value);
+            }
+        }
 
         // 캐시에 없으면 DB에서 count 조회
         Integer countFromDb = dbCountSupplier.get();

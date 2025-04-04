@@ -43,18 +43,15 @@ public class RedisRepositoryConfig {
     }
 
     // 1번 db: 좋아요 수 집계
-    @Bean(name = "likeCountRedisConnectionFactory")
-    public RedisConnectionFactory likeCountRedisConnectionFactory() {
+    @Bean(name = "likeCountRedisTemplate")
+    public StringRedisTemplate likeCountRedisTemplate() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(host, port);
         config.setPassword(password);
         config.setDatabase(1);
-        return new LettuceConnectionFactory(config);
-    }
 
-    // 1번 DB에 연결되는 RedisTemplate
-    @Bean(name = "likeCountRedisTemplate")
-    public StringRedisTemplate likeCountRedisTemplate(
-            @Qualifier("likeCountRedisConnectionFactory") RedisConnectionFactory connectionFactory) {
+        LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(config);
+        connectionFactory.afterPropertiesSet();
+
         return new StringRedisTemplate(connectionFactory);
     }
 }

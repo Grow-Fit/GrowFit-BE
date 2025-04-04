@@ -8,7 +8,6 @@ import com.project.growfit.domain.board.entity.Age;
 import com.project.growfit.domain.board.entity.Bookmark;
 import com.project.growfit.domain.board.entity.Category;
 import com.project.growfit.domain.board.entity.Image;
-import com.project.growfit.domain.board.entity.Like;
 import com.project.growfit.domain.board.entity.Post;
 import com.project.growfit.domain.board.repository.BookmarkRepository;
 import com.project.growfit.domain.board.repository.ImageRepository;
@@ -25,8 +24,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -70,7 +67,6 @@ public class PostService {
     public PostResponseDto getPost(Long boardId) {
         Post post = postRepository.findById(boardId).orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
         Parent parent = parentRepository.findById(post.getParent().getId()).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
-        //int likeCount = likeRepository.countByPostId(post.getId());  // db에서 조회
         int likeCount = postLikeService.getOrInit(boardId, () -> likeRepository.countByPostId(boardId));  // redis에서 조회
         boolean isLike = likeRepository.existsByPostIdAndParentId(post.getId(), parent.getId());
         boolean isBookmark = bookmarkRepository.existsByPostIdAndParentId(post.getId(), parent.getId());
@@ -179,7 +175,8 @@ public class PostService {
                 .map(post -> {
                     boolean isLike = likeRepository.existsByPostIdAndParentId(post.getId(), parent.getId());
                     boolean isBookmark = bookmarkRepository.existsByPostIdAndParentId(post.getId(), parent.getId());
-                    return PostResponseDto.from(post, post.getParent().getNickname(), post.getLikeList().size(), isLike, isBookmark);
+                    int likeCount = postLikeService.getOrInit(post.getId(), () -> likeRepository.countByPostId(post.getId()));  // redis에서 조회
+                    return PostResponseDto.from(post, post.getParent().getNickname(), likeCount, isLike, isBookmark);
                 }).collect(Collectors.toList());
     }
 }
