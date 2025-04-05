@@ -53,4 +53,5 @@ public class Diet extends BaseEntity {
 
     @OneToMany(mappedBy = "diet", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Food> foodList = new ArrayList<>();
+
 }

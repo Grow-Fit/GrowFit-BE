@@ -17,6 +17,16 @@ public enum ResultCode {
     CHILD_LOGIN_SUCCESS(HttpStatus.OK, "아이 계정 로그인 성공."),
     PARENT_LOGIN_SUCCESS(HttpStatus.OK, "부모 계정 로그인 성공."),
 
+    //Diet
+    DIET_SEARCH_SUCCESS(HttpStatus.OK, "식단 음식 검색에 성공하였습니다."),
+    DIET_SEARCH_RESULT_EMPTY(HttpStatus.OK, "검색 결과가 없습니다."),
+    DIET_DETAIL_RETRIEVAL_SUCCESS(HttpStatus.OK, "음식 상세 정보를 성공적으로 조회하였습니다."),
+    DIET_ADD_FOOD_SUCCESS(HttpStatus.OK, "식단에 음식이 성공적으로 추가되었습니다."),
+    DIET_ADD_IMAGE_SUCCESS(HttpStatus.OK, "식단 사진이 성공적으로 업로드되었습니다."),
+    DAILY_DIET_RETRIEVAL_SUCCESS(HttpStatus.OK, "일일 식단 조회에 성공하였습니다."),
+    DIET_DELETE_SUCCESS(HttpStatus.OK, "식단에서 음식이 성공적으로 삭제되었습니다."),
+    DIET_UPDATE_SUCCESS(HttpStatus.OK, "식단 정보가 성공적으로 수정되었습니다."),
+
     // Community
     CREATE_POST_SUCCESS(HttpStatus.OK, "글 등록 성공."),
     GET_POST_SUCCESS(HttpStatus.OK, "글 조회 성공"),

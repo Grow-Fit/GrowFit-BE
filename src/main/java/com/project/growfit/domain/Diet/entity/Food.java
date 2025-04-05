@@ -28,10 +28,29 @@ public class Food extends BaseEntity {
     @Column(name = "name", nullable = false, length = 50)
     private String name;
 
-    @Column(name = "calorie", nullable = false)
-    private long calorie;
+    @Column(nullable = false, length = 30)
+    private String mainCategory;
+
+    @Column(nullable = false, length = 30)
+    private String subCategory;
+
+    @Column(nullable = false, length = 30)
+    private String manufacturer;
+
+    @Column(nullable = false)
+    private double calorie;
+
+    @Column(nullable = false)
+    private double carbohydrate;
+
+    @Column(nullable = false)
+    private double fat;
+
+    @Column(nullable = false)
+    private double protein;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "diet_id")
     private Diet diet;
+
 }

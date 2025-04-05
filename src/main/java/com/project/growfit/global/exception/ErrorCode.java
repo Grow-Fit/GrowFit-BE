@@ -42,7 +42,16 @@ public enum ErrorCode {
     POST_NOT_FOUND(HttpStatus.NOT_FOUND, "게시글을 찾을 수 없습니다."),
     FORBIDDEN_ACCESS(HttpStatus.FORBIDDEN, "접근 권한이 없습니다."),
     IMAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "이미지를 찾을 수 없습니다."),
-    COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "댓글을 찾을 수 없습니다.");
+    COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "댓글을 찾을 수 없습니다."),
+
+    //Diet
+    DIET_NOT_FOUND(HttpStatus.NOT_FOUND, "요청한 식단을 찾을 수 없습니다."),
+    DAILY_DIET_NOT_FOUND(HttpStatus.NOT_FOUND, "요청한 날짜의 식단 정보가 존재하지 않습니다."),
+    FOOD_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 음식 정보를 찾을 수 없습니다."),
+    FOOD_LIST_EMPTY(HttpStatus.BAD_REQUEST, "식단에 추가할 음식 정보가 비어있습니다."),
+    DIET_IMAGE_UPLOAD_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "식단 이미지 업로드에 실패했습니다."),
+    DIET_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 등록된 식단입니다."),
+    INVALID_DIET_TIME_SLOT(HttpStatus.BAD_REQUEST, "잘못된 식사 시간대입니다.");
 
     private final HttpStatus status;
     private final String message;
