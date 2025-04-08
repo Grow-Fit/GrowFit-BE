@@ -28,7 +28,8 @@ public enum ResultCode {
     GET_BOOKMARKS_SUCCESS(HttpStatus.OK, "북마크한 글 리스트 조회 성공"),
     GET_MY_POST_SUCCESS(HttpStatus.OK, "나의 작성 글 리스트 조회 성공"),
     COMMENT_POST_SUCCESS(HttpStatus.OK, "댓글 작성 성공"),
-    GET_COMMENTS_SUCCESS(HttpStatus.OK, "댓글 조회 성공");
+    GET_COMMENTS_SUCCESS(HttpStatus.OK, "댓글 조회 성공"),
+    GET_PROFILE_SUCCESS(HttpStatus.OK, "프로필 조회 성공");
 
     private final HttpStatus status;
     private final String message;

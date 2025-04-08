@@ -1,5 +1,6 @@
 package com.project.growfit.domain.board.controller;
 
+import com.project.growfit.domain.board.dto.response.MyInfoResponseDto;
 import com.project.growfit.domain.board.dto.response.MyPageResponseListDto;
 import com.project.growfit.domain.board.service.UserPostService;
 import com.project.growfit.global.response.ResultCode;
@@ -35,5 +36,12 @@ public class UserPostController {
     public ResultResponse<List<MyPageResponseListDto>> getMyPosts(@PathVariable Long userId) {
         List<MyPageResponseListDto> list = userPostService.getMyPosts(userId);
         return new ResultResponse<>(ResultCode.GET_MY_POST_SUCCESS, list);
+    }
+
+    @Operation(summary = "특정 부모 커뮤니티 정보 조회", description = "본인 프로필의 경우, isLogin 값을 true로 설정하여 프로필 수정 버튼을 표기. 다른 사용자의 프로필 조회인 경우, isLogin 값을 false로 설정하여 버튼 표기x")
+    @GetMapping("/{userId}/profile")
+    public ResultResponse<MyInfoResponseDto> getProfile(@PathVariable Long userId) {
+        MyInfoResponseDto dto = userPostService.getProfile(userId);
+        return new ResultResponse<>(ResultCode.GET_PROFILE_SUCCESS, dto);
     }
 }

@@ -2,6 +2,7 @@ package com.project.growfit.domain.board.service;
 
 import com.project.growfit.domain.User.entity.Parent;
 import com.project.growfit.domain.User.repository.ParentRepository;
+import com.project.growfit.domain.board.dto.response.MyInfoResponseDto;
 import com.project.growfit.domain.board.dto.response.MyPageResponseListDto;
 import com.project.growfit.domain.board.entity.Post;
 import com.project.growfit.domain.board.repository.ImageRepository;
@@ -59,5 +60,16 @@ public class UserPostService {
     public List<MyPageResponseListDto> getMyPosts(Long userId) {
         List<Post> myPosts = postRepository.findPostsByUserId(userId);
         return getMyPageResponseListDtos(myPosts);
+    }
+
+    @Transactional(readOnly = true)
+    public MyInfoResponseDto getProfile(Long userId) {
+        Parent parent = parentRepository.findByEmail(getCurrentEmail()).orElseThrow(() -> new BusinessException(
+                ErrorCode.USER_NOT_FOUND));
+        boolean isSelf = false;
+        if (parent.getId().equals(userId)) {
+            isSelf = true;
+        }
+        return MyInfoResponseDto.from(parent, isSelf);
     }
 }
