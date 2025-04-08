@@ -57,4 +57,9 @@ public record PostResponseDto(
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         return dateTime.format(formatter);
     }
+
+    @Override
+    public int likeCount() {
+        return likeCount;
+    }
 }

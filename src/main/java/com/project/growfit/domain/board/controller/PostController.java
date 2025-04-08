@@ -3,6 +3,7 @@ package com.project.growfit.domain.board.controller;
 import com.project.growfit.domain.board.dto.request.CommentRequestDto;
 import com.project.growfit.domain.board.dto.request.PostRequestDto;
 import com.project.growfit.domain.board.dto.response.CommentResponseListDto;
+import com.project.growfit.domain.board.dto.response.CustomPageResponse;
 import com.project.growfit.domain.board.dto.response.PostResponseDto;
 import com.project.growfit.domain.board.entity.Age;
 import com.project.growfit.domain.board.entity.Category;
@@ -14,6 +15,8 @@ import com.project.growfit.domain.board.service.PostService;
 import com.project.growfit.global.response.ResultCode;
 import com.project.growfit.global.response.ResultResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.io.IOException;
@@ -122,14 +125,23 @@ public class PostController {
         return new ResultResponse<>(ResultCode.COMMENT_POST_SUCCESS, "id: " + comment.getPost().getId() + " 글에 대한 댓글 \"" + comment.getContent() + "\" 이 삭제되었습니다.");
     }
 
-    @Operation(summary = "글 전체 조회", description = "특정 글에 대하여 본인이 작성한 댓글을 삭제합니다.")
+    @Operation(summary = "글 전체 조회", description = "카테고리, 나이, 정렬 기준에 따라 게시글 목록을 조회합니다. 정렬 기준은 'createdAt'(최신순), 'hits'(조회순), 'like'(좋아요순) 중 하나를 선택할 수 있습니다.")
+    @Parameters({
+            @Parameter(name = "category", description = "게시글 카테고리", required = false),
+            @Parameter(name = "ages", description = "해당 게시글을 대상으로 하는 자녀 연령대 리스트(여러 개 기입 가능)", required = false),
+            @Parameter(name = "sort", description = "정렬 기준 (createdAt: 최신순, hits: 조회순, like: 좋아요순). 기본값: createdAt", required = false),
+            @Parameter(name = "page", description = "조회할 페이지 번호 (0부터 시작). 기본값: 0", required = false),
+            @Parameter(name = "size", description = "페이지당 게시글 수. 기본값: 10", required = false)
+    })
     @GetMapping
-    public ResultResponse<List<PostResponseDto>> getPosts(
+    public ResultResponse<CustomPageResponse<PostResponseDto>> getPosts(
             @RequestParam(required = false) Category category,
             @RequestParam(required = false) List<Age> ages,
-            @RequestParam(defaultValue = "createdAt") String sort
+            @RequestParam(defaultValue = "createdAt") String sort,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
             ) {
-        List<PostResponseDto> posts = postService.getPosts(category, ages, sort);
+        CustomPageResponse<PostResponseDto> posts = postService.getPosts(category, ages, sort, page, size);
         return new ResultResponse<>(ResultCode.GET_POST_SUCCESS, posts);
     }
 }

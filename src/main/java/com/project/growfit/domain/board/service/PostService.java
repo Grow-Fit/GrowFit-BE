@@ -3,6 +3,7 @@ package com.project.growfit.domain.board.service;
 import com.project.growfit.domain.User.entity.Parent;
 import com.project.growfit.domain.User.repository.ParentRepository;
 import com.project.growfit.domain.board.dto.request.PostRequestDto;
+import com.project.growfit.domain.board.dto.response.CustomPageResponse;
 import com.project.growfit.domain.board.dto.response.PostResponseDto;
 import com.project.growfit.domain.board.entity.Age;
 import com.project.growfit.domain.board.entity.Bookmark;
@@ -19,11 +20,18 @@ import com.project.growfit.global.exception.BusinessException;
 import com.project.growfit.global.exception.ErrorCode;
 import com.project.growfit.global.s3.service.S3UploadService;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -158,27 +166,63 @@ public class PostService {
         return details.getEmail();
     }
 
-    public List<PostResponseDto> getPosts(Category category, List<Age> ages, String sort) {
-        Specification<Post> spec = Specification.where(PostSpecification.hasCategory(category)).and(PostSpecification.hasAnyAge(ages));
+    public CustomPageResponse<PostResponseDto> getPosts(Category category, List<Age> ages, String sort, int page, int size) {
+        Specification<Post> spec = Specification.where(PostSpecification.hasCategory(category))
+                .and(PostSpecification.hasAnyAge(ages));
 
-        if ("hits".equals(sort)) {
-            spec = spec.and(PostSpecification.orderByHits());
-        } else if ("like".equals(sort)) {
-            spec = spec.and(PostSpecification.orderByLikes());
-        } else{
-            spec = spec.and(PostSpecification.orderByCreatedAt());
+        boolean isLikeSort = "like".equals(sort);
+        Pageable pageable = PageRequest.of(page, size);
+        Parent parent = findCurrentParent();
+
+        if (!isLikeSort) {
+            spec = spec.and(getSortSpec(sort));
+            Page<Post> postPage = postRepository.findAll(spec, pageable);
+            List<PostResponseDto> postDtos = toPostDtos(postPage.getContent(), parent);
+            return CustomPageResponse.from(new PageImpl<>(postDtos, pageable, postPage.getTotalElements()));
         }
 
+        // 좋아요 정렬
         List<Post> posts = postRepository.findAll(spec);
+        List<PostResponseDto> postDtos = toPostDtos(posts, parent);
 
-        Parent parent = parentRepository.findByEmail(getCurrentEmail()).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        return sortAndPaginateByLike(postDtos, page, size);
+    }
 
+    private Specification<Post> getSortSpec(String sort) {
+        return switch (sort) {
+            case "hits" -> PostSpecification.orderByHits();
+            default -> PostSpecification.orderByCreatedAt();
+        };
+    }
+
+    private Parent findCurrentParent() {
+        return parentRepository.findByEmail(getCurrentEmail())
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+    }
+
+    private List<PostResponseDto> toPostDtos(List<Post> posts, Parent parent) {
         return posts.stream()
                 .map(post -> {
                     boolean isLike = likeRepository.existsByPostIdAndParentId(post.getId(), parent.getId());
                     boolean isBookmark = bookmarkRepository.existsByPostIdAndParentId(post.getId(), parent.getId());
-                    int likeCount = redisPostService.getOrInit(post.getId(), () -> likeRepository.countByPostId(post.getId()));  // redis에서 조회
+                    int likeCount = redisPostService.getOrInit(post.getId(),
+                            () -> likeRepository.countByPostId(post.getId()));
                     return PostResponseDto.from(post, post.getParent().getNickname(), likeCount, isLike, isBookmark);
-                }).collect(Collectors.toList());
+                })
+                .collect(Collectors.toList());
+    }
+
+    private CustomPageResponse<PostResponseDto> sortAndPaginateByLike(List<PostResponseDto> dtos, int page, int size) {
+        dtos.sort(Comparator.comparingInt(PostResponseDto::likeCount).reversed());
+
+        int fromIndex = page * size;
+        int toIndex = Math.min(fromIndex + size, dtos.size());
+
+        if (fromIndex >= dtos.size()) {
+            return CustomPageResponse.from(new PageImpl<>(Collections.emptyList(), PageRequest.of(page, size), dtos.size()));
+        }
+
+        List<PostResponseDto> paged = new ArrayList<>(dtos.subList(fromIndex, toIndex));
+        return CustomPageResponse.from(new PageImpl<>(paged, PageRequest.of(page, size), dtos.size()));
     }
 }
