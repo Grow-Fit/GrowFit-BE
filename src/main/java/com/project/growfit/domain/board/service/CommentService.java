@@ -5,9 +5,7 @@ import com.project.growfit.domain.User.repository.ParentRepository;
 import com.project.growfit.domain.board.dto.request.CommentRequestDto;
 import com.project.growfit.domain.board.dto.response.CommentResponseListDto;
 import com.project.growfit.domain.board.entity.Comment;
-import com.project.growfit.domain.board.entity.Post;
 import com.project.growfit.domain.board.repository.CommentRepository;
-import com.project.growfit.domain.board.repository.PostRepository;
 import com.project.growfit.global.auto.dto.CustomUserDetails;
 import com.project.growfit.global.exception.BusinessException;
 import com.project.growfit.global.exception.ErrorCode;
@@ -27,16 +25,6 @@ public class CommentService {
 
     private final CommentRepository commentRepository;
     private final ParentRepository parentRepository;
-    private final PostRepository postRepository;
-
-    @Transactional
-    public Comment saveComment(Long postId, CommentRequestDto dto) {
-        Parent parent = parentRepository.findByEmail(getCurrentEmail()).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
-        Post post = postRepository.findById(postId).orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
-        Comment comment = Comment.createComment(dto, post, parent);
-        commentRepository.save(comment);
-        return comment;
-    }
 
     private String getCurrentEmail() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -63,13 +51,5 @@ public class CommentService {
         if (!writer.getEmail().equals(loginParent.getEmail())) {
             throw new BusinessException(ErrorCode.FORBIDDEN_ACCESS);
         }
-    }
-
-    @Transactional
-    public Comment deleteComment(Long commentId) {
-        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new BusinessException(ErrorCode.COMMENT_NOT_FOUND));
-        checkPostOwnership(comment.getParent());
-        commentRepository.delete(comment);
-        return comment;
     }
 }

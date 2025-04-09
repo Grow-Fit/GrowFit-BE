@@ -11,6 +11,7 @@ import com.project.growfit.domain.board.entity.Category;
 import com.project.growfit.domain.board.entity.Image;
 import com.project.growfit.domain.board.entity.Post;
 import com.project.growfit.domain.board.repository.BookmarkRepository;
+import com.project.growfit.domain.board.repository.CommentRepository;
 import com.project.growfit.domain.board.repository.ImageRepository;
 import com.project.growfit.domain.board.repository.LikeRepository;
 import com.project.growfit.domain.board.repository.PostRepository;
@@ -51,12 +52,12 @@ public class PostService {
     private final ImageRepository imageRepository;
     private final LikeRepository likeRepository;
     private final BookmarkRepository bookmarkRepository;
+    private final CommentRepository commentRepository;
     private final S3UploadService s3UploadService;
     private final RedisPostService redisPostService;
 
     private static final String LIKE_COUNT_PREFIX = "like:count:";
     private static final String COMMENT_COUNT_PREFIX = "comment:count:";
-    private static final String POST_VIEW_PREFIX = "post:view:";
 
     @Transactional
     public Post savePost(PostRequestDto dto, List<MultipartFile> images) throws IOException {
@@ -81,9 +82,10 @@ public class PostService {
         Parent parent = parentRepository.findByEmail(getCurrentEmail()).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
         redisPostService.increaseHitIfNotViewed(post, parent.getId());
         int likeCount = redisPostService.getOrInit(boardId, () -> likeRepository.countByPostId(boardId), LIKE_COUNT_PREFIX);  // redis에서 조회
+        int commentCount = redisPostService.getOrInit(boardId, () -> commentRepository.countByPostId(boardId), COMMENT_COUNT_PREFIX);
         boolean isLike = likeRepository.existsByPostIdAndParentId(post.getId(), parent.getId());
         boolean isBookmark = bookmarkRepository.existsByPostIdAndParentId(post.getId(), parent.getId());
-        return PostResponseDto.from(post, parent.getNickname(), likeCount, isLike, isBookmark);
+        return PostResponseDto.from(post, parent.getNickname(), likeCount, commentCount, isLike, isBookmark);
     }
 
     @Transactional
@@ -98,6 +100,7 @@ public class PostService {
         }
         postRepository.delete(post);
         redisPostService.deletePostLikeCount(postId);
+        redisPostService.deletePostCommentCount(postId);
         return imageCnt;
     }
 
@@ -211,7 +214,9 @@ public class PostService {
                     boolean isBookmark = bookmarkRepository.existsByPostIdAndParentId(post.getId(), parent.getId());
                     int likeCount = redisPostService.getOrInit(post.getId(),
                             () -> likeRepository.countByPostId(post.getId()), LIKE_COUNT_PREFIX);
-                    return PostResponseDto.from(post, post.getParent().getNickname(), likeCount, isLike, isBookmark);
+                    int commentCount = redisPostService.getOrInit(post.getId(),
+                            () -> commentRepository.countByPostId(post.getId()), COMMENT_COUNT_PREFIX);
+                    return PostResponseDto.from(post, post.getParent().getNickname(), likeCount, commentCount, isLike, isBookmark);
                 })
                 .collect(Collectors.toList());
     }

@@ -2,8 +2,11 @@ package com.project.growfit.domain.board.service;
 
 import com.project.growfit.domain.User.entity.Parent;
 import com.project.growfit.domain.User.repository.ParentRepository;
+import com.project.growfit.domain.board.dto.request.CommentRequestDto;
+import com.project.growfit.domain.board.entity.Comment;
 import com.project.growfit.domain.board.entity.Like;
 import com.project.growfit.domain.board.entity.Post;
+import com.project.growfit.domain.board.repository.CommentRepository;
 import com.project.growfit.domain.board.repository.LikeRepository;
 import com.project.growfit.domain.board.repository.PostRepository;
 import com.project.growfit.global.auto.dto.CustomUserDetails;
@@ -27,21 +30,23 @@ public class RedisPostService {
     private final ParentRepository parentRepository;
     private final PostRepository postRepository;
     private final LikeRepository likeRepository;
+    private final CommentRepository commentRepository;
     private final StringRedisTemplate redisTemplate;
 
     public RedisPostService(
             ParentRepository parentRepository,
             PostRepository postRepository,
             LikeRepository likeRepository,
+            CommentRepository commentRepository,
             @Qualifier("communityStatsRedisTemplate") StringRedisTemplate redisTemplate) {
 
         this.parentRepository = parentRepository;
         this.postRepository = postRepository;
         this.likeRepository = likeRepository;
+        this.commentRepository = commentRepository;
         this.redisTemplate = redisTemplate;
     }
 
-    //private final static String PREFIX = "like:count:";
     private static final String LIKE_COUNT_PREFIX = "like:count:";
     private static final String COMMENT_COUNT_PREFIX = "comment:count:";
     private static final String POST_VIEW_PREFIX = "post:view:";
@@ -95,7 +100,7 @@ public class RedisPostService {
     }
 
     public void increaseHitIfNotViewed(Post post, Long parentId) {
-        String key = "post:view:" + post.getId() + ":" + parentId;
+        String key = POST_VIEW_PREFIX + post.getId() + ":" + parentId;
 
         Boolean isNew = redisTemplate.opsForValue().setIfAbsent(key, "1", Duration.ofMinutes(30));
         if (Boolean.TRUE.equals(isNew)) {
@@ -105,6 +110,36 @@ public class RedisPostService {
 
     public void deletePostLikeCount(Long postId) {
         redisTemplate.delete(LIKE_COUNT_PREFIX + postId);
+    }
+
+    public void deletePostCommentCount(Long postId) {
+        redisTemplate.delete(COMMENT_COUNT_PREFIX + postId);
+    }
+
+    @Transactional
+    public Comment saveComment(Long postId, CommentRequestDto dto) {
+        Parent parent = parentRepository.findByEmail(getCurrentEmail()).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        Post post = postRepository.findById(postId).orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
+        Comment comment = Comment.createComment(dto, post, parent);
+        commentRepository.save(comment);
+        increment(postId, COMMENT_COUNT_PREFIX);
+        return comment;
+    }
+
+    @Transactional
+    public Comment deleteComment(Long commentId) {
+        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new BusinessException(ErrorCode.COMMENT_NOT_FOUND));
+        checkPostOwnership(comment.getParent());
+        commentRepository.delete(comment);
+        decrement(comment.getPost().getId(), COMMENT_COUNT_PREFIX);
+        return comment;
+    }
+
+    private void checkPostOwnership(Parent writer) {
+        Parent loginParent = parentRepository.findByEmail(getCurrentEmail()).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        if (!writer.getEmail().equals(loginParent.getEmail())) {
+            throw new BusinessException(ErrorCode.FORBIDDEN_ACCESS);
+        }
     }
 
     private String getCurrentEmail() {

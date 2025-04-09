@@ -46,7 +46,7 @@ public class PostController {
 
     private final PostService postService;
     private final CommentService commentService;
-    private final RedisPostService postLikeService;
+    private final RedisPostService redisPostService;
 
     @Operation(summary = "커뮤니티 글 등록", description = "부모는 게시판, 연령대, 제목, 내용, 사진(0~4)을 입력하여 글을 등록합니다. MultipartFile 형식으로 요청을 해야 합니다.")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -84,7 +84,7 @@ public class PostController {
     @Operation(summary = "글 좋아요", description = "글에 좋아요를 할 수 있습니다. 좋아요가 비활성화된 상태에서 요청을 하면 좋아요가 활성화 되고, 활성화된 상태에서 요청을 하면 좋아요가 비활성화 됩니다.")
     @PostMapping("/{postId}/like")
     public ResultResponse<String> likePost(@PathVariable Long postId) {
-        boolean isLike = postLikeService.postLike(postId);
+        boolean isLike = redisPostService.postLike(postId);
         if (isLike) return new ResultResponse<>(ResultCode.LIKE_POST_SUCCESS, "id: " + postId + " 번 글이 좋아요 처리되었습니다.");
         else return new ResultResponse<>(ResultCode.DISLIKE_POST_SUCCESS, "id: " + postId + " 번 글 좋아요 취소 처리되었습니다.");
     }
@@ -100,7 +100,7 @@ public class PostController {
     @Operation(summary = "댓글 작성", description = "특정 글에 대한 댓글을 작성합니다.")
     @PostMapping("/{postId}/comment")
     public ResultResponse<String> saveComment(@PathVariable Long postId, @RequestBody @Valid CommentRequestDto dto) {
-        Comment comment = commentService.saveComment(postId, dto);
+        Comment comment = redisPostService.saveComment(postId, dto);
         return new ResultResponse<>(ResultCode.COMMENT_POST_SUCCESS, "id: " + comment.getPost().getId() + " 글에 대한 댓글 \"" + comment.getContent() + "\" 이 등록되었습니다.");
     }
 
@@ -121,7 +121,7 @@ public class PostController {
     @Operation(summary = "댓글 삭제", description = "특정 글에 대하여 본인이 작성한 댓글을 삭제합니다.")
     @DeleteMapping("/comment/{commentId}")
     public ResultResponse<String> deleteComment(@PathVariable Long commentId) {
-        Comment comment = commentService.deleteComment(commentId);
+        Comment comment = redisPostService.deleteComment(commentId);
         return new ResultResponse<>(ResultCode.COMMENT_POST_SUCCESS, "id: " + comment.getPost().getId() + " 글에 대한 댓글 \"" + comment.getContent() + "\" 이 삭제되었습니다.");
     }
 
