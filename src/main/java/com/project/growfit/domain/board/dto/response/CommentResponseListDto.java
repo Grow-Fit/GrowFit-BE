@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public record CommentResponseListDto(
+        Long commentId,
         Long writerId,
         String writer,
         String createdAt,
@@ -12,6 +13,7 @@ public record CommentResponseListDto(
 ) {
     public static CommentResponseListDto from(Comment comment) {
         return new CommentResponseListDto(
+                comment.getId(),
                 comment.getParent().getId(),
                 comment.getParent().getNickname(),
                 getFormattedDate(comment.getCreatedAt()),

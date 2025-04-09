@@ -1,5 +1,6 @@
 package com.project.growfit.domain.User.entity;
 
+import com.project.growfit.domain.board.dto.request.ProfileRequestDto;
 import com.project.growfit.domain.board.entity.Bookmark;
 import com.project.growfit.domain.board.entity.Comment;
 import com.project.growfit.domain.board.entity.Like;
@@ -88,5 +89,15 @@ public class Parent extends BaseEntity {
 
     public void addChild(Child child) {
         this.children.add(child);
+    }
+
+    public void updateCommunityInfo(ProfileRequestDto dto, String photo) {
+        this.nickname = dto.getNickname();
+        this.introduce = dto.getIntroduce();
+        this.photo = photo;
+    }
+
+    public void deletedPhoto() {
+        this.photo = null;
     }
 }

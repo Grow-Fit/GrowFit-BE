@@ -21,10 +21,12 @@ import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Getter
 @Entity
 @Table(name = "post")
+@Slf4j
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Post extends BaseEntity {
 
@@ -43,15 +45,14 @@ public class Post extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Category category;
 
-    @Column(name = "age", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private Age age;
-
     @Column(name = "hits", nullable = false)
     private int hits = 0;
 
-    @Column(name = "is_publish", nullable = false)
-    private boolean isPublish;
+    @Column(name = "is_delete", nullable = false)
+    private boolean isDelete;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PostAge> postAges = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
@@ -74,9 +75,12 @@ public class Post extends BaseEntity {
         post.title = dto.getTitle();
         post.content = dto.getContent();
         post.category = dto.getCategory();
-        post.age = dto.getAge();
         post.parent = parent;
-        post.isPublish = true;
+        post.isDelete = false;
+
+        for (Age age : dto.getAges()) {
+            post.postAges.add(new PostAge(post, age));
+        }
         return post;
     }
 
@@ -84,6 +88,14 @@ public class Post extends BaseEntity {
         this.title = dto.getTitle();
         this.content = dto.getContent();
         this.category = dto.getCategory();
-        this.age = dto.getAge();
+        this.postAges.clear();
+        for (Age age : dto.getAges()) {
+            this.postAges.add(new PostAge(this, age));
+        }
+    }
+
+    public void increaseHit() {
+        this.hits++;
+        log.debug("Post 조회수 증가: postId={}, hits={}", this.id, this.hits);
     }
 }
