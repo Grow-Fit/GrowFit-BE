@@ -41,7 +41,10 @@ public class RedisPostService {
         this.redisTemplate = redisTemplate;
     }
 
-    private final static String PREFIX = "like:count:";
+    //private final static String PREFIX = "like:count:";
+    private static final String LIKE_COUNT_PREFIX = "like:count:";
+    private static final String COMMENT_COUNT_PREFIX = "comment:count:";
+    private static final String POST_VIEW_PREFIX = "post:view:";
 
     @Transactional
     public boolean postLike(Long postId) {
@@ -51,30 +54,30 @@ public class RedisPostService {
 
         if (existingLike.isPresent()) {
             likeRepository.delete(existingLike.get());
-            decrement(postId);  // redis 캐시 감소
+            decrement(postId, LIKE_COUNT_PREFIX);  // redis 캐시 감소
             return false;
         } else {
             Post post = postRepository.findById(postId).orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
             likeRepository.save(new Like(post, parent));
-            increment(postId);  // redis 캐시 증가
+            increment(postId, LIKE_COUNT_PREFIX);  // redis 캐시 증가
             return true;
         }
     }
 
-    private String getKey(Long postId) {
-        return PREFIX + postId;
+    private String getKey(String prefix, Long postId) {
+        return prefix + postId;
     }
 
-    private Long increment(Long postId) {
-        return redisTemplate.opsForValue().increment(getKey(postId));
+    private Long increment(Long postId, String prefix) {
+        return redisTemplate.opsForValue().increment(getKey(prefix, postId));
     }
 
-    private Long decrement(Long postId) {
-        return redisTemplate.opsForValue().decrement(getKey(postId));
+    private Long decrement(Long postId, String prefix) {
+        return redisTemplate.opsForValue().decrement(getKey(prefix, postId));
     }
 
-    public Integer getOrInit(Long postId, Supplier<Integer> dbCountSupplier) {
-        String key = getKey(postId);
+    public Integer getOrInit(Long postId, Supplier<Integer> dbCountSupplier, String prefix) {
+        String key = getKey(prefix, postId);
         Object value = redisTemplate.opsForValue().get(key);
 
         if (value != null) {
@@ -101,7 +104,7 @@ public class RedisPostService {
     }
 
     public void deletePostLikeCount(Long postId) {
-        redisTemplate.delete(PREFIX + postId);
+        redisTemplate.delete(LIKE_COUNT_PREFIX + postId);
     }
 
     private String getCurrentEmail() {

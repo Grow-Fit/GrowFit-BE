@@ -54,6 +54,10 @@ public class PostService {
     private final S3UploadService s3UploadService;
     private final RedisPostService redisPostService;
 
+    private static final String LIKE_COUNT_PREFIX = "like:count:";
+    private static final String COMMENT_COUNT_PREFIX = "comment:count:";
+    private static final String POST_VIEW_PREFIX = "post:view:";
+
     @Transactional
     public Post savePost(PostRequestDto dto, List<MultipartFile> images) throws IOException {
         Parent parent = parentRepository.findByEmail(getCurrentEmail()).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
@@ -74,9 +78,9 @@ public class PostService {
     @Transactional
     public PostResponseDto getPost(Long boardId) {
         Post post = postRepository.findById(boardId).orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
-        Parent parent = parentRepository.findById(post.getParent().getId()).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        Parent parent = parentRepository.findByEmail(getCurrentEmail()).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
         redisPostService.increaseHitIfNotViewed(post, parent.getId());
-        int likeCount = redisPostService.getOrInit(boardId, () -> likeRepository.countByPostId(boardId));  // redis에서 조회
+        int likeCount = redisPostService.getOrInit(boardId, () -> likeRepository.countByPostId(boardId), LIKE_COUNT_PREFIX);  // redis에서 조회
         boolean isLike = likeRepository.existsByPostIdAndParentId(post.getId(), parent.getId());
         boolean isBookmark = bookmarkRepository.existsByPostIdAndParentId(post.getId(), parent.getId());
         return PostResponseDto.from(post, parent.getNickname(), likeCount, isLike, isBookmark);
@@ -206,7 +210,7 @@ public class PostService {
                     boolean isLike = likeRepository.existsByPostIdAndParentId(post.getId(), parent.getId());
                     boolean isBookmark = bookmarkRepository.existsByPostIdAndParentId(post.getId(), parent.getId());
                     int likeCount = redisPostService.getOrInit(post.getId(),
-                            () -> likeRepository.countByPostId(post.getId()));
+                            () -> likeRepository.countByPostId(post.getId()), LIKE_COUNT_PREFIX);
                     return PostResponseDto.from(post, post.getParent().getNickname(), likeCount, isLike, isBookmark);
                 })
                 .collect(Collectors.toList());
