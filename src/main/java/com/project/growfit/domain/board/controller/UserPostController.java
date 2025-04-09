@@ -1,5 +1,6 @@
 package com.project.growfit.domain.board.controller;
 
+import com.project.growfit.domain.board.dto.request.ProfileRequestDto;
 import com.project.growfit.domain.board.dto.response.MyInfoResponseDto;
 import com.project.growfit.domain.board.dto.response.MyPageResponseListDto;
 import com.project.growfit.domain.board.service.UserPostService;
@@ -7,13 +8,18 @@ import com.project.growfit.global.response.ResultCode;
 import com.project.growfit.global.response.ResultResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @Slf4j
@@ -43,5 +49,14 @@ public class UserPostController {
     public ResultResponse<MyInfoResponseDto> getProfile(@PathVariable Long userId) {
         MyInfoResponseDto dto = userPostService.getProfile(userId);
         return new ResultResponse<>(ResultCode.GET_PROFILE_SUCCESS, dto);
+    }
+
+    @Operation(summary = "특정 부모 커뮤니티 프로필 정보 수정", description = "본인 프로필인 경우, 프로필 사진, 닉네임, 소개를 수정할 수 있다.")
+    @PutMapping(value = "/profile/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResultResponse<String> updateProfile(
+            @RequestPart("dto") @Valid ProfileRequestDto dto,
+            @RequestPart(value = "image", required = false) MultipartFile image) {
+        userPostService.updateProfile(dto, image);
+        return new ResultResponse<>(ResultCode.UPDATE_PROFILE_SUCCESS, "");
     }
 }
