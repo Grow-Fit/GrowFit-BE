@@ -33,6 +33,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -233,5 +235,14 @@ public class PostService {
 
         List<PostResponseDto> paged = new ArrayList<>(dtos.subList(fromIndex, toIndex));
         return CustomPageResponse.from(new PageImpl<>(paged, PageRequest.of(page, size), dtos.size()));
+    }
+
+    @Transactional(readOnly = true)
+    public CustomPageResponse<PostResponseDto> getSearchPosts(String keyword, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Direction.DESC, "createdAt"));
+        Page<Post> postPage = postRepository.findByTitleContainingOrContentContaining(keyword, keyword, pageable);
+        Parent parent = findCurrentParent();
+        List<PostResponseDto> postDtos = toPostDtos(postPage.getContent(), parent);
+        return CustomPageResponse.from(postDtos, postPage);
     }
 }

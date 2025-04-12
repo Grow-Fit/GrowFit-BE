@@ -23,4 +23,16 @@ public record CustomPageResponse<T>(
                 page.isLast()
         );
     }
+
+    public static <T> CustomPageResponse<T> from(List<T> dtoList, Page<?> page) {
+        return new CustomPageResponse<>(
+                dtoList,
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalPages(),
+                page.getTotalElements(),
+                page.isFirst(),
+                page.isLast()
+        );
+    }
 }

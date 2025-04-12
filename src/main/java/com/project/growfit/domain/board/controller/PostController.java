@@ -144,4 +144,15 @@ public class PostController {
         CustomPageResponse<PostResponseDto> posts = postService.getPosts(category, ages, sort, page, size);
         return new ResultResponse<>(ResultCode.GET_POST_SUCCESS, posts);
     }
+
+    @Operation(summary = "글 검색", description = "키워드 또는 태그로 검색한다.")
+    @GetMapping("/search")
+    public ResultResponse<CustomPageResponse<PostResponseDto>> getSearchPosts(
+            @RequestParam String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        CustomPageResponse<PostResponseDto> posts = postService.getSearchPosts(keyword, page, size);
+        return new ResultResponse<>(ResultCode.GET_POST_SUCCESS, posts);
+    }
 }
