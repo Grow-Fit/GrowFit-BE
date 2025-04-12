@@ -45,4 +45,8 @@ public class Comment extends BaseEntity {
         comment.parent = parent;
         return comment;
     }
+
+    public void updateComment(CommentRequestDto dto) {
+        this.content = dto.getComment();
+    }
 }

@@ -3,14 +3,20 @@ package com.project.growfit.domain.board.controller;
 import com.project.growfit.domain.board.dto.request.CommentRequestDto;
 import com.project.growfit.domain.board.dto.request.PostRequestDto;
 import com.project.growfit.domain.board.dto.response.CommentResponseListDto;
+import com.project.growfit.domain.board.dto.response.CustomPageResponse;
 import com.project.growfit.domain.board.dto.response.PostResponseDto;
+import com.project.growfit.domain.board.entity.Age;
+import com.project.growfit.domain.board.entity.Category;
 import com.project.growfit.domain.board.entity.Comment;
 import com.project.growfit.domain.board.entity.Post;
 import com.project.growfit.domain.board.service.CommentService;
+import com.project.growfit.domain.board.service.RedisPostService;
 import com.project.growfit.domain.board.service.PostService;
 import com.project.growfit.global.response.ResultCode;
 import com.project.growfit.global.response.ResultResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.io.IOException;
@@ -20,11 +26,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -38,6 +46,7 @@ public class PostController {
 
     private final PostService postService;
     private final CommentService commentService;
+    private final RedisPostService redisPostService;
 
     @Operation(summary = "커뮤니티 글 등록", description = "부모는 게시판, 연령대, 제목, 내용, 사진(0~4)을 입력하여 글을 등록합니다. MultipartFile 형식으로 요청을 해야 합니다.")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -75,7 +84,7 @@ public class PostController {
     @Operation(summary = "글 좋아요", description = "글에 좋아요를 할 수 있습니다. 좋아요가 비활성화된 상태에서 요청을 하면 좋아요가 활성화 되고, 활성화된 상태에서 요청을 하면 좋아요가 비활성화 됩니다.")
     @PostMapping("/{postId}/like")
     public ResultResponse<String> likePost(@PathVariable Long postId) {
-        boolean isLike = postService.postLike(postId);
+        boolean isLike = redisPostService.postLike(postId);
         if (isLike) return new ResultResponse<>(ResultCode.LIKE_POST_SUCCESS, "id: " + postId + " 번 글이 좋아요 처리되었습니다.");
         else return new ResultResponse<>(ResultCode.DISLIKE_POST_SUCCESS, "id: " + postId + " 번 글 좋아요 취소 처리되었습니다.");
     }
@@ -91,7 +100,7 @@ public class PostController {
     @Operation(summary = "댓글 작성", description = "특정 글에 대한 댓글을 작성합니다.")
     @PostMapping("/{postId}/comment")
     public ResultResponse<String> saveComment(@PathVariable Long postId, @RequestBody @Valid CommentRequestDto dto) {
-        Comment comment = commentService.saveComment(postId, dto);
+        Comment comment = redisPostService.saveComment(postId, dto);
         return new ResultResponse<>(ResultCode.COMMENT_POST_SUCCESS, "id: " + comment.getPost().getId() + " 글에 대한 댓글 \"" + comment.getContent() + "\" 이 등록되었습니다.");
     }
 
@@ -100,5 +109,50 @@ public class PostController {
     public ResultResponse<List<CommentResponseListDto>> getComments(@PathVariable Long postId) {
         List<CommentResponseListDto> list = commentService.getComments(postId);
         return new ResultResponse<>(ResultCode.GET_COMMENTS_SUCCESS, list);
+    }
+
+    @Operation(summary = "댓글 수정", description = "특정 글에 대하여 본인이 작성한 댓글을 수정합니다.")
+    @PatchMapping("/comment/{commentId}")
+    public ResultResponse<String> updateComment(@PathVariable Long commentId, @RequestBody @Valid CommentRequestDto dto) {
+        Comment comment = commentService.updateComment(commentId, dto);
+        return new ResultResponse<>(ResultCode.COMMENT_POST_SUCCESS, "id: " + comment.getPost().getId() + " 글에 대한 댓글 \"" + comment.getContent() + "\" 이 수정되었습니다.");
+    }
+
+    @Operation(summary = "댓글 삭제", description = "특정 글에 대하여 본인이 작성한 댓글을 삭제합니다.")
+    @DeleteMapping("/comment/{commentId}")
+    public ResultResponse<String> deleteComment(@PathVariable Long commentId) {
+        Comment comment = redisPostService.deleteComment(commentId);
+        return new ResultResponse<>(ResultCode.COMMENT_POST_SUCCESS, "id: " + comment.getPost().getId() + " 글에 대한 댓글 \"" + comment.getContent() + "\" 이 삭제되었습니다.");
+    }
+
+    @Operation(summary = "글 전체 조회", description = "카테고리, 나이, 정렬 기준에 따라 게시글 목록을 조회합니다. 정렬 기준은 'createdAt'(최신순), 'hits'(조회순), 'like'(좋아요순) 중 하나를 선택할 수 있습니다.")
+    @Parameters({
+            @Parameter(name = "category", description = "게시글 카테고리", required = false),
+            @Parameter(name = "ages", description = "해당 게시글을 대상으로 하는 자녀 연령대 리스트(여러 개 기입 가능)", required = false),
+            @Parameter(name = "sort", description = "정렬 기준 (createdAt: 최신순, hits: 조회순, like: 좋아요순). 기본값: createdAt", required = false),
+            @Parameter(name = "page", description = "조회할 페이지 번호 (0부터 시작). 기본값: 0", required = false),
+            @Parameter(name = "size", description = "페이지당 게시글 수. 기본값: 10", required = false)
+    })
+    @GetMapping
+    public ResultResponse<CustomPageResponse<PostResponseDto>> getPosts(
+            @RequestParam(required = false) Category category,
+            @RequestParam(required = false) List<Age> ages,
+            @RequestParam(defaultValue = "createdAt") String sort,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+            ) {
+        CustomPageResponse<PostResponseDto> posts = postService.getPosts(category, ages, sort, page, size);
+        return new ResultResponse<>(ResultCode.GET_POST_SUCCESS, posts);
+    }
+
+    @Operation(summary = "글 검색", description = "키워드 또는 태그로 검색한다.")
+    @GetMapping("/search")
+    public ResultResponse<CustomPageResponse<PostResponseDto>> getSearchPosts(
+            @RequestParam String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        CustomPageResponse<PostResponseDto> posts = postService.getSearchPosts(keyword, page, size);
+        return new ResultResponse<>(ResultCode.GET_POST_SUCCESS, posts);
     }
 }

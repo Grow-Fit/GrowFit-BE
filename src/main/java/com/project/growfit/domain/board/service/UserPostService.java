@@ -2,6 +2,8 @@ package com.project.growfit.domain.board.service;
 
 import com.project.growfit.domain.User.entity.Parent;
 import com.project.growfit.domain.User.repository.ParentRepository;
+import com.project.growfit.domain.board.dto.request.ProfileRequestDto;
+import com.project.growfit.domain.board.dto.response.MyInfoResponseDto;
 import com.project.growfit.domain.board.dto.response.MyPageResponseListDto;
 import com.project.growfit.domain.board.entity.Post;
 import com.project.growfit.domain.board.repository.ImageRepository;
@@ -9,6 +11,7 @@ import com.project.growfit.domain.board.repository.PostRepository;
 import com.project.growfit.global.auto.dto.CustomUserDetails;
 import com.project.growfit.global.exception.BusinessException;
 import com.project.growfit.global.exception.ErrorCode;
+import com.project.growfit.global.s3.service.S3UploadService;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +20,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @Slf4j
@@ -26,6 +30,7 @@ public class UserPostService {
     private final ParentRepository parentRepository;
     private final PostRepository postRepository;
     private final ImageRepository imageRepository;
+    private final S3UploadService s3UploadService;
 
     @Transactional(readOnly = true)
     public List<MyPageResponseListDto> getBookmarks(Long userId) {
@@ -59,5 +64,33 @@ public class UserPostService {
     public List<MyPageResponseListDto> getMyPosts(Long userId) {
         List<Post> myPosts = postRepository.findPostsByUserId(userId);
         return getMyPageResponseListDtos(myPosts);
+    }
+
+    @Transactional(readOnly = true)
+    public MyInfoResponseDto getProfile(Long userId) {
+        Parent parent = parentRepository.findByEmail(getCurrentEmail()).orElseThrow(() -> new BusinessException(
+                ErrorCode.USER_NOT_FOUND));
+        boolean isSelf = false;
+        if (parent.getId().equals(userId)) {
+            isSelf = true;
+        }
+        return MyInfoResponseDto.from(parent, isSelf);
+    }
+
+    @Transactional
+    public void updateProfile(ProfileRequestDto dto, MultipartFile image) {
+        Parent parent = parentRepository.findByEmail(getCurrentEmail()).orElseThrow(() -> new BusinessException(
+                ErrorCode.USER_NOT_FOUND));
+
+        if (parent.getPhoto() != null) {
+            s3UploadService.deleteFile(parent.getPhoto());
+            parent.deletedPhoto();
+        }
+
+        if (image != null) {
+            parent.updateCommunityInfo(dto, s3UploadService.saveFile(image));
+            return;
+        }
+        parent.updateCommunityInfo(dto, null);
     }
 }

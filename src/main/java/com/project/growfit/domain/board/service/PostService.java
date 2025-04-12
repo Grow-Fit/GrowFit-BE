@@ -3,25 +3,39 @@ package com.project.growfit.domain.board.service;
 import com.project.growfit.domain.User.entity.Parent;
 import com.project.growfit.domain.User.repository.ParentRepository;
 import com.project.growfit.domain.board.dto.request.PostRequestDto;
+import com.project.growfit.domain.board.dto.response.CustomPageResponse;
 import com.project.growfit.domain.board.dto.response.PostResponseDto;
+import com.project.growfit.domain.board.entity.Age;
 import com.project.growfit.domain.board.entity.Bookmark;
+import com.project.growfit.domain.board.entity.Category;
 import com.project.growfit.domain.board.entity.Image;
-import com.project.growfit.domain.board.entity.Like;
 import com.project.growfit.domain.board.entity.Post;
 import com.project.growfit.domain.board.repository.BookmarkRepository;
+import com.project.growfit.domain.board.repository.CommentRepository;
 import com.project.growfit.domain.board.repository.ImageRepository;
 import com.project.growfit.domain.board.repository.LikeRepository;
 import com.project.growfit.domain.board.repository.PostRepository;
+import com.project.growfit.domain.board.repository.PostSpecification;
 import com.project.growfit.global.auto.dto.CustomUserDetails;
 import com.project.growfit.global.exception.BusinessException;
 import com.project.growfit.global.exception.ErrorCode;
 import com.project.growfit.global.s3.service.S3UploadService;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -40,7 +54,12 @@ public class PostService {
     private final ImageRepository imageRepository;
     private final LikeRepository likeRepository;
     private final BookmarkRepository bookmarkRepository;
+    private final CommentRepository commentRepository;
     private final S3UploadService s3UploadService;
+    private final RedisPostService redisPostService;
+
+    private static final String LIKE_COUNT_PREFIX = "like:count:";
+    private static final String COMMENT_COUNT_PREFIX = "comment:count:";
 
     @Transactional
     public Post savePost(PostRequestDto dto, List<MultipartFile> images) throws IOException {
@@ -59,14 +78,16 @@ public class PostService {
         return post;
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public PostResponseDto getPost(Long boardId) {
         Post post = postRepository.findById(boardId).orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
-        Parent parent = parentRepository.findById(post.getParent().getId()).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
-        int likeCount = likeRepository.countByPostId(post.getId());
+        Parent parent = parentRepository.findByEmail(getCurrentEmail()).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        redisPostService.increaseHitIfNotViewed(post, parent.getId());
+        int likeCount = redisPostService.getOrInit(boardId, () -> likeRepository.countByPostId(boardId), LIKE_COUNT_PREFIX);  // redis에서 조회
+        int commentCount = redisPostService.getOrInit(boardId, () -> commentRepository.countByPostId(boardId), COMMENT_COUNT_PREFIX);
         boolean isLike = likeRepository.existsByPostIdAndParentId(post.getId(), parent.getId());
         boolean isBookmark = bookmarkRepository.existsByPostIdAndParentId(post.getId(), parent.getId());
-        return PostResponseDto.from(post, parent.getNickname(), likeCount, isLike, isBookmark);
+        return PostResponseDto.from(post, parent.getNickname(), likeCount, commentCount, isLike, isBookmark);
     }
 
     @Transactional
@@ -80,6 +101,8 @@ public class PostService {
             imageCnt++;
         }
         postRepository.delete(post);
+        redisPostService.deletePostLikeCount(postId);
+        redisPostService.deletePostCommentCount(postId);
         return imageCnt;
     }
 
@@ -125,21 +148,6 @@ public class PostService {
     }
 
     @Transactional
-    public boolean postLike(Long postId) {
-        Parent parent = parentRepository.findByEmail(getCurrentEmail()).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
-        Optional<Like> existingLike = likeRepository.findByPostIdAndParentId(postId, parent.getId());
-
-        if (existingLike.isPresent()) {
-            likeRepository.delete(existingLike.get());
-            return false;
-        } else {
-            Post post = postRepository.findById(postId).orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
-            likeRepository.save(new Like(post, parent));
-            return true;
-        }
-    }
-
-    @Transactional
     public boolean bookmarkPost(Long postId) {
         Parent parent = parentRepository.findByEmail(getCurrentEmail()).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
         Optional<Bookmark> existingBookmark = bookmarkRepository.findByPostIdAndParentId(postId, parent.getId());
@@ -165,5 +173,76 @@ public class PostService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         CustomUserDetails details = (CustomUserDetails) authentication.getPrincipal();
         return details.getEmail();
+    }
+
+    public CustomPageResponse<PostResponseDto> getPosts(Category category, List<Age> ages, String sort, int page, int size) {
+        Specification<Post> spec = Specification.where(PostSpecification.hasCategory(category))
+                .and(PostSpecification.hasAnyAge(ages));
+
+        boolean isLikeSort = "like".equals(sort);
+        Pageable pageable = PageRequest.of(page, size);
+        Parent parent = findCurrentParent();
+
+        if (!isLikeSort) {
+            spec = spec.and(getSortSpec(sort));
+            Page<Post> postPage = postRepository.findAll(spec, pageable);
+            List<PostResponseDto> postDtos = toPostDtos(postPage.getContent(), parent);
+            return CustomPageResponse.from(new PageImpl<>(postDtos, pageable, postPage.getTotalElements()));
+        }
+
+        // 좋아요 정렬
+        List<Post> posts = postRepository.findAll(spec);
+        List<PostResponseDto> postDtos = toPostDtos(posts, parent);
+
+        return sortAndPaginateByLike(postDtos, page, size);
+    }
+
+    private Specification<Post> getSortSpec(String sort) {
+        return switch (sort) {
+            case "hits" -> PostSpecification.orderByHits();
+            default -> PostSpecification.orderByCreatedAt();
+        };
+    }
+
+    private Parent findCurrentParent() {
+        return parentRepository.findByEmail(getCurrentEmail())
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+    }
+
+    private List<PostResponseDto> toPostDtos(List<Post> posts, Parent parent) {
+        return posts.stream()
+                .map(post -> {
+                    boolean isLike = likeRepository.existsByPostIdAndParentId(post.getId(), parent.getId());
+                    boolean isBookmark = bookmarkRepository.existsByPostIdAndParentId(post.getId(), parent.getId());
+                    int likeCount = redisPostService.getOrInit(post.getId(),
+                            () -> likeRepository.countByPostId(post.getId()), LIKE_COUNT_PREFIX);
+                    int commentCount = redisPostService.getOrInit(post.getId(),
+                            () -> commentRepository.countByPostId(post.getId()), COMMENT_COUNT_PREFIX);
+                    return PostResponseDto.from(post, post.getParent().getNickname(), likeCount, commentCount, isLike, isBookmark);
+                })
+                .collect(Collectors.toList());
+    }
+
+    private CustomPageResponse<PostResponseDto> sortAndPaginateByLike(List<PostResponseDto> dtos, int page, int size) {
+        dtos.sort(Comparator.comparingInt(PostResponseDto::likeCount).reversed());
+
+        int fromIndex = page * size;
+        int toIndex = Math.min(fromIndex + size, dtos.size());
+
+        if (fromIndex >= dtos.size()) {
+            return CustomPageResponse.from(new PageImpl<>(Collections.emptyList(), PageRequest.of(page, size), dtos.size()));
+        }
+
+        List<PostResponseDto> paged = new ArrayList<>(dtos.subList(fromIndex, toIndex));
+        return CustomPageResponse.from(new PageImpl<>(paged, PageRequest.of(page, size), dtos.size()));
+    }
+
+    @Transactional(readOnly = true)
+    public CustomPageResponse<PostResponseDto> getSearchPosts(String keyword, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Direction.DESC, "createdAt"));
+        Page<Post> postPage = postRepository.findByTitleContainingOrContentContaining(keyword, keyword, pageable);
+        Parent parent = findCurrentParent();
+        List<PostResponseDto> postDtos = toPostDtos(postPage.getContent(), parent);
+        return CustomPageResponse.from(postDtos, postPage);
     }
 }

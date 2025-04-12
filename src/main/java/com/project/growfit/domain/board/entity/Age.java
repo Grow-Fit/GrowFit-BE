@@ -1,5 +1,9 @@
 package com.project.growfit.domain.board.entity;
 
 public enum Age {
-    ZERO_TO_FIVE, SIX_TO_NINE, TEN_TO_TWELVE, THIRTEEN_TO_FIFTEEN, SIXTEEN_TO_EIGHTEEN
+    TODDLER,         // 유아
+    ELEMENTARY_LOW,  // 초등 저학년
+    ELEMENTARY_HIGH, // 초등 고학년
+    MIDDLE_SCHOOL,   // 중학생
+    TEENAGER         // 청소년
 }
