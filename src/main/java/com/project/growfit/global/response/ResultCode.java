@@ -18,14 +18,18 @@ public enum ResultCode {
     PARENT_LOGIN_SUCCESS(HttpStatus.OK, "부모 계정 로그인 성공."),
 
     //Diet
+    DIET_RETRIEVAL_SUCCESS(HttpStatus.OK, "식단을 성공적으로 조회했습니다."),
     DIET_SEARCH_SUCCESS(HttpStatus.OK, "식단 음식 검색에 성공하였습니다."),
     DIET_SEARCH_RESULT_EMPTY(HttpStatus.OK, "검색 결과가 없습니다."),
     DIET_DETAIL_RETRIEVAL_SUCCESS(HttpStatus.OK, "음식 상세 정보를 성공적으로 조회하였습니다."),
-    DIET_ADD_FOOD_SUCCESS(HttpStatus.OK, "식단에 음식이 성공적으로 추가되었습니다."),
+    DIET_ADD_SUCCESS(HttpStatus.OK, "식단이 성공적으로 추가되었습니다."),
     DIET_ADD_IMAGE_SUCCESS(HttpStatus.OK, "식단 사진이 성공적으로 업로드되었습니다."),
     DAILY_DIET_RETRIEVAL_SUCCESS(HttpStatus.OK, "일일 식단 조회에 성공하였습니다."),
-    DIET_DELETE_SUCCESS(HttpStatus.OK, "식단에서 음식이 성공적으로 삭제되었습니다."),
-    DIET_UPDATE_SUCCESS(HttpStatus.OK, "식단 정보가 성공적으로 수정되었습니다."),
+    DIET_FOOD_DELETE_SUCCESS(HttpStatus.OK, "식단에서 음식이 성공적으로 삭제되었습니다."),
+    DIET_DELETE_SUCCESS(HttpStatus.NO_CONTENT, "식단이 성공적으로 삭제되었습니다."),
+    DIET_EDIT_SUCCESS(HttpStatus.OK, "식단 정보가 성공적으로 수정되었습니다."),
+    STICKER_MARK_SUCCESS(HttpStatus.OK, "스티커가 성공적으로 등록되었습니다."),
+    CALENDAR_OVERVIEW_SUCCESS(HttpStatus.OK, "식단 캘린더 조회에 성공했습니다."),
 
     // Community
     CREATE_POST_SUCCESS(HttpStatus.OK, "글 등록 성공."),

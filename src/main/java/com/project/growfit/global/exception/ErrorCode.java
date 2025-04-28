@@ -51,7 +51,9 @@ public enum ErrorCode {
     FOOD_LIST_EMPTY(HttpStatus.BAD_REQUEST, "식단에 추가할 음식 정보가 비어있습니다."),
     DIET_IMAGE_UPLOAD_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "식단 이미지 업로드에 실패했습니다."),
     DIET_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 등록된 식단입니다."),
-    INVALID_DIET_TIME_SLOT(HttpStatus.BAD_REQUEST, "잘못된 식사 시간대입니다.");
+    INVALID_DIET_TIME_SLOT(HttpStatus.BAD_REQUEST, "잘못된 식사 시간대입니다."),
+    DUPLICATE_MEALTYPE(HttpStatus.CONFLICT, "이미 해당 끼니의 식단이 존재합니다."),
+    NO_FOOD_FOR_STICKER(HttpStatus.BAD_REQUEST, "음식이 등록되어야 스티커를 남길 수 있습니다.");
 
     private final HttpStatus status;
     private final String message;
