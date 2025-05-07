@@ -61,6 +61,8 @@ public class PostService {
     private static final String LIKE_COUNT_PREFIX = "like:count:";
     private static final String COMMENT_COUNT_PREFIX = "comment:count:";
 
+    private String imageUploadPath = "post/";
+
     @Transactional
     public Post savePost(PostRequestDto dto, List<MultipartFile> images) throws IOException {
         Parent parent = parentRepository.findByEmail(getCurrentEmail()).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
@@ -70,7 +72,7 @@ public class PostService {
         if (images != null && !images.isEmpty()) {
             int index = 0;
             for (MultipartFile image : images) {
-                String imageUrl = s3UploadService.saveFile(image);
+                String imageUrl = s3UploadService.saveFile(image, imageUploadPath);
                 Image imageEntity = Image.createImage(imageUrl, post, index++);
                 imageRepository.save(imageEntity);
             }
@@ -124,7 +126,7 @@ public class PostService {
         int currentOrderIndex = post.getImageList().size();
 
         for (MultipartFile image : images) {
-            String imageUrl = s3UploadService.saveFile(image);
+            String imageUrl = s3UploadService.saveFile(image, imageUploadPath);
             Image newImage = Image.createImage(imageUrl, post, currentOrderIndex++);
             imageRepository.save(newImage);
         }

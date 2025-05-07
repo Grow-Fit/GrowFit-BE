@@ -23,11 +23,11 @@ public class S3UploadService {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
-    public String saveFile(MultipartFile multipartFile) {
+    public String saveFile(MultipartFile multipartFile, String filePath) {
         try {
             String originalFilename = multipartFile.getOriginalFilename();
             String extension = extractExtension(originalFilename);
-            String uniqueFileName = UUID.randomUUID() + extension;
+            String uniqueFileName = filePath + UUID.randomUUID() + extension;
 
             ObjectMetadata metadata = new ObjectMetadata();
             metadata.setContentLength(multipartFile.getSize());
