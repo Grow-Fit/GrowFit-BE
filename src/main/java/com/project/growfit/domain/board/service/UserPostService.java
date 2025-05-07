@@ -32,6 +32,8 @@ public class UserPostService {
     private final ImageRepository imageRepository;
     private final S3UploadService s3UploadService;
 
+    private String imageUploadPath = "profile/";
+
     @Transactional(readOnly = true)
     public List<MyPageResponseListDto> getBookmarks(Long userId) {
         Parent parent = parentRepository.findByEmail(getCurrentEmail()).orElseThrow(() -> new BusinessException(
@@ -88,7 +90,7 @@ public class UserPostService {
         }
 
         if (image != null) {
-            parent.updateCommunityInfo(dto, s3UploadService.saveFile(image));
+            parent.updateCommunityInfo(dto, s3UploadService.saveFile(image, imageUploadPath));
             return;
         }
         parent.updateCommunityInfo(dto, null);
