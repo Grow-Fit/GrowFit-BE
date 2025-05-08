@@ -8,6 +8,8 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.project.growfit.global.exception.BusinessException;
 import com.project.growfit.global.exception.ErrorCode;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -50,11 +52,11 @@ public class S3UploadService {
     public void deleteFile(String fileUrl) {
         try {
             // S3 URL에서 파일명 추출
-            String fileName = extractFileNameFromUrl(fileUrl);
+            String objectKey = extractObjectKeyFromUrl(fileUrl);
 
             // S3에서 파일 삭제
-            amazonS3.deleteObject(bucket, fileName);
-        } catch (SdkClientException e) {
+            amazonS3.deleteObject(bucket, objectKey);
+        } catch (SdkClientException | URISyntaxException e) {
             throw new BusinessException(ErrorCode.FILE_DELETE_ERROR);
         }
     }
@@ -82,7 +84,8 @@ public class S3UploadService {
         return filename.substring(filename.lastIndexOf("."));
     }
 
-    private String extractFileNameFromUrl(String fileUrl) {
-        return fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
+    private String extractObjectKeyFromUrl(String fileUrl) throws URISyntaxException {
+        URI uri = new URI(fileUrl);
+        return uri.getPath().substring(1);
     }
 }
