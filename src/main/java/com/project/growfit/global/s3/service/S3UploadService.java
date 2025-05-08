@@ -23,6 +23,10 @@ public class S3UploadService {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
+    @Value("${cloud.aws.region.static}")
+    private String region;
+
+
     public String saveFile(MultipartFile multipartFile, String filePath) {
         try {
             String originalFilename = multipartFile.getOriginalFilename();
@@ -37,7 +41,7 @@ public class S3UploadService {
             amazonS3.putObject(new PutObjectRequest(bucket, uniqueFileName, multipartFile.getInputStream(), metadata)
                     .withCannedAcl(CannedAccessControlList.PublicRead));
 
-            return amazonS3.getUrl(bucket, uniqueFileName).toString();
+            return predictResizedImageUrl(amazonS3.getUrl(bucket, uniqueFileName).toString());
         } catch (IOException e) {
             throw new BusinessException(ErrorCode.FILE_UPLOAD_ERROR);
         }
@@ -53,6 +57,22 @@ public class S3UploadService {
         } catch (SdkClientException e) {
             throw new BusinessException(ErrorCode.FILE_DELETE_ERROR);
         }
+    }
+
+    public String predictResizedImageUrl(String originalImageUrl) {
+        String s3BaseUrl = "https://" + bucket + ".s3.ap-northeast-2.amazonaws.com/";
+
+        // s3 키 추출 ex) post/abc123.png
+        String originalKey = originalImageUrl.substring(originalImageUrl.indexOf(s3BaseUrl) + s3BaseUrl.length());
+
+        // 확장자 제거 ex) post/abc123
+        int extensionIndex = originalKey.lastIndexOf(".");
+        String withoutExtension = (extensionIndex != -1) ? originalKey.substring(0, extensionIndex) : originalKey;
+
+        // 리사이징된 경로 구성 ex) resized-post/abc123.webp
+        String resizedKey = "resized-" + withoutExtension + ".webp";
+
+        return s3BaseUrl + resizedKey;
     }
 
     private String extractExtension(String filename) {
