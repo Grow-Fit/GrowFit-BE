@@ -25,10 +25,6 @@ public class S3UploadService {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
-    @Value("${cloud.aws.region.static}")
-    private String region;
-
-
     public String saveFile(MultipartFile multipartFile, String filePath) {
         try {
             String originalFilename = multipartFile.getOriginalFilename();
