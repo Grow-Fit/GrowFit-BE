@@ -71,10 +71,8 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script_stop: true
           script: |
-            # 환경 변수를 설정
-            export DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}
-
             # Docker Compose 실행
+            docker rm -f redis || true # redis 컨테이너가 있을 경우 강제 삭제 (없으면 무시)
             sudo docker-compose -f /home/ubuntu/docker-compose.yml down
             sudo docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/growfit-server:latest
