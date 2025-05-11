@@ -75,7 +75,7 @@ jobs:
             export DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}
 
             # Docker Compose 실행
-            docker compose -f /home/ubuntu/docker-compose.yml down
+            sudo docker-compose -f /home/ubuntu/docker-compose.yml down
             sudo docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/growfit-server:latest
-            docker compose -f /home/ubuntu/docker-compose.yml up -d
+            sudo docker-compose -f /home/ubuntu/docker-compose.yml up -d
