@@ -72,6 +72,6 @@ jobs:
           script_stop: true
           script: |
             docker compose -f /home/compose/docker-compose.yml down
-            sudo docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_TOKEN }}
+            sudo docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/growfit-server:latest
             docker compose -f /home/compose/docker-compose.yml up -d
