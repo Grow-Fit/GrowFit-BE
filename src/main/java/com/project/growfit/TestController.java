@@ -19,6 +19,7 @@ public class TestController {
                 createMap(2, "Second"),
                 createMap(3, "Third")
         );
+        System.out.println("test");
         return new ResultResponse<>(ResultCode.RESPONSE_TEST, dataList);
     }
 
