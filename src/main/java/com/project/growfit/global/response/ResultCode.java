@@ -18,6 +18,15 @@ public enum ResultCode {
     PARENT_LOGIN_SUCCESS(HttpStatus.OK, "부모 계정 로그인 성공."),
 
     //Diet
+    STICKER_DELETE_SUCCESS(HttpStatus.OK, "스티커 삭제에 성공했습니다."),
+    CHILD_PHOTO_DELETE_SUCCESS(HttpStatus.OK, "아이 식단 사진 삭제에 성공했습니다."),
+    DIET_SET_LIST_SUCCESS(HttpStatus.OK, "식단 세트 목록 조회에 성공하였습니다."),
+    DIET_SET_SAVE_SUCCESS(HttpStatus.CREATED, "식단 세트 저장에 성공하였습니다."),
+    DIET_SET_DETAIL_SUCCESS(HttpStatus.OK, "식단 세트 상세 조회에 성공하였습니다."),
+    DIET_OVERRIDE_SUCCESS(HttpStatus.OK, "식단 불이행 정보 입력에 성공했습니다."),
+    DIET_TIME_UPDATE_SUCCESS(HttpStatus.OK, "식단 시간 수정에 성공하였습니다."),
+    CHILD_PHOTO_UPLOAD_SUCCESS(HttpStatus.OK, "이미지 업로드 성공"),
+    CHILD_LOG_UPLOAD_SUCCESS(HttpStatus.OK, " 섭취 식단 업데이트 성공"),
     DIET_RETRIEVAL_SUCCESS(HttpStatus.OK, "식단을 성공적으로 조회했습니다."),
     DIET_SEARCH_SUCCESS(HttpStatus.OK, "식단 음식 검색에 성공하였습니다."),
     DIET_SEARCH_RESULT_EMPTY(HttpStatus.OK, "검색 결과가 없습니다."),
@@ -30,7 +39,11 @@ public enum ResultCode {
     DIET_EDIT_SUCCESS(HttpStatus.OK, "식단 정보가 성공적으로 수정되었습니다."),
     STICKER_MARK_SUCCESS(HttpStatus.OK, "스티커가 성공적으로 등록되었습니다."),
     CALENDAR_OVERVIEW_SUCCESS(HttpStatus.OK, "식단 캘린더 조회에 성공했습니다."),
-
+    DIET_COPY_SUCCESS(HttpStatus.OK, "식단 복사에 성공했습니다."),
+    DIET_SET_RETRIEVAL_SUCCESS(HttpStatus.OK, "식단 세트 조회에 성공했습니다."),
+    DIET_SET_DELETE_SUCCESS(HttpStatus.OK, "식단 세트 삭제에 성공했습니다."),
+    DIET_SET_EDIT_SUCCESS(HttpStatus.OK, "식단 세트 수정에 성공했습니다." ),
+    STICKER_UPDATE_SUCCESS(HttpStatus.OK, "스티커가 수정되었습니다."),
     // Community
     CREATE_POST_SUCCESS(HttpStatus.OK, "글 등록 성공."),
     GET_POST_SUCCESS(HttpStatus.OK, "글 조회 성공"),

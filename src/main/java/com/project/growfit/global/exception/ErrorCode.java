@@ -45,16 +45,20 @@ public enum ErrorCode {
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "댓글을 찾을 수 없습니다."),
 
     //Diet
+    INVALID_TIME_FORMAT(HttpStatus.BAD_REQUEST, "유효하지 않은 시간 형식입니다."),
+    STICKER_NOT_FOUND(HttpStatus.NOT_FOUND, "등록된 스티커가 존재하지 않습니다."),
     DIET_NOT_FOUND(HttpStatus.NOT_FOUND, "요청한 식단을 찾을 수 없습니다."),
     DAILY_DIET_NOT_FOUND(HttpStatus.NOT_FOUND, "요청한 날짜의 식단 정보가 존재하지 않습니다."),
-    FOOD_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 음식 정보를 찾을 수 없습니다."),
+    DIET_SET_NOT_FOUND(HttpStatus.NOT_FOUND, "요청한 식단 세트를 찾을 수 없습니다."),
+    NO_SELECTED_FOOD(HttpStatus.BAD_REQUEST, "선택된 음식이 없습니다."),
+    INVALID_FOOD_SOURCE_TYPE(HttpStatus.BAD_REQUEST, "유효하지 않은 음식 출처 타입입니다."),
+    FOOD_NOT_FOUND(HttpStatus.NOT_FOUND, "음식 정보를 찾을 수 없습니다."),
     FOOD_LIST_EMPTY(HttpStatus.BAD_REQUEST, "식단에 추가할 음식 정보가 비어있습니다."),
     DIET_IMAGE_UPLOAD_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "식단 이미지 업로드에 실패했습니다."),
     DIET_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 등록된 식단입니다."),
     INVALID_DIET_TIME_SLOT(HttpStatus.BAD_REQUEST, "잘못된 식사 시간대입니다."),
     DUPLICATE_MEALTYPE(HttpStatus.CONFLICT, "이미 해당 끼니의 식단이 존재합니다."),
     NO_FOOD_FOR_STICKER(HttpStatus.BAD_REQUEST, "음식이 등록되어야 스티커를 남길 수 있습니다.");
-
     private final HttpStatus status;
     private final String message;
 }
