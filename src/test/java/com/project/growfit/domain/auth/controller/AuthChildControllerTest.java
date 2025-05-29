@@ -1,10 +1,11 @@
 package com.project.growfit.domain.auth.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.project.growfit.domain.auth.dto.request.ChildCredentialsRequest;
-import com.project.growfit.domain.auth.dto.request.FindChildPasswordRequestDto;
-import com.project.growfit.domain.auth.dto.request.UpdateNicknameRequestDto;
-import com.project.growfit.domain.auth.service.AuthChildService;
+import com.project.growfit.domain.User.controller.AuthChildController;
+import com.project.growfit.domain.User.dto.request.ChildCredentialsRequest;
+import com.project.growfit.domain.User.dto.request.FindChildPasswordRequestDto;
+import com.project.growfit.domain.User.dto.request.UpdateNicknameRequestDto;
+import com.project.growfit.domain.User.service.AuthChildService;
 import com.project.growfit.global.auto.jwt.excpetion.CustomAuthenticationEntryPoint;
 import com.project.growfit.global.config.SecurityConfig;
 import com.project.growfit.global.response.ResultCode;
@@ -48,7 +49,6 @@ class AuthChildControllerTest {
 
     @BeforeEach
     void setUp() {
-        // Mockito 초기화는 필요 없음 (@WebMvcTest가 알아서 해줌)
     }
 
     @Test
