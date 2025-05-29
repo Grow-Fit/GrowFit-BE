@@ -1,5 +1,6 @@
 package com.project.growfit.domain.notice.controller;
 
+import com.project.growfit.domain.notice.dto.response.NoticeListResponseDto;
 import com.project.growfit.domain.notice.dto.response.NoticeResponseDto;
 import com.project.growfit.domain.notice.service.NoticeService;
 import com.project.growfit.domain.notice.service.SseEmitterService;
@@ -7,6 +8,7 @@ import com.project.growfit.global.response.ResultCode;
 import com.project.growfit.global.response.ResultResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -50,5 +52,12 @@ public class SseController {
     public ResultResponse<NoticeResponseDto> getNotice(@PathVariable Long noticeId) {
         NoticeResponseDto dto = noticeService.getNotice(noticeId);
         return new ResultResponse<>(ResultCode.GET_NOTICE_SUCCESS, dto);
+    }
+
+    @GetMapping("/notice")
+    @Operation(summary = "알림 리스트 조회", description = "알림 수신자는 알림들을 목록으로 조회할 수 있습니다.")
+    public ResultResponse<List<NoticeListResponseDto>> getNotices() {
+        List<NoticeListResponseDto> list = noticeService.getNotices();
+        return new ResultResponse<>(ResultCode.GET_NOTICE_SUCCESS, list);
     }
 }

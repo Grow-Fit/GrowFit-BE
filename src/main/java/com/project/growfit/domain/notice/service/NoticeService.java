@@ -5,6 +5,7 @@ import com.project.growfit.domain.User.entity.Parent;
 import com.project.growfit.domain.User.repository.ChildRepository;
 import com.project.growfit.domain.User.repository.ParentRepository;
 import com.project.growfit.domain.notice.dto.request.NoticeRequestDto;
+import com.project.growfit.domain.notice.dto.response.NoticeListResponseDto;
 import com.project.growfit.domain.notice.dto.response.NoticeResponseDto;
 import com.project.growfit.domain.notice.entity.Notice;
 import com.project.growfit.domain.notice.entity.NoticeType;
@@ -13,6 +14,8 @@ import com.project.growfit.domain.notice.repository.NoticeRepository;
 import com.project.growfit.global.auto.dto.CustomUserDetails;
 import com.project.growfit.global.exception.BusinessException;
 import com.project.growfit.global.exception.ErrorCode;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -40,7 +43,7 @@ public class NoticeService {
         return notice;
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public NoticeResponseDto getNotice(Long noticeId) {
         String userRole = getCurrentUserDetails().getRole();
         TargetType targetType;
@@ -65,6 +68,30 @@ public class NoticeService {
 
         return NoticeResponseDto.from(notice, nickname);
     }
+
+    @Transactional(readOnly = true)
+    public List<NoticeListResponseDto> getNotices() {
+        String userRole = getCurrentUserDetails().getRole();
+        TargetType targetType;
+        Long targetId;
+
+        if (userRole.equals(PARENT_USER_ROLE)) {
+            Parent parent = parentRepository.findByEmail(getCurrentUserDetails().getEmail()).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+            targetType = TargetType.PARENT;
+            targetId = parent.getId();
+        } else if (userRole.equals(CHILD_USER_ROLE)) {
+            Child child = childRepository.findByLoginId(getCurrentUserDetails().getUserId()).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+            targetType = TargetType.CHILD;
+            targetId = child.getId();
+        } else {
+            throw new BusinessException(ErrorCode.USER_NOT_FOUND);
+        }
+
+        List<Notice> notices = noticeRepository.findByTargetTypeAndTargetIdOrderByCreatedAtDesc(targetType, targetId);
+
+        return notices.stream().map(NoticeListResponseDto::from).collect(Collectors.toList());
+    }
+
 
     private CustomUserDetails getCurrentUserDetails() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
