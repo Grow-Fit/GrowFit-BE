@@ -2,27 +2,22 @@ package com.project.growfit.domain.Diet.service;
 
 import com.project.growfit.domain.Diet.dto.request.AddDietRequestDto;
 import com.project.growfit.domain.Diet.dto.request.UpdateDietRequestDto;
+import com.project.growfit.domain.Diet.dto.request.UpdateNutritionRequestDto;
 import com.project.growfit.domain.Diet.entity.Sticker;
-import com.project.growfit.global.auto.dto.CustomUserDetails;
 import com.project.growfit.global.response.ResultResponse;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-
 public interface DietService {
 
-    // 1. 음식 검색어로 조회
-    ResultResponse<?> searchFoods(CustomUserDetails user, String keyword, int page, int size);
+    ResultResponse<?> searchFoods(String keyword, int page, int size);
 
-    // 2.  음식 데이터 상세 조회
-    ResultResponse<?> getFoodDetail(CustomUserDetails user, Long foodId);
+    ResultResponse<?> getFoodDetail(Long foodId);
 
-    // 3. 식단 추가
-    ResultResponse<?> addDiet(CustomUserDetails user, AddDietRequestDto dto);
+    ResultResponse<?> addDiet(AddDietRequestDto dto);
 
     ResultResponse<?> getDailyDietById(Long dailyId);
 
-    ResultResponse<?> getDailyDietByDate(CustomUserDetails user, String date);
+    ResultResponse<?> getDailyDietByDate(String date);
 
     ResultResponse<?> deleteDiet(Long dietId);
 
@@ -30,5 +25,20 @@ public interface DietService {
 
     ResultResponse<?> markSticker(Long dailyDietId, Sticker sticker);
 
-    ResultResponse<?> getMonthlyStickersByParent(CustomUserDetails user, String month);
+    ResultResponse<?> getMonthlyStickersByParent(String month);
+
+    ResultResponse<?> uploadPhoto(Long dietId, MultipartFile image);
+    ResultResponse<?> updateDietFood(Long dietId, String log);
+
+    ResultResponse<?> updateDietTime(Long dietId, String newTime);
+
+    ResultResponse<?> overrideDietNutrition(Long dietId, UpdateNutritionRequestDto dto);
+
+    ResultResponse<?> getDietDetail(Long dietId);
+
+    ResultResponse<?> deletePhoto(Long dietId);
+
+    ResultResponse<?> deleteSticker(Long dailyDietId);
+
+    ResultResponse<?> updateSticker(Long dailyDietId, Sticker sticker);
 }
