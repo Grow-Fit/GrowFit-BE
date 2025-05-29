@@ -30,7 +30,9 @@ public enum ResultCode {
     COMMENT_POST_SUCCESS(HttpStatus.OK, "댓글 작성 성공"),
     GET_COMMENTS_SUCCESS(HttpStatus.OK, "댓글 조회 성공"),
     GET_PROFILE_SUCCESS(HttpStatus.OK, "프로필 조회 성공"),
-    UPDATE_PROFILE_SUCCESS(HttpStatus.OK, "프로필 수정 성공");
+    UPDATE_PROFILE_SUCCESS(HttpStatus.OK, "프로필 수정 성공"),
+
+    GET_NOTICE_SUCCESS(HttpStatus.OK, "알림 조회 성공");
 
     private final HttpStatus status;
     private final String message;

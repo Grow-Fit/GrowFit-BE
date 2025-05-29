@@ -1,23 +1,29 @@
 package com.project.growfit.domain.notice.controller;
 
+import com.project.growfit.domain.notice.dto.response.NoticeResponseDto;
+import com.project.growfit.domain.notice.service.NoticeService;
 import com.project.growfit.domain.notice.service.SseEmitterService;
+import com.project.growfit.global.response.ResultCode;
+import com.project.growfit.global.response.ResultResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @RestController
-@RequestMapping("/api/sse")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 @Tag(name = "SSE 알림", description = "알림 관련 API")
 public class SseController {
 
     private final SseEmitterService sseEmitterService;
+    private final NoticeService noticeService;
 
-    @GetMapping(value = "/subscribe", produces = "text/event-stream")
+    @GetMapping(value = "/sse/subscribe", produces = "text/event-stream")
     @Operation(summary = "알림 이벤트 구독",
             description = """
         클라이언트(프론트엔드)에서 서버의 알림 이벤트를 실시간으로 수신받기 위해 구독하는 API입니다.
@@ -37,5 +43,12 @@ public class SseController {
         """)
     public SseEmitter subscribe() {
         return sseEmitterService.subscribe();
+    }
+
+    @GetMapping("/notice/{noticeId}")
+    @Operation(summary = "알림 상세 조회", description = "알림 수신자는 알림 id로 수신 알림을 조회할 수 있다.")
+    public ResultResponse<NoticeResponseDto> getNotice(@PathVariable Long noticeId) {
+        NoticeResponseDto dto = noticeService.getNotice(noticeId);
+        return new ResultResponse<>(ResultCode.GET_NOTICE_SUCCESS, dto);
     }
 }
