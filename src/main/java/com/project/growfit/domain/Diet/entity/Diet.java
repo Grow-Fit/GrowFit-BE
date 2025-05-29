@@ -1,30 +1,20 @@
 package com.project.growfit.domain.Diet.entity;
 
 import com.project.growfit.domain.Diet.dto.request.UpdateDietRequestDto;
+import com.project.growfit.domain.Diet.dto.request.UpdateNutritionRequestDto;
 import com.project.growfit.domain.User.entity.Child;
 import com.project.growfit.global.entity.BaseEntity;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
-
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Getter
@@ -39,6 +29,9 @@ public class Diet extends BaseEntity {
 
     @Column(name = "time", nullable = false)
     private LocalTime time;
+
+    @Column(name = "image")
+    private String imageUrl;
 
     @Column(name = "meal_type", nullable = false)
     @Enumerated(EnumType.STRING)
@@ -56,8 +49,25 @@ public class Diet extends BaseEntity {
     @JoinColumn(name = "total_calorie")
     private double totalCalorie;
 
+    @Column(nullable = false)
+    @JoinColumn(name = "food_log")
+    private String foodLog;
+
     @OneToMany(mappedBy = "diet", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Food> foodList = new ArrayList<>();
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "state")
+    private DietState state;
+
+    @Column(nullable = false)
+    private double totalCarbohydrate;
+
+    @Column(nullable = false)
+    private double totalProtein;
+
+    @Column(nullable = false)
+    private double totalFat;
 
     public static Diet create(String time, MealType mealType, DailyDiet dailyDiet, Child child, @NotBlank(message = "음식을 입력해주세요.") List<Food> foodList) {
         Diet diet = new Diet();
@@ -65,11 +75,16 @@ public class Diet extends BaseEntity {
         diet.mealType = mealType;
         diet.dailyDiet = dailyDiet;
         diet.child = child;
-        for (Food food : foodList) {
-            food.registerDiet(diet);
-        }
-        diet.foodList = foodList;
+        for (Food food : foodList) food.registerDiet(diet);
+        diet.foodLog = foodList.stream()
+                .map(Food::getName)
+                .collect(Collectors.joining(", "));
         diet.totalCalorie = calcCalorie(foodList);
+        diet.totalCarbohydrate = foodList.stream().mapToDouble(Food::getCarbohydrate).sum();
+        diet.totalProtein = foodList.stream().mapToDouble(Food::getProtein).sum();
+        diet.totalFat = foodList.stream().mapToDouble(Food::getFat).sum();
+        diet.foodList = foodList;
+        diet.state = DietState.NONE;
         return diet;
     }
 
@@ -85,6 +100,9 @@ public class Diet extends BaseEntity {
         for (Food food : foodList) this.addFood(food);
         this.totalCalorie = calcCalorie(foodList);
     }
+    public void updateState(DietState newState) {
+        this.state = newState;
+    }
 
     public void registerDailyDiet(DailyDiet dailyDiet) {
         this.dailyDiet = dailyDiet;
@@ -95,4 +113,44 @@ public class Diet extends BaseEntity {
         for (Food food : foodList) total += food.getCalorie();
         return total;
     }
+    public void updateImage(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public DietState evaluateDietState(String foodLog) {
+        if (foodLog == null || foodLog.trim().isEmpty()) {
+            return DietState.ACHIEVED;
+        }
+
+        Set<String> loggedFoods = Arrays.stream(foodLog.split("[,\\s]+"))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.toSet());
+
+        Set<String> expectedFoods = this.foodList.stream()
+                .map(Food::getName)
+                .map(String::trim)
+                .collect(Collectors.toSet());
+
+        if (loggedFoods.equals(expectedFoods)) {
+            return DietState.ACHIEVED;
+        } else {
+            this.foodLog = foodLog;
+            return DietState.UNACHIEVED;
+        }
+    }
+
+    public void modifyByParent(UpdateNutritionRequestDto dto) {
+        this.state = DietState.MODIFIED_BY_PARENT;
+        this.totalCalorie = dto.totalCalorie();
+        this.totalCarbohydrate = dto.carbohydrate();
+        this.totalFat = dto.fat();
+        this.totalProtein = dto.protein();
+        this.foodList.clear();
+    }
+
+    public void updateTime(LocalTime newTime) {
+        this.time = newTime;
+    }
+
 }

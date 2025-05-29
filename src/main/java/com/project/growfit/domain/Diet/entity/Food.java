@@ -37,6 +37,9 @@ public class Food extends BaseEntity {
     @Column(nullable = false)
     private double protein;
 
+    @Column(nullable = false)
+    private int count = 1;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "diet_id")
     private Diet diet;
@@ -45,7 +48,7 @@ public class Food extends BaseEntity {
         this.diet = diet;
     }
 
-    public static Food fromFood(FoodApi api) {
+    public static Food fromFood(FoodApi api, int count) {
         Food food = new Food();
         food.sourceType = FoodSourceType.API;
         food.name = api.getFoodNm();
@@ -53,19 +56,36 @@ public class Food extends BaseEntity {
         food.carbohydrate = api.getChocdf();
         food.fat = api.getFatce();
         food.protein = api.getProt();
+        food.count = count;
         return food;
     }
 
-    public static Food fromFood(CustomFood customFood) {
+    private Food(FoodSourceType sourceType, String name, double calorie, double carbohydrate, double fat, double protein, int count, Diet diet) {
+        this.sourceType = sourceType;
+        this.name = name;
+        this.calorie = calorie;
+        this.carbohydrate = carbohydrate;
+        this.fat = fat;
+        this.protein = protein;
+        this.diet = diet;
+    }
+
+    public static Food create(FoodSourceType sourceType, String name, double calorie, double carbohydrate, double fat, double protein, int count, Diet diet) {
+        return new Food(sourceType, name, calorie, carbohydrate, fat, protein, count, diet);
+    }
+
+    public static Food fromFood(CustomFood customFood, int count) {
         Food food = new Food();
+        food.sourceType = FoodSourceType.CUSTOM;
         food.name = customFood.getName();
         food.calorie = customFood.getCalorie();
         food.carbohydrate = customFood.getCarbohydrate();
         food.fat = customFood.getFat();
         food.protein = customFood.getProtein();
-        food.sourceType = FoodSourceType.CUSTOM;
+        food.count = count;
         return food;
     }
+
 
     public void addDiet(Diet diet) {
         this.diet = diet;

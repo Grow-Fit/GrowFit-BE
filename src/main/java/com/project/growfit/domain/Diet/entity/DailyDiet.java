@@ -8,7 +8,6 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +36,7 @@ public class DailyDiet extends BaseEntity {
 
     @Column(nullable = false)
     @JoinColumn(name = "total_calorie")
-    private double totalCalorie;
+    private long totalCalorie;
 
     @OneToMany(mappedBy = "dailyDiet", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Diet> diets = new ArrayList<>();
