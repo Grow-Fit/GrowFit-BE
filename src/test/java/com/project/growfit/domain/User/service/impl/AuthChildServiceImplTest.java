@@ -1,10 +1,11 @@
 package com.project.growfit.domain.auth.service.impl;
 
-import com.project.growfit.domain.auth.dto.request.ChildCredentialsRequest;
-import com.project.growfit.domain.auth.dto.request.FindChildPasswordRequestDto;
-import com.project.growfit.domain.auth.dto.response.ChildInfoResponseDto;
-import com.project.growfit.domain.auth.entity.Child;
-import com.project.growfit.domain.auth.repository.ChildRepository;
+import com.project.growfit.domain.User.dto.request.ChildCredentialsRequest;
+import com.project.growfit.domain.User.dto.request.FindChildPasswordRequestDto;
+import com.project.growfit.domain.User.dto.response.ChildInfoResponseDto;
+import com.project.growfit.domain.User.entity.Child;
+import com.project.growfit.domain.User.repository.ChildRepository;
+import com.project.growfit.domain.User.service.impl.AuthChildServiceImpl;
 import com.project.growfit.global.auto.jwt.JwtProvider;
 import com.project.growfit.global.auto.service.CustomAuthenticationProvider;
 import com.project.growfit.global.exception.BusinessException;
@@ -63,7 +64,7 @@ class AuthChildServiceImplTest {
     void findByCode_Success() {
         // Given
         String code = "testCode";
-        when(childRepository.findByCode(code)).thenReturn(Optional.of(mockChild));
+        when(childRepository.findByCodeNumber(code)).thenReturn(Optional.of(mockChild));
 
         // When
         ResultResponse<?> response = authChildService.findByCode(code);
@@ -71,7 +72,7 @@ class AuthChildServiceImplTest {
         // Then
         assertThat(response).isNotNull();
         assertThat(response.getData()).isInstanceOf(ChildInfoResponseDto.class);
-        verify(childRepository, times(1)).findByCode(code);
+        verify(childRepository, times(1)).findByCodeNumber(code);
     }
 
     @Test
@@ -79,14 +80,14 @@ class AuthChildServiceImplTest {
     void findByCode_NotFound() {
         // Given
         String code = "invalidCode";
-        when(childRepository.findByCode(code)).thenReturn(Optional.empty());
+        when(childRepository.findByCodeNumber(code)).thenReturn(Optional.empty());
 
         // When & Then
         assertThatThrownBy(() -> authChildService.findByCode(code))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage(ErrorCode.CHILD_NOT_FOUND.getMessage());
 
-        verify(childRepository, times(1)).findByCode(code);
+        verify(childRepository, times(1)).findByCodeNumber(code);
     }
 
     @Test
@@ -95,7 +96,7 @@ class AuthChildServiceImplTest {
         // Given
         Long childId = 1L;
         ChildCredentialsRequest request = new ChildCredentialsRequest("childTestId", "password123");
-        when(childRepository.findByPid(childId)).thenReturn(Optional.of(mockChild));
+        when(childRepository.findById(childId)).thenReturn(Optional.of(mockChild));
         when(passwordEncoder.encode(request.childPassword())).thenReturn("encodedPassword");
 
         // When
@@ -112,14 +113,14 @@ class AuthChildServiceImplTest {
         // Given
         Long childId = 999L;
         ChildCredentialsRequest request = new ChildCredentialsRequest("childTestId", "password123");
-        when(childRepository.findByPid(childId)).thenReturn(Optional.empty());
+        when(childRepository.findById(childId)).thenReturn(Optional.empty());
 
         // When & Then
         assertThatThrownBy(() -> authChildService.registerChildCredentials(childId, request))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage(ErrorCode.CHILD_NOT_FOUND.getMessage());
 
-        verify(childRepository, times(1)).findByPid(childId);
+        verify(childRepository, times(1)).findById(childId);
     }
 
     @Test
@@ -127,8 +128,8 @@ class AuthChildServiceImplTest {
     void findChildPassword_Success() {
         // Given
         FindChildPasswordRequestDto request = new FindChildPasswordRequestDto("childTestId", "testCode", "newPassword");
-        when(childRepository.existsByCodeAndChildId(request.code(), request.user_id())).thenReturn(true);
-        when(childRepository.findByCode(request.code())).thenReturn(Optional.of(mockChild));
+        when(childRepository.existsByCodeNumberAndLoginId(request.code(), request.user_id())).thenReturn(true);
+        when(childRepository.findByCodeNumber(request.code())).thenReturn(Optional.of(mockChild));
 
         // When
         ResultResponse<?> response = authChildService.findChildPassword(request);
@@ -143,13 +144,13 @@ class AuthChildServiceImplTest {
     void findChildPassword_NotFound() {
         // Given
         FindChildPasswordRequestDto request = new FindChildPasswordRequestDto("childTestId", "invalidCode", "newPassword");
-        when(childRepository.existsByCodeAndChildId(request.code(), request.user_id())).thenReturn(false);
+        when(childRepository.existsByCodeNumberAndLoginId(request.code(), request.user_id())).thenReturn(false);
 
         // When & Then
         assertThatThrownBy(() -> authChildService.findChildPassword(request))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage(ErrorCode.CHILD_NOT_FOUND.getMessage());
 
-        verify(childRepository, times(1)).existsByCodeAndChildId(request.code(), request.user_id());
+        verify(childRepository, times(1)).existsByCodeNumberAndLoginId(request.code(), request.user_id());
     }
 }

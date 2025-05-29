@@ -1,7 +1,7 @@
-package com.project.growfit.domain.auth.controller;
+
+package com.project.growfit.domain.User.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.project.growfit.domain.User.controller.AuthParentController;
 import com.project.growfit.domain.User.dto.request.RegisterChildRequest;
 import com.project.growfit.domain.User.dto.request.UpdateNicknameRequestDto;
 import com.project.growfit.domain.User.entity.Parent;
