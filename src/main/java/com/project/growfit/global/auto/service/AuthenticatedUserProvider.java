@@ -19,13 +19,21 @@ public class AuthenticatedUserProvider {
     private final ParentRepository parentRepository;
     private final ChildRepository childRepository;
 
-    public Object getAuthenticatedUser() {
-        CustomUserDetails details = getCurrentUser();
-        return switch (details.user_role()) {
-            case "ROLE_PARENT" -> parentRepository.findByEmail(details.getUserId())
-                    .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
-            case "ROLE_CHILD" -> childRepository.findByLoginId(details.getUserId())
-                    .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+    public Parent getAuthenticatedParent() {
+        CustomUserDetails user = getCurrentUser();
+        validateRole(user, "ROLE_PARENT");
+        return getParentByEmail(user.getEmail());
+    }
+
+
+    public Child getAuthenticatedChild() {
+        CustomUserDetails user = getCurrentUser();
+        return switch (user.getRole()) {
+            case "ROLE_CHILD" -> getChildByLoginId(user.getUserId());
+            case "ROLE_PARENT" -> {
+                Parent parent = getParentByEmail(user.getEmail());
+                yield getChildByParent(parent);
+            }
             default -> throw new BusinessException(ErrorCode.FORBIDDEN_ACCESS);
         };
     }
@@ -37,5 +45,26 @@ public class AuthenticatedUserProvider {
     private CustomUserDetails getCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return (CustomUserDetails) auth.getPrincipal();
+    }
+
+    private void validateRole(CustomUserDetails user, String requiredRole) {
+        if (!user.getRole().equals(requiredRole)) {
+            throw new BusinessException(ErrorCode.FORBIDDEN_ACCESS);
+        }
+    }
+
+    private Parent getParentByEmail(String email) {
+        return parentRepository.findByEmail(email)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+    }
+
+    private Child getChildByLoginId(String loginId) {
+        return childRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.CHILD_NOT_FOUND));
+    }
+
+    private Child getChildByParent(Parent parent) {
+        return childRepository.findByParent(parent)
+                .orElseThrow(() -> new BusinessException(ErrorCode.CHILD_NOT_FOUND));
     }
 }
