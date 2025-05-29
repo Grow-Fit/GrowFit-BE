@@ -63,4 +63,8 @@ public class Notice extends BaseEntity {
 
         return notice;
     }
+
+    public void readNotice() {
+        this.isRead = true;
+    }
 }

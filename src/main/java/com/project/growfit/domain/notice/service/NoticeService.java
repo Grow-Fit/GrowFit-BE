@@ -65,6 +65,7 @@ public class NoticeService {
         }
 
         Notice notice = noticeRepository.findByIdAndTargetTypeAndTargetId(noticeId, targetType, targetId).orElseThrow(() -> new BusinessException(ErrorCode.NOTICE_NOT_FOUND));
+        notice.readNotice();  // 조회 시 읽음
 
         return NoticeResponseDto.from(notice, nickname);
     }
