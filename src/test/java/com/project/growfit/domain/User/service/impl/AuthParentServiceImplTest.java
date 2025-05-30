@@ -1,14 +1,14 @@
-package com.project.growfit.domain.auth.service.impl;
+package com.project.growfit.domain.User.service.impl;
 
 import com.google.zxing.WriterException;
-import com.project.growfit.domain.auth.dto.request.RegisterChildRequest;
-import com.project.growfit.domain.auth.dto.request.UpdateNicknameRequestDto;
-import com.project.growfit.domain.auth.dto.response.ChildQrCodeResponseDto;
-import com.project.growfit.domain.auth.entity.Child;
-import com.project.growfit.domain.auth.entity.Parent;
-import com.project.growfit.domain.auth.entity.ROLE;
-import com.project.growfit.domain.auth.repository.ChildRepository;
-import com.project.growfit.domain.auth.repository.ParentRepository;
+import com.project.growfit.domain.User.dto.request.RegisterChildRequest;
+import com.project.growfit.domain.User.dto.request.UpdateNicknameRequestDto;
+import com.project.growfit.domain.User.dto.response.ChildQrCodeResponseDto;
+import com.project.growfit.domain.User.entity.Child;
+import com.project.growfit.domain.User.entity.Parent;
+import com.project.growfit.domain.User.entity.ROLE;
+import com.project.growfit.domain.User.repository.ChildRepository;
+import com.project.growfit.domain.User.repository.ParentRepository;
 import com.project.growfit.global.auto.dto.CustomUserDetails;
 import com.project.growfit.global.exception.BusinessException;
 import com.project.growfit.global.exception.ErrorCode;
@@ -106,7 +106,7 @@ class AuthParentServiceImplTest {
     void createQR_Success() throws WriterException {
         // Given
         Long childId = 1L;
-        when(childRepository.findByPid(childId)).thenReturn(Optional.of(mockChild));
+        when(childRepository.findById(childId)).thenReturn(Optional.of(mockChild));
 
         // When
         ResultResponse<?> response = authParentService.createQR(mockUserDetails, childId);
@@ -114,7 +114,7 @@ class AuthParentServiceImplTest {
         // Then
         assertThat(response).isNotNull();
         assertThat(response.getData()).isInstanceOf(ChildQrCodeResponseDto.class);
-        verify(childRepository, times(1)).findByPid(childId);
+        verify(childRepository, times(1)).findById(childId);
     }
 
     @Test
@@ -122,14 +122,14 @@ class AuthParentServiceImplTest {
     void createQR_ChildNotFound() {
         // Given
         Long childId = 999L;
-        when(childRepository.findByPid(childId)).thenReturn(Optional.empty());
+        when(childRepository.findById(childId)).thenReturn(Optional.empty());
 
         // When & Then
         assertThatThrownBy(() -> authParentService.createQR(mockUserDetails, childId))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage(ErrorCode.USER_NOT_FOUND.getMessage());
 
-        verify(childRepository, times(1)).findByPid(childId);
+        verify(childRepository, times(1)).findById(childId);
     }
 
     private void setField(Object target, String fieldName, Object value) throws Exception {
