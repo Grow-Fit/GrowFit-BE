@@ -44,12 +44,16 @@ public class Notice extends BaseEntity {
     @Column(name = "is_read", nullable = false)
     private boolean isRead = false;
 
+    @Column(name = "weekly_goal_id")
+    private Long weeklyGoalId;
+
     public static Notice createNoticeParentToChild(NoticeRequestDto dto, Child child, NoticeType noticeType) {
         Notice notice = new Notice();
         notice.targetType = TargetType.CHILD;
         notice.targetId = child.getId();
         notice.message = dto.getMessage();
         notice.noticeType = noticeType;
+        if (noticeType.equals(NoticeType.PRAISE_LETTER)) notice.weeklyGoalId = child.getId();  // 부모가 편지를 작성한 경우(목표보드), 해당 주간 목표 id 저장
 
         return notice;
     }
