@@ -46,6 +46,7 @@ public enum ErrorCode {
 
     WRONG_USER_ROLE(HttpStatus.BAD_REQUEST, "사용자의 역할이 잘못되었습니다."),
     NOTICE_NOT_FOUND(HttpStatus.NOT_FOUND, "알림을 찾을 수 없습니다"),
+    WRONG_TARGET_TYPE(HttpStatus.BAD_REQUEST, "대상 타입이 잘못되었습니다"),
 
     //Diet
     INVALID_TIME_FORMAT(HttpStatus.BAD_REQUEST, "유효하지 않은 시간 형식입니다."),

@@ -13,12 +13,14 @@ import com.project.growfit.domain.notice.entity.TargetType;
 import com.project.growfit.domain.notice.repository.NoticeRepository;
 import com.project.growfit.domain.notice.service.NoticeService;
 import com.project.growfit.global.auto.dto.CustomUserDetails;
+import com.project.growfit.global.event.NoticeSavedEvent;
 import com.project.growfit.global.exception.BusinessException;
 import com.project.growfit.global.exception.ErrorCode;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -32,6 +34,7 @@ public class NoticeServiceImpl implements NoticeService {
     private final ParentRepository parentRepository;
     private final ChildRepository childRepository;
     private final NoticeRepository noticeRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     private static final String PARENT_USER_ROLE = "ROLE_PARENT";
     private static final String CHILD_USER_ROLE = "ROLE_CHILD";
@@ -42,6 +45,8 @@ public class NoticeServiceImpl implements NoticeService {
         Parent parent = parentRepository.findByEmail(getCurrentUserDetails().getEmail()).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
         Notice notice = Notice.createNoticeParentToChild(dto, parent.getChildren().getFirst(), noticeType);  // 현재는 아이 1명만 고려
         noticeRepository.save(notice);
+
+        eventPublisher.publishEvent(new NoticeSavedEvent(notice));
         return notice;
     }
 

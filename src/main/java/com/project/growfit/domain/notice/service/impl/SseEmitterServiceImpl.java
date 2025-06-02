@@ -2,12 +2,14 @@ package com.project.growfit.domain.notice.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.growfit.domain.notice.entity.NoticeType;
 import com.project.growfit.domain.notice.repository.EmitterRepository;
 import com.project.growfit.domain.notice.service.SseEmitterService;
 import com.project.growfit.global.auto.dto.CustomUserDetails;
 import com.project.growfit.global.exception.BusinessException;
 import com.project.growfit.global.exception.ErrorCode;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -64,6 +66,25 @@ public class SseEmitterServiceImpl implements SseEmitterService {
         return sseEmitter;
     }
 
+    /**
+     *
+     * @param userId: 부모: 이메일, 아이: 아이디 (CustomUserDetails 기준)
+     * @param userRole: ROLE_PARENT / ROLE_CHILD
+     * @param noticeType
+     * @param title: ex) 새로운 편지가 도착했습니다. 이번 미션도 잘했어요~
+     * @param data: ex) notice
+     */
+    @Override
+    @Transactional
+    public void send(String userId, String userRole, NoticeType noticeType, String title, Object data) {  // userId: 부모: 이메일, 아이: 아이디
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("type", noticeType.toString());
+        payload.put("title", title);
+        payload.put("data", data);
+
+        sendToClient(userId, userRole, payload);
+    }
+
     @Override
     public String getUserKey(String userId, String userRole) {
         if (userRole.equals(PARENT_USER_ROLE)) {
@@ -75,7 +96,7 @@ public class SseEmitterServiceImpl implements SseEmitterService {
     }
 
     @Override
-    public void sendToClient(String userId, String userRole, Object data) {
+    public void sendToClient(String userId, String userRole, Object data) {  // userId: 부모: 이메일, 아이: 아이디
         String userKey = getUserKey(userId, userRole);
         SseEmitter sseEmitter = emitterRepository.findEmitterByKey(userKey);
 
