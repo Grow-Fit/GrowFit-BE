@@ -2,8 +2,8 @@ package com.project.growfit.domain.notice.controller;
 
 import com.project.growfit.domain.notice.dto.response.NoticeListResponseDto;
 import com.project.growfit.domain.notice.dto.response.NoticeResponseDto;
-import com.project.growfit.domain.notice.service.NoticeService;
-import com.project.growfit.domain.notice.service.SseEmitterService;
+import com.project.growfit.domain.notice.service.impl.NoticeServiceImpl;
+import com.project.growfit.domain.notice.service.impl.SseEmitterServiceImpl;
 import com.project.growfit.global.response.ResultCode;
 import com.project.growfit.global.response.ResultResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,8 +22,8 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @Tag(name = "SSE 알림", description = "알림 관련 API")
 public class SseController {
 
-    private final SseEmitterService sseEmitterService;
-    private final NoticeService noticeService;
+    private final SseEmitterServiceImpl sseEmitterService;
+    private final NoticeServiceImpl noticeService;
 
     @GetMapping(value = "/sse/subscribe", produces = "text/event-stream")
     @Operation(summary = "알림 이벤트 구독",
