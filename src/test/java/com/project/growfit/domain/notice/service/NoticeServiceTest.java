@@ -22,6 +22,7 @@ import com.project.growfit.domain.notice.entity.TargetType;
 import com.project.growfit.domain.notice.repository.NoticeRepository;
 import com.project.growfit.domain.notice.service.impl.NoticeServiceImpl;
 import com.project.growfit.global.auto.dto.CustomUserDetails;
+import com.project.growfit.global.event.NoticeSavedEvent;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -29,9 +30,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -57,6 +60,9 @@ class NoticeServiceTest {
 
     @Mock
     private SecurityContext securityContext;
+
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
 
     @BeforeEach
     void setUp() {
@@ -85,6 +91,13 @@ class NoticeServiceTest {
         // then
         assertNotNull(notice);
         verify(noticeRepository).save(any(Notice.class));
+
+        ArgumentCaptor<NoticeSavedEvent> eventCaptor = ArgumentCaptor.forClass(NoticeSavedEvent.class);
+        verify(eventPublisher).publishEvent(eventCaptor.capture());
+        NoticeSavedEvent capturedEvent = eventCaptor.getValue();
+
+        assertNotNull(capturedEvent);
+        assertEquals(notice.getId(), capturedEvent.getNotice().getId());
     }
 
     @Test
