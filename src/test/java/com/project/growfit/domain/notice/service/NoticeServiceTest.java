@@ -15,8 +15,10 @@ import com.project.growfit.domain.User.repository.ChildRepository;
 import com.project.growfit.domain.User.repository.ParentRepository;
 import com.project.growfit.domain.notice.dto.request.NoticeRequestDto;
 import com.project.growfit.domain.notice.dto.response.NoticeListResponseDto;
+import com.project.growfit.domain.notice.dto.response.NoticeResponseDto;
 import com.project.growfit.domain.notice.entity.Notice;
 import com.project.growfit.domain.notice.entity.NoticeType;
+import com.project.growfit.domain.notice.entity.TargetType;
 import com.project.growfit.domain.notice.repository.NoticeRepository;
 import com.project.growfit.domain.notice.service.impl.NoticeServiceImpl;
 import com.project.growfit.global.auto.dto.CustomUserDetails;
@@ -86,10 +88,66 @@ class NoticeServiceTest {
     }
 
     @Test
-    @DisplayName("[getNotice 성공 테스트] 아이가 로그인하여 편지 조회")
-    void getNotice_success() {
+    @DisplayName("[getNotice 부모 테스트] 부모의 특정 알림 조회 성공")
+    void getNotice_parent_success() {
         // given
-        Child child = new Child("child1", "encodedPassword", "아이", ChildGender.MALE, 10, 140, 35, "아이 닉네임", ROLE.ROLE_CHILD);
+        Parent parent = new Parent("parent@example.com", "부모님", null, "kakao", "11111111", ROLE.ROLE_PARENT);
+        ReflectionTestUtils.setField(parent, "id", 1L);
+        CustomUserDetails userDetails = new CustomUserDetails(parent);
+        when(authentication.getPrincipal()).thenReturn(userDetails);
+        when(parentRepository.findByEmail(anyString())).thenReturn(Optional.of(parent));
+
+        NoticeRequestDto dto = new NoticeRequestDto();
+        dto.setMessage("부모가 로그인하여 본인에게 수신된 특정 알림 조회");
+        Notice notice = Notice.createNoticeChildToParent(dto, parent, NoticeType.PRAISE_LETTER);
+        LocalDateTime now = LocalDateTime.now();
+        ReflectionTestUtils.setField(notice, "id", 100L);
+        ReflectionTestUtils.setField(notice, "createdAt", now);
+
+        when(noticeRepository.findByIdAndTargetTypeAndTargetId(100L, TargetType.PARENT, parent.getId())).thenReturn(Optional.of(notice));
+
+        // when
+        NoticeResponseDto response = noticeService.getNotice(100L);
+
+        // then
+        assertEquals(100L, response.getNoticeId());
+        assertEquals("부모가 로그인하여 본인에게 수신된 특정 알림 조회", response.getMessage());
+        assertEquals("부모님", response.getTargetName());
+    }
+
+    @Test
+    @DisplayName("[getNotice 자녀 테스트] 자녀의 특정 알림 조회 성공")
+    void getNotice_child_success() {
+        // given
+        Child child = new Child("child", "encodedPassword", "아이", ChildGender.MALE, 10, 140, 35, "자녀", ROLE.ROLE_CHILD);
+        ReflectionTestUtils.setField(child, "id", 1L);
+        CustomUserDetails userDetails = new CustomUserDetails(child);
+        when(authentication.getPrincipal()).thenReturn(userDetails);
+        when(childRepository.findByLoginId(anyString())).thenReturn(Optional.of(child));
+
+        NoticeRequestDto dto = new NoticeRequestDto();
+        dto.setMessage("자녀가 로그인하여 본인에게 수신된 특정 알림 조회");
+        Notice notice = Notice.createNoticeParentToChild(dto, child, NoticeType.PRAISE_LETTER);
+        LocalDateTime now = LocalDateTime.now();
+        ReflectionTestUtils.setField(notice, "id", 200L);
+        ReflectionTestUtils.setField(notice, "createdAt", now);
+
+        when(noticeRepository.findByIdAndTargetTypeAndTargetId(200L, TargetType.CHILD, child.getId())).thenReturn(Optional.of(notice));
+
+        // when
+        NoticeResponseDto response = noticeService.getNotice(200L);
+
+        // then
+        assertEquals(200L, response.getNoticeId());
+        assertEquals("자녀가 로그인하여 본인에게 수신된 특정 알림 조회", response.getMessage());
+        assertEquals("자녀", response.getTargetName());
+    }
+
+    @Test
+    @DisplayName("[getNotices 성공 테스트] 아이가 로그인하여 편지 리스트 조회")
+    void getNotices_success() {
+        // given
+        Child child = new Child("child", "encodedPassword", "아이", ChildGender.MALE, 10, 140, 35, "아이 닉네임", ROLE.ROLE_CHILD);
         ReflectionTestUtils.setField(child, "id", 1L);
 
         CustomUserDetails userDetails = new CustomUserDetails(child);
