@@ -3,6 +3,7 @@ package com.project.growfit.domain.User.service.impl;
 import com.project.growfit.domain.User.dto.request.ChildCredentialsRequestDto;
 import com.project.growfit.domain.User.dto.request.FindChildPasswordRequestDto;
 import com.project.growfit.domain.User.dto.request.UpdateNicknameRequestDto;
+import com.project.growfit.domain.User.dto.response.ChildIdResponse;
 import com.project.growfit.domain.User.dto.response.ChildInfoResponseDto;
 import com.project.growfit.domain.User.entity.Child;
 import com.project.growfit.domain.User.repository.ChildRepository;
@@ -42,7 +43,7 @@ public class AuthChildServiceImpl implements AuthChildService {
         Long childPid = child.getId();
 
         log.info("[findByCode] 아이 정보 PID 조회 성공: {}", childPid);
-        return new ResultResponse<>(ResultCode.CHILD_INFO_RETRIEVAL_SUCCESS, childPid);
+        return new ResultResponse<>(ResultCode.CHILD_INFO_RETRIEVAL_SUCCESS, new ChildIdResponse(childPid));
     }
 
     public ResultResponse<?> updateNickname(Long child_id, UpdateNicknameRequestDto request) {
