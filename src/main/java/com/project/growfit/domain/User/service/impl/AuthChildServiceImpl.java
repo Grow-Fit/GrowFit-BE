@@ -1,6 +1,6 @@
 package com.project.growfit.domain.User.service.impl;
 
-import com.project.growfit.domain.User.dto.request.ChildCredentialsRequest;
+import com.project.growfit.domain.User.dto.request.ChildCredentialsRequestDto;
 import com.project.growfit.domain.User.dto.request.FindChildPasswordRequestDto;
 import com.project.growfit.domain.User.dto.request.UpdateNicknameRequestDto;
 import com.project.growfit.domain.User.dto.response.ChildInfoResponseDto;
@@ -39,10 +39,10 @@ public class AuthChildServiceImpl implements AuthChildService {
     public ResultResponse<?> findByCode(String code) {
         log.info("[findByCode] 코드로 아이 정보 조회 요청: {}", code);
         Child child = getChild(code);
-        ChildInfoResponseDto dto = ChildInfoResponseDto.toDto(child);
+        Long childPid = child.getId();
 
-        log.info("[findByCode] 아이 정보 조회 성공: {}", dto);
-        return new ResultResponse<>(ResultCode.CHILD_INFO_RETRIEVAL_SUCCESS, dto);
+        log.info("[findByCode] 아이 정보 PID 조회 성공: {}", childPid);
+        return new ResultResponse<>(ResultCode.CHILD_INFO_RETRIEVAL_SUCCESS, childPid);
     }
 
     public ResultResponse<?> updateNickname(Long child_id, UpdateNicknameRequestDto request) {
@@ -54,7 +54,7 @@ public class AuthChildServiceImpl implements AuthChildService {
     }
 
     @Override
-    public ResultResponse<?> registerChildCredentials(Long child_id, ChildCredentialsRequest request) {
+    public ResultResponse<?> registerChildCredentials(Long child_id, ChildCredentialsRequestDto request) {
         log.info("[registerChildCredentials] 아이 계정 정보 등록 요청: child_id={}, child_login_id={}", child_id, request.childId());
         boolean isExists = childRepository.existsByLoginIdOrPassword(request.childId(), request.childPassword());
 
@@ -63,7 +63,7 @@ public class AuthChildServiceImpl implements AuthChildService {
         }
         else {
             Child child = getChild(child_id);
-            child.updateCredentials(request.childId(), passwordEncoder.encode(request.childPassword()));
+            child.updateCredentials(request.childId(), passwordEncoder.encode(request.childPassword()), request.nickname());
             childRepository.save(child);
         }
 
@@ -73,7 +73,7 @@ public class AuthChildServiceImpl implements AuthChildService {
 
 
     @Override
-    public ResultResponse<?> login(ChildCredentialsRequest request, HttpServletResponse response) {
+    public ResultResponse<?> login(ChildCredentialsRequestDto request, HttpServletResponse response) {
         log.info("[login] 아이 로그인 시도 . . . : child_login_id={}", request.childId());
         Authentication authenticate;
         try {
