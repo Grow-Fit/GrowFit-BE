@@ -117,9 +117,10 @@ public class Child extends BaseEntity {
     public void updatePassword(String password){
         this.password = password;}
 
-    public void updateCredentials(String id, String password) {
+    public void updateCredentials(String id, String password, String nickname) {
         this.loginId = id;
         this.password = password;
+        this.nickname = nickname;
     }
 
     public ChildBodyInfo getLatestBodyInfo() {
