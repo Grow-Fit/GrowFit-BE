@@ -4,6 +4,7 @@ import com.project.growfit.domain.User.service.OauthService;
 import com.project.growfit.global.exception.BusinessException;
 import com.project.growfit.global.response.ResultResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/oauth")
 @RequiredArgsConstructor
+@Tag(name = "Social OAuth API", description = "소셜 로그인 관련 API (카카오)")
 public class OAuthController {
 
     private final OauthService oauthService;
