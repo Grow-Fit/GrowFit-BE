@@ -80,9 +80,9 @@ public class Diet extends BaseEntity {
                 .map(Food::getName)
                 .collect(Collectors.joining(", "));
         diet.totalCalorie = calcCalorie(foodList);
-        diet.totalCarbohydrate = foodList.stream().mapToDouble(Food::getCarbohydrate).sum();
-        diet.totalProtein = foodList.stream().mapToDouble(Food::getProtein).sum();
-        diet.totalFat = foodList.stream().mapToDouble(Food::getFat).sum();
+        diet.totalCarbohydrate = calcCarbohydrate(foodList);
+        diet.totalFat = calcFat(foodList);
+        diet.totalProtein = calcProtein(foodList);
         diet.foodList = foodList;
         diet.state = DietState.NONE;
         return diet;
@@ -108,11 +108,6 @@ public class Diet extends BaseEntity {
         this.dailyDiet = dailyDiet;
     }
 
-    private static double calcCalorie(List<Food> foodList) {
-        double total = 0;
-        for (Food food : foodList) total += food.getCalorie();
-        return total;
-    }
     public void updateImage(String imageUrl) {
         this.imageUrl = imageUrl;
     }
@@ -151,6 +146,30 @@ public class Diet extends BaseEntity {
 
     public void updateTime(LocalTime newTime) {
         this.time = newTime;
+    }
+
+    private static double calcCalorie(List<Food> foodList) {
+        return foodList.stream()
+                .mapToDouble(f -> f.getCalorie() * f.getCount())
+                .sum();
+    }
+
+    private static double calcCarbohydrate(List<Food> foodList) {
+        return foodList.stream()
+                .mapToDouble(f -> f.getCarbohydrate() * f.getCount())
+                .sum();
+    }
+
+    private static double calcFat(List<Food> foodList) {
+        return foodList.stream()
+                .mapToDouble(f -> f.getFat() * f.getCount())
+                .sum();
+    }
+
+    private static double calcProtein(List<Food> foodList) {
+        return foodList.stream()
+                .mapToDouble(f -> f.getProtein() * f.getCount())
+                .sum();
     }
 
 }
