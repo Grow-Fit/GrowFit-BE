@@ -1,4 +1,4 @@
-package com.project.growfit.global.auto.dto;
+package com.project.growfit.global.auth.dto;
 
 import com.project.growfit.domain.User.entity.Child;
 import com.project.growfit.domain.User.entity.Parent;

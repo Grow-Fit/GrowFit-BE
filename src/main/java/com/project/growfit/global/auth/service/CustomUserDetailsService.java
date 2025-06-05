@@ -1,8 +1,8 @@
-package com.project.growfit.global.auto.service;
+package com.project.growfit.global.auth.service;
 
 import com.project.growfit.domain.User.entity.Child;
 import com.project.growfit.domain.User.repository.ChildRepository;
-import com.project.growfit.global.auto.dto.CustomUserDetails;
+import com.project.growfit.global.auth.dto.CustomUserDetails;
 import com.project.growfit.global.exception.BusinessException;
 import com.project.growfit.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;

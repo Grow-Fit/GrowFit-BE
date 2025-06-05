@@ -1,4 +1,4 @@
-package com.project.growfit.global.auto.jwt.excpetion;
+package com.project.growfit.global.auth.jwt.excpetion;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;

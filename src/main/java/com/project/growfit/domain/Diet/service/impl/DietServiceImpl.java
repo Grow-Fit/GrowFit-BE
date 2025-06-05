@@ -15,7 +15,7 @@ import com.project.growfit.domain.User.entity.Child;
 import com.project.growfit.domain.User.entity.Parent;
 import com.project.growfit.global.api.entity.FoodApi;
 import com.project.growfit.global.api.repository.FoodApiRepository;
-import com.project.growfit.global.auto.service.AuthenticatedUserProvider;
+import com.project.growfit.global.auth.service.AuthenticatedUserProvider;
 import com.project.growfit.global.exception.BusinessException;
 import com.project.growfit.global.exception.ErrorCode;
 import com.project.growfit.global.response.ResultCode;

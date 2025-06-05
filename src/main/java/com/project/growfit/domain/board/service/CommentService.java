@@ -6,7 +6,7 @@ import com.project.growfit.domain.board.dto.request.CommentRequestDto;
 import com.project.growfit.domain.board.dto.response.CommentResponseListDto;
 import com.project.growfit.domain.board.entity.Comment;
 import com.project.growfit.domain.board.repository.CommentRepository;
-import com.project.growfit.global.auto.dto.CustomUserDetails;
+import com.project.growfit.global.auth.dto.CustomUserDetails;
 import com.project.growfit.global.exception.BusinessException;
 import com.project.growfit.global.exception.ErrorCode;
 import java.util.List;
