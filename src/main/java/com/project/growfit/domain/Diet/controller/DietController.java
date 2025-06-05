@@ -3,6 +3,7 @@ package com.project.growfit.domain.Diet.controller;
 import com.project.growfit.domain.Diet.dto.request.AddDietRequestDto;
 import com.project.growfit.domain.Diet.dto.request.UpdateDietRequestDto;
 import com.project.growfit.domain.Diet.dto.request.UpdateNutritionRequestDto;
+import com.project.growfit.domain.Diet.entity.DietState;
 import com.project.growfit.domain.Diet.entity.Sticker;
 import com.project.growfit.domain.Diet.service.DietService;
 import com.project.growfit.global.response.ResultResponse;
@@ -87,12 +88,12 @@ public class DietController {
         return ResponseEntity.status(HttpStatus.OK).body(resultResponse);
     }
 
-    @Operation(summary = "아이 섭취 식단 추가", description = "아이가 저장된 식단에 섭취 식단을 추가합니다.")
-    @PostMapping(value = "/food/{dietId}/log")
-    public ResponseEntity<?> uploadDietPhoto(@PathVariable Long dietId,
-                                             @RequestParam String log) {
-        ResultResponse<?> resultResponse = dietService.updateDietFood(dietId, log);
-        return ResponseEntity.status(HttpStatus.OK).body(resultResponse);
+    @Operation(summary = "아이 식단 섭취 여부 등록", description = "식단 섭취 여부(MATCH/UNMATCH)를 등록합니다. 식단을 어길 시 UNMATCH, 식단을 지킬 시 MATCH")
+    @PatchMapping("/food/{dietId}/state")
+    public ResponseEntity<?> updateDietState(@PathVariable Long dietId,
+                                             @RequestParam DietState dietState) {
+        ResultResponse<?> result = dietService.updateDietState(dietId, dietState);
+        return ResponseEntity.ok(result);
     }
 
     @Operation(summary = "식단 불이행 시 영양 정보 직접 입력", description = "아이 식단을 지키지 못한 경우 수동으로 영양소를 입력합니다.")

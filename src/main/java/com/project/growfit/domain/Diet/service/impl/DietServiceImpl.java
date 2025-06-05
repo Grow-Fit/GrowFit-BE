@@ -199,11 +199,10 @@ public class DietServiceImpl implements DietService {
 
     @Override
     @Transactional
-    public ResultResponse<?> updateDietFood(Long dietId, String foodLog) {
+    public ResultResponse<?> updateDietState(Long dietId, DietState dietState){
         authenticatedProvider.getAuthenticatedChild();
         Diet diet = getDietOrThrow(dietId);
-        DietState state = diet.evaluateDietState(foodLog);
-        diet.updateState(state);
+        diet.updateState(dietState);
         return ResultResponse.of(ResultCode.CHILD_LOG_UPLOAD_SUCCESS, null);
     }
 
@@ -243,7 +242,6 @@ public class DietServiceImpl implements DietService {
                 diet.getId(),
                 diet.getImageUrl(),
                 diet.getTime().toString(),
-                diet.getFoodLog(),
                 diet.getTotalCalorie(),
                 diet.getTotalCarbohydrate(),
                 diet.getTotalProtein(),
@@ -367,7 +365,7 @@ public class DietServiceImpl implements DietService {
     }
 
     private DietResponseDto toDietResponseDto(Diet diet) {
-        if (diet.getState() == DietState.MODIFIED_BY_PARENT) {
+        if (diet.getState() == DietState.MODIFIED) {
             return new DietResponseDto(
                     diet.getId(),
                     diet.getTime().toString(),

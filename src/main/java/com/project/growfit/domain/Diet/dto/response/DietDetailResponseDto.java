@@ -14,9 +14,6 @@ public record DietDetailResponseDto(
         @Schema(description = "섭취 시간", example = "08:30")
         String time,
 
-        @Schema(description = "섭취 기록", example = "밥 반공기, 닭가슴살 100g")
-        String foodLog,
-
         @Schema(description = "총 칼로리", example = "420")
         double totalCalorie,
 

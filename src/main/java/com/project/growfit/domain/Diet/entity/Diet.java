@@ -57,7 +57,7 @@ public class Diet extends BaseEntity {
     private List<Food> foodList = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "state")
+    @Column(name = "state", nullable = false)
     private DietState state;
 
     @Column(nullable = false)
@@ -115,31 +115,9 @@ public class Diet extends BaseEntity {
         this.imageUrl = imageUrl;
     }
 
-    public DietState evaluateDietState(String foodLog) {
-        if (foodLog == null || foodLog.trim().isEmpty()) {
-            return DietState.ACHIEVED;
-        }
-
-        Set<String> loggedFoods = Arrays.stream(foodLog.split("[,\\s]+"))
-                .map(String::trim)
-                .filter(s -> !s.isEmpty())
-                .collect(Collectors.toSet());
-
-        Set<String> expectedFoods = this.foodList.stream()
-                .map(Food::getName)
-                .map(String::trim)
-                .collect(Collectors.toSet());
-
-        if (loggedFoods.equals(expectedFoods)) {
-            return DietState.ACHIEVED;
-        } else {
-            this.foodLog = foodLog;
-            return DietState.UNACHIEVED;
-        }
-    }
 
     public void modifyByParent(UpdateNutritionRequestDto dto) {
-        this.state = DietState.MODIFIED_BY_PARENT;
+        this.state = DietState.MODIFIED;
         this.totalCalorie = dto.totalCalorie();
         this.totalCarbohydrate = dto.carbohydrate();
         this.totalFat = dto.fat();
