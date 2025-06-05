@@ -1,8 +1,8 @@
-package com.project.growfit.global.auto.filter;
+package com.project.growfit.global.auth.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.project.growfit.global.auto.dto.CustomUserDetails;
-import com.project.growfit.global.auto.jwt.JwtProvider;
+import com.project.growfit.global.auth.dto.CustomUserDetails;
+import com.project.growfit.global.auth.jwt.JwtProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

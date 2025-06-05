@@ -57,7 +57,7 @@ public class Diet extends BaseEntity {
     private List<Food> foodList = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "state")
+    @Column(name = "state", nullable = false)
     private DietState state;
 
     @Column(nullable = false)
@@ -80,9 +80,9 @@ public class Diet extends BaseEntity {
                 .map(Food::getName)
                 .collect(Collectors.joining(", "));
         diet.totalCalorie = calcCalorie(foodList);
-        diet.totalCarbohydrate = foodList.stream().mapToDouble(Food::getCarbohydrate).sum();
-        diet.totalProtein = foodList.stream().mapToDouble(Food::getProtein).sum();
-        diet.totalFat = foodList.stream().mapToDouble(Food::getFat).sum();
+        diet.totalCarbohydrate = calcCarbohydrate(foodList);
+        diet.totalFat = calcFat(foodList);
+        diet.totalProtein = calcProtein(foodList);
         diet.foodList = foodList;
         diet.state = DietState.NONE;
         return diet;
@@ -99,6 +99,9 @@ public class Diet extends BaseEntity {
         this.foodList.clear();
         for (Food food : foodList) this.addFood(food);
         this.totalCalorie = calcCalorie(foodList);
+        this.totalCarbohydrate = calcCarbohydrate(foodList);
+        this.totalFat = calcFat(foodList);
+        this.totalProtein = calcProtein(foodList);
     }
     public void updateState(DietState newState) {
         this.state = newState;
@@ -108,40 +111,13 @@ public class Diet extends BaseEntity {
         this.dailyDiet = dailyDiet;
     }
 
-    private static double calcCalorie(List<Food> foodList) {
-        double total = 0;
-        for (Food food : foodList) total += food.getCalorie();
-        return total;
-    }
     public void updateImage(String imageUrl) {
         this.imageUrl = imageUrl;
     }
 
-    public DietState evaluateDietState(String foodLog) {
-        if (foodLog == null || foodLog.trim().isEmpty()) {
-            return DietState.ACHIEVED;
-        }
-
-        Set<String> loggedFoods = Arrays.stream(foodLog.split("[,\\s]+"))
-                .map(String::trim)
-                .filter(s -> !s.isEmpty())
-                .collect(Collectors.toSet());
-
-        Set<String> expectedFoods = this.foodList.stream()
-                .map(Food::getName)
-                .map(String::trim)
-                .collect(Collectors.toSet());
-
-        if (loggedFoods.equals(expectedFoods)) {
-            return DietState.ACHIEVED;
-        } else {
-            this.foodLog = foodLog;
-            return DietState.UNACHIEVED;
-        }
-    }
 
     public void modifyByParent(UpdateNutritionRequestDto dto) {
-        this.state = DietState.MODIFIED_BY_PARENT;
+        this.state = DietState.MODIFIED;
         this.totalCalorie = dto.totalCalorie();
         this.totalCarbohydrate = dto.carbohydrate();
         this.totalFat = dto.fat();
@@ -151,6 +127,30 @@ public class Diet extends BaseEntity {
 
     public void updateTime(LocalTime newTime) {
         this.time = newTime;
+    }
+
+    private static double calcCalorie(List<Food> foodList) {
+        return foodList.stream()
+                .mapToDouble(f -> f.getCalorie() * f.getCount())
+                .sum();
+    }
+
+    private static double calcCarbohydrate(List<Food> foodList) {
+        return foodList.stream()
+                .mapToDouble(f -> f.getCarbohydrate() * f.getCount())
+                .sum();
+    }
+
+    private static double calcFat(List<Food> foodList) {
+        return foodList.stream()
+                .mapToDouble(f -> f.getFat() * f.getCount())
+                .sum();
+    }
+
+    private static double calcProtein(List<Food> foodList) {
+        return foodList.stream()
+                .mapToDouble(f -> f.getProtein() * f.getCount())
+                .sum();
     }
 
 }

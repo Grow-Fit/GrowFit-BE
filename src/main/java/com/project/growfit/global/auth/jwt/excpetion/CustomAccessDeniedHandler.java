@@ -1,4 +1,4 @@
-package com.project.growfit.global.auto.jwt.excpetion;
+package com.project.growfit.global.auth.jwt.excpetion;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

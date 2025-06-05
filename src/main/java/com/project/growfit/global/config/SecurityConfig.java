@@ -1,10 +1,10 @@
 package com.project.growfit.global.config;
 
-import com.project.growfit.global.auto.jwt.JwtProvider;
-import com.project.growfit.global.auto.jwt.excpetion.CustomAccessDeniedHandler;
-import com.project.growfit.global.auto.jwt.excpetion.CustomAuthenticationEntryPoint;
-import com.project.growfit.global.auto.filter.JwtCookieAuthenticationFilter;
-import com.project.growfit.global.auto.filter.LoginFilter;
+import com.project.growfit.global.auth.jwt.JwtProvider;
+import com.project.growfit.global.auth.jwt.excpetion.CustomAccessDeniedHandler;
+import com.project.growfit.global.auth.jwt.excpetion.CustomAuthenticationEntryPoint;
+import com.project.growfit.global.auth.filter.JwtCookieAuthenticationFilter;
+import com.project.growfit.global.auth.filter.LoginFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

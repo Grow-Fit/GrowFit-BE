@@ -1,6 +1,6 @@
-package com.project.growfit.global.auto.filter;
+package com.project.growfit.global.auth.filter;
 
-import com.project.growfit.global.auto.jwt.JwtProvider;
+import com.project.growfit.global.auth.jwt.JwtProvider;
 import com.project.growfit.global.utils.CookieUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

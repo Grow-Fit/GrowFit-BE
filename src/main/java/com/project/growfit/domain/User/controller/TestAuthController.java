@@ -1,7 +1,7 @@
 package com.project.growfit.domain.User.controller;
 
 import com.project.growfit.domain.User.dto.response.ParentLoginResponseDto;
-import com.project.growfit.global.auto.jwt.JwtProvider;
+import com.project.growfit.global.auth.jwt.JwtProvider;
 import com.project.growfit.global.redis.entity.TokenRedis;
 import com.project.growfit.global.redis.repository.TokenRedisRepository;
 import com.project.growfit.global.response.ResultCode;

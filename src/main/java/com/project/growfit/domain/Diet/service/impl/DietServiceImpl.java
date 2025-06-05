@@ -15,7 +15,7 @@ import com.project.growfit.domain.User.entity.Child;
 import com.project.growfit.domain.User.entity.Parent;
 import com.project.growfit.global.api.entity.FoodApi;
 import com.project.growfit.global.api.repository.FoodApiRepository;
-import com.project.growfit.global.auto.service.AuthenticatedUserProvider;
+import com.project.growfit.global.auth.service.AuthenticatedUserProvider;
 import com.project.growfit.global.exception.BusinessException;
 import com.project.growfit.global.exception.ErrorCode;
 import com.project.growfit.global.response.ResultCode;
@@ -148,8 +148,11 @@ public class DietServiceImpl implements DietService {
     public ResultResponse<?> updateDiet(Long dietId, UpdateDietRequestDto dto) {
         Parent parent = authenticatedProvider.getAuthenticatedParent();
         Diet diet = getDietOrThrow(dietId);
+        DailyDiet dailyDiet = diet.getDailyDiet();
         List<Food> foodList = createFoodListFromDto(dto.foodList(), parent);
+
         diet.edit(foodList, dto);
+        dailyDiet.recalculate();
         return ResultResponse.of(ResultCode.DIET_EDIT_SUCCESS, null);
     }
 
@@ -196,11 +199,10 @@ public class DietServiceImpl implements DietService {
 
     @Override
     @Transactional
-    public ResultResponse<?> updateDietFood(Long dietId, String foodLog) {
+    public ResultResponse<?> updateDietState(Long dietId, DietState dietState){
         authenticatedProvider.getAuthenticatedChild();
         Diet diet = getDietOrThrow(dietId);
-        DietState state = diet.evaluateDietState(foodLog);
-        diet.updateState(state);
+        diet.updateState(dietState);
         return ResultResponse.of(ResultCode.CHILD_LOG_UPLOAD_SUCCESS, null);
     }
 
@@ -240,7 +242,6 @@ public class DietServiceImpl implements DietService {
                 diet.getId(),
                 diet.getImageUrl(),
                 diet.getTime().toString(),
-                diet.getFoodLog(),
                 diet.getTotalCalorie(),
                 diet.getTotalCarbohydrate(),
                 diet.getTotalProtein(),
@@ -364,7 +365,7 @@ public class DietServiceImpl implements DietService {
     }
 
     private DietResponseDto toDietResponseDto(Diet diet) {
-        if (diet.getState() == DietState.MODIFIED_BY_PARENT) {
+        if (diet.getState() == DietState.MODIFIED) {
             return new DietResponseDto(
                     diet.getId(),
                     diet.getTime().toString(),

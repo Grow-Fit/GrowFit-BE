@@ -9,7 +9,7 @@ import com.project.growfit.domain.User.entity.Parent;
 import com.project.growfit.domain.User.entity.ROLE;
 import com.project.growfit.domain.User.repository.ChildRepository;
 import com.project.growfit.domain.User.repository.ParentRepository;
-import com.project.growfit.global.auto.dto.CustomUserDetails;
+import com.project.growfit.global.auth.dto.CustomUserDetails;
 import com.project.growfit.global.exception.BusinessException;
 import com.project.growfit.global.exception.ErrorCode;
 import com.project.growfit.global.response.ResultResponse;

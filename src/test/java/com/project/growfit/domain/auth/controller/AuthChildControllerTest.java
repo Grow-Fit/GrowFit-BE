@@ -6,7 +6,7 @@ import com.project.growfit.domain.User.dto.request.ChildCredentialsRequestDto;
 import com.project.growfit.domain.User.dto.request.FindChildPasswordRequestDto;
 import com.project.growfit.domain.User.dto.request.UpdateNicknameRequestDto;
 import com.project.growfit.domain.User.service.AuthChildService;
-import com.project.growfit.global.auto.jwt.excpetion.CustomAuthenticationEntryPoint;
+import com.project.growfit.global.auth.jwt.excpetion.CustomAuthenticationEntryPoint;
 import com.project.growfit.global.config.SecurityConfig;
 import com.project.growfit.global.response.ResultCode;
 import com.project.growfit.global.response.ResultResponse;
