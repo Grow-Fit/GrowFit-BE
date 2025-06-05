@@ -12,7 +12,7 @@ import com.project.growfit.domain.notice.entity.NoticeType;
 import com.project.growfit.domain.notice.entity.TargetType;
 import com.project.growfit.domain.notice.repository.NoticeRepository;
 import com.project.growfit.domain.notice.service.NoticeService;
-import com.project.growfit.global.auto.dto.CustomUserDetails;
+import com.project.growfit.global.auth.dto.CustomUserDetails;
 import com.project.growfit.global.event.NoticeSavedEvent;
 import com.project.growfit.global.exception.BusinessException;
 import com.project.growfit.global.exception.ErrorCode;

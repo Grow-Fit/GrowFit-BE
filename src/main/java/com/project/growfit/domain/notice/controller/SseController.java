@@ -1,7 +1,9 @@
 package com.project.growfit.domain.notice.controller;
 
+import com.project.growfit.domain.notice.dto.request.NoticeRequestDto;
 import com.project.growfit.domain.notice.dto.response.NoticeListResponseDto;
 import com.project.growfit.domain.notice.dto.response.NoticeResponseDto;
+import com.project.growfit.domain.notice.entity.NoticeType;
 import com.project.growfit.domain.notice.service.impl.NoticeServiceImpl;
 import com.project.growfit.domain.notice.service.impl.SseEmitterServiceImpl;
 import com.project.growfit.global.response.ResultCode;
@@ -12,6 +14,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -59,5 +62,11 @@ public class SseController {
     public ResultResponse<List<NoticeListResponseDto>> getNotices() {
         List<NoticeListResponseDto> list = noticeService.getNotices();
         return new ResultResponse<>(ResultCode.GET_NOTICE_SUCCESS, list);
+    }
+
+    @PostMapping("/notice/post")
+    public ResultResponse<String> postNotice(NoticeRequestDto dto) {
+        noticeService.saveParentToChild(dto, NoticeType.PRAISE_LETTER);
+        return new ResultResponse<>(ResultCode.GET_NOTICE_SUCCESS, "성공");
     }
 }
