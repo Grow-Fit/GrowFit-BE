@@ -148,8 +148,11 @@ public class DietServiceImpl implements DietService {
     public ResultResponse<?> updateDiet(Long dietId, UpdateDietRequestDto dto) {
         Parent parent = authenticatedProvider.getAuthenticatedParent();
         Diet diet = getDietOrThrow(dietId);
+        DailyDiet dailyDiet = diet.getDailyDiet();
         List<Food> foodList = createFoodListFromDto(dto.foodList(), parent);
+
         diet.edit(foodList, dto);
+        dailyDiet.recalculate();
         return ResultResponse.of(ResultCode.DIET_EDIT_SUCCESS, null);
     }
 

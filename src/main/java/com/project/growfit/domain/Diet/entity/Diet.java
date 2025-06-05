@@ -99,6 +99,9 @@ public class Diet extends BaseEntity {
         this.foodList.clear();
         for (Food food : foodList) this.addFood(food);
         this.totalCalorie = calcCalorie(foodList);
+        this.totalCarbohydrate = calcCarbohydrate(foodList);
+        this.totalFat = calcFat(foodList);
+        this.totalProtein = calcProtein(foodList);
     }
     public void updateState(DietState newState) {
         this.state = newState;
