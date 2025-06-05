@@ -36,7 +36,7 @@ public class DailyDiet extends BaseEntity {
 
     @Column(nullable = false)
     @JoinColumn(name = "total_calorie")
-    private long totalCalorie;
+    private double totalCalorie;
 
     @OneToMany(mappedBy = "dailyDiet", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Diet> diets = new ArrayList<>();

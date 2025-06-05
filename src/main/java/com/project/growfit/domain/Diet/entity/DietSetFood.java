@@ -38,16 +38,16 @@ public class DietSetFood extends BaseEntity {
     private String name;
 
     @Column(name = "calorie")
-    private Double calorie;
+    private double calorie;
 
     @Column(name = "carbohydrate")
-    private Double carbohydrate;
+    private double carbohydrate;
 
     @Column(name = "fat")
-    private Double fat;
+    private double fat;
 
     @Column(name = "protein")
-    private Double protein;
+    private double protein;
 
     @Column(nullable = false)
     private int count = 1;
