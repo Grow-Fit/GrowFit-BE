@@ -3,6 +3,8 @@ package com.project.growfit.domain.Diet.dto.response;
 import com.project.growfit.domain.Diet.entity.DietState;
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.util.List;
+
 @Schema(description = "식단 상세 응답 DTO")
 public record DietDetailResponseDto(
         @Schema(description = "식단 ID", example = "11")
@@ -27,5 +29,9 @@ public record DietDetailResponseDto(
         double totalFat,
 
         @Schema(description = "식단 상태")
-        DietState state
+        DietState state,
+
+        @Schema(description = "음식 세부 정보 리스트")
+        List<FoodResponseDto> foodDetails
+
 ) {}
