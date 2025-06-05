@@ -20,8 +20,6 @@ public record DietResponseDto(
         List<FoodResponseDto> foods,
 
         @Schema(description = "총 칼로리", example = "550")
-        double totalKcal,
+        double totalKcal
 
-        @Schema(description = "섭취 기록", example = "계란 2개, 우유 200ml")
-        String foodLog
 ) {}

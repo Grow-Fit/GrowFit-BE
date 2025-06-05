@@ -4,7 +4,8 @@ package com.project.growfit.domain.Diet.service.impl;
 import com.project.growfit.domain.Diet.dto.request.AddDietRequestDto;
 import com.project.growfit.domain.Diet.dto.request.FoodItemDto;
 import com.project.growfit.domain.Diet.dto.request.UpdateDietRequestDto;
-import com.project.growfit.domain.Diet.dto.request.UpdateNutritionRequestDto;
+
+import com.project.growfit.domain.Diet.dto.request.UpdateFoodListRequestDto;
 import com.project.growfit.domain.Diet.dto.response.*;
 import com.project.growfit.domain.Diet.entity.*;
 import com.project.growfit.domain.Diet.repository.CustomFoodRepository;
@@ -143,6 +144,7 @@ public class DietServiceImpl implements DietService {
 
     }
 
+
     @Override
     @Transactional
     public ResultResponse<?> updateDiet(Long dietId, UpdateDietRequestDto dto) {
@@ -151,9 +153,21 @@ public class DietServiceImpl implements DietService {
         DailyDiet dailyDiet = diet.getDailyDiet();
         List<Food> foodList = createFoodListFromDto(dto.foodList(), parent);
 
-        diet.edit(foodList, dto);
-        dailyDiet.recalculate();
+        applyNewFoodList(diet, dailyDiet, foodList, dto);
         return ResultResponse.of(ResultCode.DIET_EDIT_SUCCESS, null);
+    }
+
+    @Override
+    @Transactional
+    public ResultResponse<?> overrideDietNutrition(Long dietId, UpdateFoodListRequestDto dto) {
+        Parent parent = authenticatedProvider.getAuthenticatedParent();
+        Diet diet = getDietOrThrow(dietId);
+        DailyDiet dailyDiet = diet.getDailyDiet();
+        List<Food> foodList = createFoodListFromDto(dto.foodList(), parent);
+
+        applyNewFoodList(diet, dailyDiet, foodList);
+        diet.updateState(DietState.MODIFIED);
+        return ResultResponse.of(ResultCode.DIET_OVERRIDE_SUCCESS, null);
     }
 
     @Override
@@ -203,7 +217,7 @@ public class DietServiceImpl implements DietService {
         authenticatedProvider.getAuthenticatedChild();
         Diet diet = getDietOrThrow(dietId);
         diet.updateState(dietState);
-        return ResultResponse.of(ResultCode.CHILD_LOG_UPLOAD_SUCCESS, null);
+        return ResultResponse.of(ResultCode.CHILD_STATE_UPLOAD_SUCCESS, null);
     }
 
     @Transactional
@@ -225,14 +239,6 @@ public class DietServiceImpl implements DietService {
         return ResultResponse.of(ResultCode.DIET_TIME_UPDATE_SUCCESS, null);
     }
 
-    @Override
-    @Transactional
-    public ResultResponse<?> overrideDietNutrition(Long dietId, UpdateNutritionRequestDto dto) {
-        authenticatedProvider.getAuthenticatedParent();
-        Diet diet = getDietOrThrow(dietId);
-        diet.modifyByParent(dto);
-        return ResultResponse.of(ResultCode.DIET_OVERRIDE_SUCCESS, null);
-    }
 
     @Transactional(readOnly = true)
     public ResultResponse<?> getDietDetail(Long dietId) {
@@ -371,8 +377,7 @@ public class DietServiceImpl implements DietService {
                     diet.getTime().toString(),
                     diet.getState(),
                     null,
-                    diet.getTotalCalorie(),
-                    diet.getFoodLog()
+                    diet.getTotalCalorie()
             );
         } else {
             List<FoodResponseDto> foodDtos = diet.getFoodList().stream()
@@ -390,9 +395,19 @@ public class DietServiceImpl implements DietService {
                     diet.getTime().toString(),
                     diet.getState(),
                     foodDtos,
-                    foodDtos.stream().mapToDouble(FoodResponseDto::calories).sum(),
-                    null
+                    foodDtos.stream().mapToDouble(FoodResponseDto::calories).sum()
             );
         }
+    }
+    // 전체 식단 수정 (시간, 종류 포함)
+    private void applyNewFoodList(Diet diet, DailyDiet dailyDiet, List<Food> foodList, UpdateDietRequestDto dto) {
+        diet.edit(foodList, dto);
+        dailyDiet.recalculate();
+    }
+
+    // 음식 리스트만 수정
+    private void applyNewFoodList(Diet diet, DailyDiet dailyDiet, List<Food> foodList) {
+        diet.edit(foodList);
+        dailyDiet.recalculate();
     }
 }

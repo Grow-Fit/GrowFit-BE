@@ -2,7 +2,7 @@ package com.project.growfit.domain.Diet.controller;
 
 import com.project.growfit.domain.Diet.dto.request.AddDietRequestDto;
 import com.project.growfit.domain.Diet.dto.request.UpdateDietRequestDto;
-import com.project.growfit.domain.Diet.dto.request.UpdateNutritionRequestDto;
+import com.project.growfit.domain.Diet.dto.request.UpdateFoodListRequestDto;
 import com.project.growfit.domain.Diet.entity.DietState;
 import com.project.growfit.domain.Diet.entity.Sticker;
 import com.project.growfit.domain.Diet.service.DietService;
@@ -96,10 +96,10 @@ public class DietController {
         return ResponseEntity.ok(result);
     }
 
-    @Operation(summary = "식단 불이행 시 영양 정보 직접 입력", description = "아이 식단을 지키지 못한 경우 수동으로 영양소를 입력합니다.")
+    @Operation(summary = "식단 불이행 시 영양 정보 직접 입력", description = "아이 식단을 지키지 못한 경우 음식 리스트를 수정합니다.")
     @PutMapping("/food/{dietId}/override")
     public ResponseEntity<?> overrideDietNutrition(@PathVariable Long dietId,
-                                                   @Valid @RequestBody UpdateNutritionRequestDto dto) {
+                                                   @Valid @RequestBody UpdateFoodListRequestDto dto) {
         ResultResponse<?> resultResponse = dietService.overrideDietNutrition(dietId, dto);
         return ResponseEntity.status(HttpStatus.OK).body(resultResponse);
     }
