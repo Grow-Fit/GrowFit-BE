@@ -8,15 +8,6 @@ public record FoodResponseDto(
         @Schema(description = "음식 이름", example = "닭가슴살")
         String foodName,
 
-        @Schema(description = "대분류", example = "육류")
-        String foodMainCategory,
-
-        @Schema(description = "소분류", example = "가공육")
-        String foodSubCategory,
-
-        @Schema(description = "제조사", example = "하림")
-        String manufacturerName,
-
         @Schema(description = "칼로리", example = "120")
         double calories,
 
@@ -32,9 +23,6 @@ public record FoodResponseDto(
     public static FoodResponseDto toDto(FoodApi foodApi) {
         return new FoodResponseDto(
                 foodApi.getFoodNm(),
-                foodApi.getFoodLv3Nm(),
-                foodApi.getFoodLv4Nm(),
-                foodApi.getMfrNm(),
                 foodApi.getEnerc(),
                 foodApi.getChocdf(),
                 foodApi.getFatce(),

@@ -4,7 +4,8 @@ package com.project.growfit.domain.Diet.service.impl;
 import com.project.growfit.domain.Diet.dto.request.AddDietRequestDto;
 import com.project.growfit.domain.Diet.dto.request.FoodItemDto;
 import com.project.growfit.domain.Diet.dto.request.UpdateDietRequestDto;
-import com.project.growfit.domain.Diet.dto.request.UpdateNutritionRequestDto;
+
+import com.project.growfit.domain.Diet.dto.request.UpdateFoodListRequestDto;
 import com.project.growfit.domain.Diet.dto.response.*;
 import com.project.growfit.domain.Diet.entity.*;
 import com.project.growfit.domain.Diet.repository.CustomFoodRepository;
@@ -15,7 +16,7 @@ import com.project.growfit.domain.User.entity.Child;
 import com.project.growfit.domain.User.entity.Parent;
 import com.project.growfit.global.api.entity.FoodApi;
 import com.project.growfit.global.api.repository.FoodApiRepository;
-import com.project.growfit.global.auto.service.AuthenticatedUserProvider;
+import com.project.growfit.global.auth.service.AuthenticatedUserProvider;
 import com.project.growfit.global.exception.BusinessException;
 import com.project.growfit.global.exception.ErrorCode;
 import com.project.growfit.global.response.ResultCode;
@@ -148,9 +149,24 @@ public class DietServiceImpl implements DietService {
     public ResultResponse<?> updateDiet(Long dietId, UpdateDietRequestDto dto) {
         Parent parent = authenticatedProvider.getAuthenticatedParent();
         Diet diet = getDietOrThrow(dietId);
+        DailyDiet dailyDiet = diet.getDailyDiet();
         List<Food> foodList = createFoodListFromDto(dto.foodList(), parent);
-        diet.edit(foodList, dto);
+
+        applyNewFoodList(diet, dailyDiet, foodList, dto);
         return ResultResponse.of(ResultCode.DIET_EDIT_SUCCESS, null);
+    }
+
+    @Override
+    @Transactional
+    public ResultResponse<?> overrideDietNutrition(Long dietId, UpdateFoodListRequestDto dto) {
+        Parent parent = authenticatedProvider.getAuthenticatedParent();
+        Diet diet = getDietOrThrow(dietId);
+        DailyDiet dailyDiet = diet.getDailyDiet();
+        List<Food> foodList = createFoodListFromDto(dto.foodList(), parent);
+
+        applyNewFoodList(diet, dailyDiet, foodList);
+        diet.updateState(DietState.MODIFIED);
+        return ResultResponse.of(ResultCode.DIET_OVERRIDE_SUCCESS, null);
     }
 
     @Override
@@ -196,12 +212,11 @@ public class DietServiceImpl implements DietService {
 
     @Override
     @Transactional
-    public ResultResponse<?> updateDietFood(Long dietId, String foodLog) {
+    public ResultResponse<?> updateDietState(Long dietId, DietState dietState){
         authenticatedProvider.getAuthenticatedChild();
         Diet diet = getDietOrThrow(dietId);
-        DietState state = diet.evaluateDietState(foodLog);
-        diet.updateState(state);
-        return ResultResponse.of(ResultCode.CHILD_LOG_UPLOAD_SUCCESS, null);
+        diet.updateState(dietState);
+        return ResultResponse.of(ResultCode.CHILD_STATE_UPLOAD_SUCCESS, null);
     }
 
     @Transactional
@@ -223,30 +238,12 @@ public class DietServiceImpl implements DietService {
         return ResultResponse.of(ResultCode.DIET_TIME_UPDATE_SUCCESS, null);
     }
 
-    @Override
-    @Transactional
-    public ResultResponse<?> overrideDietNutrition(Long dietId, UpdateNutritionRequestDto dto) {
-        authenticatedProvider.getAuthenticatedParent();
-        Diet diet = getDietOrThrow(dietId);
-        diet.modifyByParent(dto);
-        return ResultResponse.of(ResultCode.DIET_OVERRIDE_SUCCESS, null);
-    }
 
     @Transactional(readOnly = true)
     public ResultResponse<?> getDietDetail(Long dietId) {
         authenticatedProvider.getAuthenticatedChild();
         Diet diet = getDietOrThrow(dietId);
-        DietDetailResponseDto response = new DietDetailResponseDto(
-                diet.getId(),
-                diet.getImageUrl(),
-                diet.getTime().toString(),
-                diet.getFoodLog(),
-                diet.getTotalCalorie(),
-                diet.getTotalCarbohydrate(),
-                diet.getTotalProtein(),
-                diet.getTotalFat(),
-                diet.getState()
-        );
+        DietResponseDto response = toDietResponseDto(diet);
         return ResultResponse.of(ResultCode.DIET_DETAIL_RETRIEVAL_SUCCESS, response);
     }
 
@@ -364,34 +361,34 @@ public class DietServiceImpl implements DietService {
     }
 
     private DietResponseDto toDietResponseDto(Diet diet) {
-        if (diet.getState() == DietState.MODIFIED_BY_PARENT) {
-            return new DietResponseDto(
-                    diet.getId(),
-                    diet.getTime().toString(),
-                    diet.getState(),
-                    null,
-                    diet.getTotalCalorie(),
-                    diet.getFoodLog()
-            );
-        } else {
-            List<FoodResponseDto> foodDtos = diet.getFoodList().stream()
-                    .map(food -> new FoodResponseDto(
-                            food.getName(),
-                            null, null, null,
-                            food.getCalorie(),
-                            food.getCarbohydrate(),
-                            food.getFat(),
-                            food.getProtein()
-                    )).toList();
+        List<FoodResponseDto> foodDtos = diet.getFoodList().stream()
+                .map(food -> new FoodResponseDto(
+                        food.getName(),
+                        food.getCalorie(),
+                        food.getCarbohydrate(),
+                        food.getFat(),
+                        food.getProtein()
+                )).toList();
+        return new DietResponseDto(
+                diet.getId(),
+                diet.getImageUrl(),
+                diet.getTime().toString(),
+                diet.getState(),
+                foodDtos,
+                diet.getTotalCalorie(),
+                diet.getTotalCarbohydrate(),
+                diet.getTotalProtein(),
+                diet.getTotalFat()
+        );
+    }
 
-            return new DietResponseDto(
-                    diet.getId(),
-                    diet.getTime().toString(),
-                    diet.getState(),
-                    foodDtos,
-                    foodDtos.stream().mapToDouble(FoodResponseDto::calories).sum(),
-                    null
-            );
-        }
+    private void applyNewFoodList(Diet diet, DailyDiet dailyDiet, List<Food> foodList, UpdateDietRequestDto dto) {
+        diet.edit(foodList, dto);
+        dailyDiet.recalculate();
+    }
+
+    private void applyNewFoodList(Diet diet, DailyDiet dailyDiet, List<Food> foodList) {
+        diet.edit(foodList);
+        dailyDiet.recalculate();
     }
 }

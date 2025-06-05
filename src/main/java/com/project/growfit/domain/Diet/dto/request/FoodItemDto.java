@@ -5,7 +5,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 @Schema(description = "식단에 추가할 음식 항목 DTO")
 public record FoodItemDto(
-        @NotNull(message = "음식 ID를 입력해주세요.")
         @Schema(description = "음식 ID (공공 데이터 기반)", example = "1")
         Long foodId,
 

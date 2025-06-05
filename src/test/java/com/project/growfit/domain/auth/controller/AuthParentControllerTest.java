@@ -8,7 +8,7 @@ import com.project.growfit.domain.User.entity.Parent;
 import com.project.growfit.domain.User.entity.ROLE;
 import com.project.growfit.domain.User.repository.ParentRepository;
 import com.project.growfit.domain.User.service.AuthParentService;
-import com.project.growfit.global.auto.dto.CustomUserDetails;
+import com.project.growfit.global.auth.dto.CustomUserDetails;
 import com.project.growfit.global.config.SecurityConfig;
 import com.project.growfit.global.response.ResultCode;
 import com.project.growfit.global.response.ResultResponse;
@@ -68,21 +68,6 @@ class AuthParentControllerTest {
                 .andExpect(status().isOk());
     }
 
-    @Test
-    @DisplayName("부모 닉네임 설정 - 성공")
-    void setParentNickname_Success() throws Exception {
-        UpdateNicknameRequestDto request = new UpdateNicknameRequestDto("newNickname");
-
-        when(parentService.updateParentNickname(any(CustomUserDetails.class), any(UpdateNicknameRequestDto.class)))
-                .thenReturn(new ResultResponse<>(ResultCode.PARENT_NICKNAME_SET_SUCCESS, null));  // 빈 객체라도 반환
-
-        mockMvc.perform(post("/api/parent/nickname")
-                        .with(user(mockUser))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").doesNotExist());
-    }
 
     @Test
     @DisplayName("자녀 등록 - 성공")

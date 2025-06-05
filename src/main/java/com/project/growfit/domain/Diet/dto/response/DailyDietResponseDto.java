@@ -15,7 +15,7 @@ public record DailyDietResponseDto(
         String date,
 
         @Schema(description = "총 칼로리", example = "950")
-        long totalCalorie,
+        double totalCalorie,
 
         @Schema(description = "식사 유형별 식단 목록")
         Map<MealType, List<DietResponseDto>> dietsByMealType

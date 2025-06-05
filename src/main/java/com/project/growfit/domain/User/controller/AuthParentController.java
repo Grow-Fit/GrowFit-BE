@@ -3,11 +3,11 @@ package com.project.growfit.domain.User.controller;
 import com.google.zxing.WriterException;
 import com.project.growfit.domain.User.dto.request.RegisterChildRequest;
 import com.project.growfit.domain.User.dto.request.UpdateNicknameRequestDto;
-import com.project.growfit.domain.User.entity.Parent;
-import com.project.growfit.domain.User.repository.ParentRepository;
 import com.project.growfit.domain.User.service.AuthParentService;
-import com.project.growfit.global.auto.dto.CustomUserDetails;
+import com.project.growfit.global.auth.dto.CustomUserDetails;
 import com.project.growfit.global.response.ResultResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,17 +17,12 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/parent")
 @RequiredArgsConstructor
+@Tag(name = "Parent Auth API", description = "부모 회원 관련 API")
 public class AuthParentController {
 
     private final AuthParentService parentService;
-    private final ParentRepository parentRepository;
 
-    @GetMapping("/test")
-    public String test(){
-        return "ok";
-    }
-
-
+    @Operation(summary = "부모 닉네임 설정")
     @PostMapping("/nickname")
     public ResponseEntity<?> setParentNickname(@AuthenticationPrincipal CustomUserDetails user,
                                                @RequestBody UpdateNicknameRequestDto request) {
@@ -36,6 +31,7 @@ public class AuthParentController {
         return ResponseEntity.status(HttpStatus.OK).body(resultResponse);
     }
 
+    @Operation(summary = "부모 회원가입 시 아이 등록")
     @PostMapping("/child")
     public ResponseEntity<?> registerChild(@AuthenticationPrincipal CustomUserDetails user,
                                            @RequestBody RegisterChildRequest request){
@@ -44,6 +40,7 @@ public class AuthParentController {
         return ResponseEntity.status(HttpStatus.OK).body(resultResponse);
     }
 
+    @Operation(summary = "아이 QR 코드 생성")
     @GetMapping("/child/{child_id}/qr")
     public ResponseEntity<?> createQrCode(@AuthenticationPrincipal CustomUserDetails user,
                                           @PathVariable("child_id") Long  child_id) throws WriterException {
@@ -52,15 +49,4 @@ public class AuthParentController {
         return ResponseEntity.status(HttpStatus.OK).body(resultResponse);
 
     }
-
-    /* 테스트 후 삭제 될 API입니다.*/
-    @GetMapping("/me")
-    public ResponseEntity<?> testUserInfo(@AuthenticationPrincipal CustomUserDetails user) {
-        String email = user.getUsername();
-        Parent parent = parentRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        return ResponseEntity.status(HttpStatus.OK).body(parent);
-    }
-
 }

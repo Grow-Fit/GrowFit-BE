@@ -2,11 +2,11 @@ package com.project.growfit.domain.auth.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.growfit.domain.User.controller.AuthChildController;
-import com.project.growfit.domain.User.dto.request.ChildCredentialsRequest;
+import com.project.growfit.domain.User.dto.request.ChildCredentialsRequestDto;
 import com.project.growfit.domain.User.dto.request.FindChildPasswordRequestDto;
 import com.project.growfit.domain.User.dto.request.UpdateNicknameRequestDto;
 import com.project.growfit.domain.User.service.AuthChildService;
-import com.project.growfit.global.auto.jwt.excpetion.CustomAuthenticationEntryPoint;
+import com.project.growfit.global.auth.jwt.excpetion.CustomAuthenticationEntryPoint;
 import com.project.growfit.global.config.SecurityConfig;
 import com.project.growfit.global.response.ResultCode;
 import com.project.growfit.global.response.ResultResponse;
@@ -68,9 +68,9 @@ class AuthChildControllerTest {
     @DisplayName("[registerChildCredentials 성공 테스트] - 자녀 계정 등록")
     void registerChildCredentials_Success() throws Exception {
         Long childId = 1L;
-        ChildCredentialsRequest request = new ChildCredentialsRequest("childTestId", "password123");
+        ChildCredentialsRequestDto request = new ChildCredentialsRequestDto("childTestId", "password123", "민준콩");
 
-        when(authChildService.registerChildCredentials(anyLong(), any(ChildCredentialsRequest.class)))
+        when(authChildService.registerChildCredentials(anyLong(), any(ChildCredentialsRequestDto.class)))
                 .thenReturn(new ResultResponse<>(ResultCode.CHILD_REGISTRATION_SUCCESS, null));
 
         mockMvc.perform(post("/api/child/register/{child_id}/credentials", childId)
@@ -99,9 +99,9 @@ class AuthChildControllerTest {
     @Test
     @DisplayName("[loginChild 성공 테스트] - 자녀 로그인")
     void loginChild_Success() throws Exception {
-        ChildCredentialsRequest request = new ChildCredentialsRequest("childTestId", "password123");
+        ChildCredentialsRequestDto request = new ChildCredentialsRequestDto("childTestId", "password123", "민준콩");
 
-        when(authChildService.login(any(ChildCredentialsRequest.class), any(HttpServletResponse.class)))
+        when(authChildService.login(any(ChildCredentialsRequestDto.class), any(HttpServletResponse.class)))
                 .thenReturn(new ResultResponse<>(ResultCode.CHILD_LOGIN_SUCCESS, null));
 
         mockMvc.perform(post("/api/child/login")

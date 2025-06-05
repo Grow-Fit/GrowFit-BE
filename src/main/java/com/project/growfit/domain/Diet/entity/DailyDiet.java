@@ -36,10 +36,11 @@ public class DailyDiet extends BaseEntity {
 
     @Column(nullable = false)
     @JoinColumn(name = "total_calorie")
-    private long totalCalorie;
+    private double totalCalorie;
 
     @OneToMany(mappedBy = "dailyDiet", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Diet> diets = new ArrayList<>();
+
 
     public DailyDiet(Child child, LocalDate date) {
         this.child = child;
@@ -55,6 +56,10 @@ public class DailyDiet extends BaseEntity {
 
     public void markSticker(Sticker sticker) {
         this.sticker = sticker;
+    }
+
+    public void recalculate() {
+        this.totalCalorie = diets.stream().mapToDouble(Diet::getTotalCalorie).sum();
     }
 
     private boolean hasMealType(MealType mealType){

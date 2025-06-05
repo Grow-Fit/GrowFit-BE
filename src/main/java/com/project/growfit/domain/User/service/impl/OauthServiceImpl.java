@@ -9,7 +9,7 @@ import com.project.growfit.domain.User.dto.response.ParentResponse;
 import com.project.growfit.domain.User.entity.Parent;
 import com.project.growfit.domain.User.repository.ParentRepository;
 import com.project.growfit.domain.User.service.OauthService;
-import com.project.growfit.global.auto.jwt.JwtProvider;
+import com.project.growfit.global.auth.jwt.JwtProvider;
 import com.project.growfit.global.exception.BusinessException;
 import com.project.growfit.global.exception.ErrorCode;
 import com.project.growfit.global.redis.entity.TokenRedis;
@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;

@@ -1,13 +1,13 @@
 package com.project.growfit.domain.auth.service.impl;
 
-import com.project.growfit.domain.User.dto.request.ChildCredentialsRequest;
+import com.project.growfit.domain.User.dto.request.ChildCredentialsRequestDto;
 import com.project.growfit.domain.User.dto.request.FindChildPasswordRequestDto;
 import com.project.growfit.domain.User.dto.response.ChildInfoResponseDto;
 import com.project.growfit.domain.User.entity.Child;
 import com.project.growfit.domain.User.repository.ChildRepository;
 import com.project.growfit.domain.User.service.impl.AuthChildServiceImpl;
-import com.project.growfit.global.auto.jwt.JwtProvider;
-import com.project.growfit.global.auto.service.CustomAuthenticationProvider;
+import com.project.growfit.global.auth.jwt.JwtProvider;
+import com.project.growfit.global.auth.service.CustomAuthenticationProvider;
 import com.project.growfit.global.exception.BusinessException;
 import com.project.growfit.global.exception.ErrorCode;
 import com.project.growfit.global.redis.repository.TokenRedisRepository;
@@ -95,7 +95,7 @@ class AuthChildServiceImplTest {
     void registerChildCredentials_Success() {
         // Given
         Long childId = 1L;
-        ChildCredentialsRequest request = new ChildCredentialsRequest("childTestId", "password123");
+        ChildCredentialsRequestDto request = new ChildCredentialsRequestDto("childTestId", "password123", "민준콩");
         when(childRepository.findById(childId)).thenReturn(Optional.of(mockChild));
         when(passwordEncoder.encode(request.childPassword())).thenReturn("encodedPassword");
 
@@ -112,7 +112,7 @@ class AuthChildServiceImplTest {
     void registerChildCredentials_NotFound() {
         // Given
         Long childId = 999L;
-        ChildCredentialsRequest request = new ChildCredentialsRequest("childTestId", "password123");
+        ChildCredentialsRequestDto request = new ChildCredentialsRequestDto("childTestId", "password123", "민준콩");
         when(childRepository.findById(childId)).thenReturn(Optional.empty());
 
         // When & Then

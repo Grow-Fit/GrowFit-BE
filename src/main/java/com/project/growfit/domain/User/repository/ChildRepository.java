@@ -14,6 +14,7 @@ public interface ChildRepository extends JpaRepository<Child, Long> {
     Optional<Child> findByCodeNumber(String code);
 
     Optional<Child> findByParent(Parent parent);
+    boolean existsByLoginId(String childId);
 
     boolean existsByCodeNumberAndLoginId(String code, String login_id);
     boolean existsByCodeNumber(String code);
