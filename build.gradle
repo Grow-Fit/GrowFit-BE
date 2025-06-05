@@ -40,6 +40,7 @@ dependencies {
 	implementation group: 'com.google.zxing', name: 'core', version: '3.5.3'
 	implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
 	implementation("org.hibernate.common:hibernate-commons-annotations:7.0.3.Final")
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'  // json 변환 오류 해결
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.3'
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.3'
 	implementation group: 'org.springframework.data', name: 'spring-data-jpa', version: '3.4.3'

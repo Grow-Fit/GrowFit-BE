@@ -45,6 +45,10 @@ public enum ErrorCode {
     IMAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "이미지를 찾을 수 없습니다."),
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "댓글을 찾을 수 없습니다."),
 
+    WRONG_USER_ROLE(HttpStatus.BAD_REQUEST, "사용자의 역할이 잘못되었습니다."),
+    NOTICE_NOT_FOUND(HttpStatus.NOT_FOUND, "알림을 찾을 수 없습니다"),
+    WRONG_TARGET_TYPE(HttpStatus.BAD_REQUEST, "대상 타입이 잘못되었습니다"),
+
     //Diet
     INVALID_TIME_FORMAT(HttpStatus.BAD_REQUEST, "유효하지 않은 시간 형식입니다."),
     STICKER_NOT_FOUND(HttpStatus.NOT_FOUND, "등록된 스티커가 존재하지 않습니다."),
