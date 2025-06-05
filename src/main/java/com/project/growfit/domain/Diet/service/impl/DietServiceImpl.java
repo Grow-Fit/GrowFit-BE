@@ -144,7 +144,6 @@ public class DietServiceImpl implements DietService {
 
     }
 
-
     @Override
     @Transactional
     public ResultResponse<?> updateDiet(Long dietId, UpdateDietRequestDto dto) {
@@ -244,16 +243,7 @@ public class DietServiceImpl implements DietService {
     public ResultResponse<?> getDietDetail(Long dietId) {
         authenticatedProvider.getAuthenticatedChild();
         Diet diet = getDietOrThrow(dietId);
-        DietDetailResponseDto response = new DietDetailResponseDto(
-                diet.getId(),
-                diet.getImageUrl(),
-                diet.getTime().toString(),
-                diet.getTotalCalorie(),
-                diet.getTotalCarbohydrate(),
-                diet.getTotalProtein(),
-                diet.getTotalFat(),
-                diet.getState()
-        );
+        DietResponseDto response = toDietResponseDto(diet);
         return ResultResponse.of(ResultCode.DIET_DETAIL_RETRIEVAL_SUCCESS, response);
     }
 
@@ -371,41 +361,32 @@ public class DietServiceImpl implements DietService {
     }
 
     private DietResponseDto toDietResponseDto(Diet diet) {
-        if (diet.getState() == DietState.MODIFIED) {
-            return new DietResponseDto(
-                    diet.getId(),
-                    diet.getTime().toString(),
-                    diet.getState(),
-                    null,
-                    diet.getTotalCalorie()
-            );
-        } else {
-            List<FoodResponseDto> foodDtos = diet.getFoodList().stream()
-                    .map(food -> new FoodResponseDto(
-                            food.getName(),
-                            null, null, null,
-                            food.getCalorie(),
-                            food.getCarbohydrate(),
-                            food.getFat(),
-                            food.getProtein()
-                    )).toList();
-
-            return new DietResponseDto(
-                    diet.getId(),
-                    diet.getTime().toString(),
-                    diet.getState(),
-                    foodDtos,
-                    foodDtos.stream().mapToDouble(FoodResponseDto::calories).sum()
-            );
-        }
+        List<FoodResponseDto> foodDtos = diet.getFoodList().stream()
+                .map(food -> new FoodResponseDto(
+                        food.getName(),
+                        food.getCalorie(),
+                        food.getCarbohydrate(),
+                        food.getFat(),
+                        food.getProtein()
+                )).toList();
+        return new DietResponseDto(
+                diet.getId(),
+                diet.getImageUrl(),
+                diet.getTime().toString(),
+                diet.getState(),
+                foodDtos,
+                diet.getTotalCalorie(),
+                diet.getTotalCarbohydrate(),
+                diet.getTotalProtein(),
+                diet.getTotalFat()
+        );
     }
-    // 전체 식단 수정 (시간, 종류 포함)
+
     private void applyNewFoodList(Diet diet, DailyDiet dailyDiet, List<Food> foodList, UpdateDietRequestDto dto) {
         diet.edit(foodList, dto);
         dailyDiet.recalculate();
     }
 
-    // 음식 리스트만 수정
     private void applyNewFoodList(Diet diet, DailyDiet dailyDiet, List<Food> foodList) {
         diet.edit(foodList);
         dailyDiet.recalculate();

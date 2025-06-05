@@ -79,7 +79,6 @@ public class DietSetServiceImpl implements DietSetService {
         List<FoodResponseDto> foodDetails = set.getFoods().stream().map(f ->
                 new FoodResponseDto(
                         f.getName(),
-                        null, null, null,
                         f.getCalorie(),
                         f.getCarbohydrate(),
                         f.getFat(),
