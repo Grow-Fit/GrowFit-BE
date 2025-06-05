@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.growfit.domain.notice.entity.NoticeType;
 import com.project.growfit.domain.notice.repository.EmitterRepository;
 import com.project.growfit.domain.notice.service.SseEmitterService;
-import com.project.growfit.global.auto.dto.CustomUserDetails;
+import com.project.growfit.global.auth.dto.CustomUserDetails;
 import com.project.growfit.global.exception.BusinessException;
 import com.project.growfit.global.exception.ErrorCode;
 import java.io.IOException;
