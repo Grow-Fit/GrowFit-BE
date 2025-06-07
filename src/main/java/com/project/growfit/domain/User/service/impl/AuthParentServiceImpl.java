@@ -16,6 +16,7 @@ import com.project.growfit.domain.User.repository.ChildRepository;
 import com.project.growfit.domain.User.repository.ParentRepository;
 import com.project.growfit.domain.User.service.AuthParentService;
 import com.project.growfit.global.auth.dto.CustomUserDetails;
+import com.project.growfit.global.auth.service.AuthenticatedUserProvider;
 import com.project.growfit.global.exception.BusinessException;
 import com.project.growfit.global.exception.ErrorCode;
 import com.project.growfit.global.response.ResultCode;
@@ -36,6 +37,7 @@ import java.util.UUID;
 public class AuthParentServiceImpl implements AuthParentService {
     private final ParentRepository parentRepository;
     private final ChildRepository childRepository;
+    private final AuthenticatedUserProvider authenticatedProvider;
 
     @Override
     public ResultResponse<?> updateParentNickname(CustomUserDetails user, UpdateNicknameRequestDto request) {
@@ -71,14 +73,17 @@ public class AuthParentServiceImpl implements AuthParentService {
     }
 
     @Override
-    public ResultResponse<?> createQR(CustomUserDetails user, Long child_id) throws WriterException {
+    public ResultResponse<?> createQR(CustomUserDetails user) throws WriterException {
         int width = 200;
         int height = 200;
         String uniqueCode = UUID.randomUUID().toString();
-        log.info("[createQR] QR 코드 생성 요청: user_id={}, child_id={}", user.getUserId(), child_id);
-        String url = "http://localhost:8080/api/child/register/" + child_id + "/credentials";
 
-        Child child = getChild(child_id);
+        Child child = authenticatedProvider.getAuthenticatedChild();
+        Long id = child.getId();
+
+        log.info("[createQR] QR 코드 생성 요청: user_id={}", user.getUserId());
+        String url = "http://localhost:8080/api/child/register/" + id + "/credentials";
+
         if(child.getCodeNumber() != null){
             throw  new BusinessException(ErrorCode.QR_ALREADY_EXISTS);
         }
@@ -90,7 +95,7 @@ public class AuthParentServiceImpl implements AuthParentService {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             MatrixToImageWriter.writeToStream(encode, "PNG", out);
             String base64QrCode = Base64.getEncoder().encodeToString(out.toByteArray());
-            log.info("[createQR] QR 코드 생성 완료: child_id={}, qr_code={}", child_id, base64QrCode);
+            log.info("[createQR] QR 코드 생성 완료: child_id={}, qr_code={}", id, base64QrCode);
             ChildQrCodeResponseDto dto = ChildQrCodeResponseDto.toDto(child, base64QrCode, uniqueCode);
 
             return new ResultResponse<>(ResultCode.QR_GENERATION_SUCCESS, dto);

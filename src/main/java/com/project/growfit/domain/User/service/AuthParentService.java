@@ -9,5 +9,5 @@ import com.project.growfit.global.response.ResultResponse;
 public interface AuthParentService {
     ResultResponse<?> updateParentNickname(CustomUserDetails user, UpdateNicknameRequestDto request);
     ResultResponse<?> registerChild(CustomUserDetails user, RegisterChildRequest request);
-    ResultResponse<?> createQR(CustomUserDetails user, Long child_id) throws WriterException;
+    ResultResponse<?> createQR(CustomUserDetails user) throws WriterException;
 }
