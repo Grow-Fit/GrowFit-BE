@@ -109,7 +109,7 @@ class AuthParentServiceImplTest {
         when(childRepository.findById(childId)).thenReturn(Optional.of(mockChild));
 
         // When
-        ResultResponse<?> response = authParentService.createQR(mockUserDetails, childId);
+        ResultResponse<?> response = authParentService.createQR(mockUserDetails);
 
         // Then
         assertThat(response).isNotNull();

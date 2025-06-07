@@ -41,10 +41,9 @@ public class AuthParentController {
     }
 
     @Operation(summary = "아이 QR 코드 생성")
-    @GetMapping("/child/{child_id}/qr")
-    public ResponseEntity<?> createQrCode(@AuthenticationPrincipal CustomUserDetails user,
-                                          @PathVariable("child_id") Long  child_id) throws WriterException {
-        ResultResponse<?> resultResponse = parentService.createQR(user, child_id);
+    @GetMapping("/child/qr")
+    public ResponseEntity<?> createQrCode(@AuthenticationPrincipal CustomUserDetails user) throws WriterException {
+        ResultResponse<?> resultResponse = parentService.createQR(user);
 
         return ResponseEntity.status(HttpStatus.OK).body(resultResponse);
 
