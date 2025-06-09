@@ -13,6 +13,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -191,10 +193,22 @@ public class JwtProvider {
         cookie.setSecure(false);
         cookie.setMaxAge((int) (accessTokenValidityMilliSeconds / 1000));
         response.addCookie(cookie);
-        response.setHeader("Set-Cookie", "accessToken=" + token + "; Path=/; HttpOnly; Secure; SameSite=None");
-
+        //response.setHeader("Set-Cookie", "accessToken=" + token + "; Path=/; HttpOnly; Secure; SameSite=None");
         log.info("[saveAccessTokenToCookie] Access Token이 쿠키에 저장되었습니다.");
     }
+
+    public void saveEmailToCookie(HttpServletResponse response, String email) {
+        log.info("[saveEmailToCookie] 이메일이 쿠키에 저장되었습니다.");
+        ResponseCookie cookie = ResponseCookie.from("email", email)
+                .httpOnly(false)
+                .secure(true)
+                .sameSite("None")
+                .maxAge(60)
+                .path("/")
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+    }
+
 
     public String getSubjectFromToken(String token) {
         try {
