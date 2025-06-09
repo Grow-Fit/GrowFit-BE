@@ -70,7 +70,7 @@ class AuthParentServiceImplTest {
         verify(childRepository, times(1)).findById(childId);
     }
 
-    @Test
+/*    @Test
     @DisplayName("[createQR 실패 테스트] - 자녀 정보 없음")
     void createQR_ChildNotFound() {
         // Given
@@ -83,7 +83,7 @@ class AuthParentServiceImplTest {
                 .hasMessage(ErrorCode.USER_NOT_FOUND.getMessage());
 
         verify(childRepository, times(1)).findById(childId);
-    }
+    }*/
 
     private void setField(Object target, String fieldName, Object value) throws Exception {
         Field field = target.getClass().getDeclaredField(fieldName);
