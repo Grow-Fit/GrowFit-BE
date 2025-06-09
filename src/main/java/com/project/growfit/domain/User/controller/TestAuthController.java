@@ -1,6 +1,7 @@
 package com.project.growfit.domain.User.controller;
 
 import com.project.growfit.domain.User.dto.response.ParentLoginResponseDto;
+import com.project.growfit.global.auth.cookie.CookieService;
 import com.project.growfit.global.auth.jwt.JwtProvider;
 import com.project.growfit.global.redis.entity.TokenRedis;
 import com.project.growfit.global.redis.repository.TokenRedisRepository;
@@ -24,6 +25,7 @@ public class TestAuthController {
 
     private final JwtProvider jwtProvider;
     private final TokenRedisRepository tokenRedisRepository;
+    private final CookieService cookieService;
 
     @PostMapping("/generate-token")
     @Operation(summary = "테스트 계정 토큰 변환 api")
@@ -32,7 +34,7 @@ public class TestAuthController {
         String newAccessToken = jwtProvider.createAccessToken(email, "ROLE_PARENT", "SOCIAL_KAKAO");
         String newRefreshToken = jwtProvider.createRefreshToken(email);
         tokenRedisRepository.save(new TokenRedis(email, newAccessToken, newRefreshToken));
-        jwtProvider.saveAccessTokenToCookie(response, newAccessToken);
+        cookieService.saveAccessTokenToCookie(response, newAccessToken);
 
         log.info("로그인 성공: email={}, accessToken 저장 완료", email);
         ParentLoginResponseDto dto = new ParentLoginResponseDto(email, true);

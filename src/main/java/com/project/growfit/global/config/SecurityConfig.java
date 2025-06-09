@@ -1,5 +1,6 @@
 package com.project.growfit.global.config;
 
+import com.project.growfit.global.auth.cookie.CookieService;
 import com.project.growfit.global.auth.jwt.JwtProvider;
 import com.project.growfit.global.auth.jwt.excpetion.CustomAccessDeniedHandler;
 import com.project.growfit.global.auth.jwt.excpetion.CustomAuthenticationEntryPoint;
@@ -31,6 +32,7 @@ public class SecurityConfig {
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JwtProvider jwtUtil;
+    private final CookieService cookieService;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -77,7 +79,7 @@ public class SecurityConfig {
                         .authenticationEntryPoint(customAuthenticationEntryPoint)
                         .accessDeniedHandler(customAccessDeniedHandler)
                 )
-                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class)
+                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, cookieService), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new JwtCookieAuthenticationFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

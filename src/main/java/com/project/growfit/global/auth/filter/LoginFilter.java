@@ -1,6 +1,7 @@
 package com.project.growfit.global.auth.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.growfit.global.auth.cookie.CookieService;
 import com.project.growfit.global.auth.dto.CustomUserDetails;
 import com.project.growfit.global.auth.jwt.JwtProvider;
 import jakarta.servlet.FilterChain;
@@ -20,11 +21,13 @@ import java.io.IOException;
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     private final AuthenticationManager authenticationManager;
     private final JwtProvider jwtProvider;
+    private final CookieService cookieService;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public LoginFilter(AuthenticationManager authenticationManager, JwtProvider jwtProvider) {
+    public LoginFilter(AuthenticationManager authenticationManager, JwtProvider jwtProvider, CookieService cookieService) {
         this.authenticationManager = authenticationManager;
         this.jwtProvider = jwtProvider;
+        this.cookieService = cookieService;
     }
 
     @Override
@@ -68,7 +71,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         String token = jwtProvider.createAccessToken(user_id, role, login_type);
 
-        jwtProvider.saveAccessTokenToCookie(response, token);
+        cookieService.saveAccessTokenToCookie(response, token);
 
         log.info("[successfulAuthentication] 로그인 성공 - 사용자 ID: {}, 역할: {}, JWT 저장 완료", user_id, role);
 

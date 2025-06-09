@@ -2,6 +2,7 @@ package com.project.growfit.global.auth.jwt;
 
 import com.project.growfit.domain.User.repository.ChildRepository;
 import com.project.growfit.domain.User.repository.ParentRepository;
+import com.project.growfit.global.auth.cookie.CookieService;
 import com.project.growfit.global.auth.dto.CustomUserDetails;
 import com.project.growfit.global.redis.entity.TokenRedis;
 import com.project.growfit.global.redis.repository.TokenRedisRepository;
@@ -31,9 +32,6 @@ import java.util.List;
 @Slf4j
 @Component
 public class JwtProvider {
-
-    @Value("${app.cookie.secure}")
-    private boolean isProdSecure;
     private static final String AUTHORITIES_KEY = "role";
 
     private SecretKey secretKey;
@@ -42,34 +40,31 @@ public class JwtProvider {
     private final TokenRedisRepository tokenRedisRepository;
     private final ParentRepository parentRepository;
     private final ChildRepository childRepository;
+    private final CookieService cookieService;
 
     public JwtProvider(@Value("${jwt.secret_key}") String key,
                        @Value("${jwt.access-token-validity-in-seconds}") long accessTokenValiditySeconds,
-                       @Value("${jwt.refresh-token-validity-in-seconds}") long refreshTokenValiditySeconds, TokenRedisRepository tokenRedisRepository, ParentRepository parentRepository, ChildRepository childRepository) {
+                       @Value("${jwt.refresh-token-validity-in-seconds}") long refreshTokenValiditySeconds, TokenRedisRepository tokenRedisRepository, ParentRepository parentRepository, ChildRepository childRepository, CookieService cookieService) {
         this.secretKey = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
         this.accessTokenValidityMilliSeconds = accessTokenValiditySeconds * 1000;
         this.refreshTokenValidityMilliSeconds = refreshTokenValiditySeconds * 1000;
         this.tokenRedisRepository = tokenRedisRepository;
         this.parentRepository = parentRepository;
         this.childRepository = childRepository;
-        log.info("[JwtProvider] JwtProvider 초기화 완료. AccessToken 유효시간: {}ms, RefreshToken 유효시간: {}ms",
+        this.cookieService = cookieService;
+        log.debug("[JwtProvider] JwtProvider 초기화 완료. AccessToken 유효시간: {}ms, RefreshToken 유효시간: {}ms",
                 accessTokenValidityMilliSeconds, refreshTokenValidityMilliSeconds);
-    }
-
-    @PostConstruct
-    public void init() {
-        log.info("[JwtProvider] isProdSecure: {}", isProdSecure); // ← 여기를 확인
     }
 
     public String createAccessToken(String userId, String role, String loginType) {
         String token = createJwt(userId, role, loginType, accessTokenValidityMilliSeconds);
-        log.info("[createAccessToken] Access Token 생성 완료 for userId={} with role={}", userId, role);
+        log.debug("[createAccessToken] Access Token 생성 완료 for userId={} with role={}", userId, role);
         return token;
     }
 
     public String createRefreshToken(String userId) {
         String token = createJwt(userId, "REFRESH", "", refreshTokenValidityMilliSeconds);
-        log.info("[createRefreshToken] Refresh Token 생성 완료 for userId={}", userId);
+        log.debug("[createRefreshToken] Refresh Token 생성 완료 for userId={}", userId);
         return token;
     }
 
@@ -138,7 +133,7 @@ public class JwtProvider {
                     .orElseThrow(() -> new UsernameNotFoundException("자식을 찾을 수 없습니다: " + userId));
         }
         CustomUserDetails userDetails = new CustomUserDetails(user);
-        log.info("[createAuthenticationFromToken] Authentication 생성: userId={}, 역할={}", userId, role);
+        log.debug("[createAuthenticationFromToken] Authentication 생성: userId={}, 역할={}", userId, role);
         return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
     }
 
@@ -147,22 +142,18 @@ public class JwtProvider {
             TokenRedis tokenRedis = tokenRedisRepository.findByAccessToken(token)
                     .orElseThrow(() -> new RuntimeException("다시 로그인 해 주세요."));
             String refreshToken = tokenRedis.getRefreshToken();
-
             Jwts.parser().setSigningKey(secretKey).build().parseClaimsJws(refreshToken);
+            log.debug("[replaceAccessToken] 토큰 재발급 시작");
 
-            log.info("[replaceAccessToken] 토큰 재발급 시작");
             String userId = tokenRedis.getId();
-
             Result result = getResult(userId);
-
-
             String newAccessToken = createAccessToken(userId, result.role(), result.login_type());
 
             tokenRedis.updateAccessToken(newAccessToken);
             tokenRedisRepository.save(tokenRedis);
-            log.info("[replaceAccessToken] 토큰 재발급 완료 - 새로운 액세스 토큰 발급됨: {}", newAccessToken);
+            log.debug("[replaceAccessToken] 토큰 재발급 완료 - 새로운 액세스 토큰 발급됨: {}", newAccessToken);
 
-            saveAccessTokenToCookie(response, newAccessToken);
+            cookieService.saveAccessTokenToCookie(response, newAccessToken);
 
             return new UsernamePasswordAuthenticationToken(new CustomUserDetails(userId, result.role()), null,
                     List.of(new SimpleGrantedAuthority(result.role())));
@@ -193,28 +184,6 @@ public class JwtProvider {
 
     private record Result(String role, String login_type) {
     }
-
-    public void saveAccessTokenToCookie(HttpServletResponse response, String token) {
-        Cookie cookie = new Cookie("accessToken", token);
-        cookie.setPath("/");
-        cookie.setHttpOnly(false);
-        cookie.setSecure(isProdSecure);
-        cookie.setMaxAge((int) (accessTokenValidityMilliSeconds / 1000));
-        response.addCookie(cookie);
-        log.info("[saveAccessTokenToCookie] Access Token이 쿠키에 저장되었습니다.");
-    }
-
-    public void saveEmailToCookie(HttpServletResponse response, String email) {
-        ResponseCookie cookie = ResponseCookie.from("email", email)
-                .httpOnly(false)
-                .secure(isProdSecure)
-                .maxAge(60)
-                .path("/")
-                .build();
-        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-        log.info("[saveEmailToCookie] 이메일이 쿠키에 저장되었습니다.");
-    }
-
 
     public String getSubjectFromToken(String token) {
         try {
