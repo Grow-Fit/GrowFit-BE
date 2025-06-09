@@ -1,6 +1,6 @@
 package com.project.growfit.domain.User.controller;
 
-import com.project.growfit.domain.User.dto.request.ChildCredentialsRequestDto;
+import com.project.growfit.domain.User.dto.request.AuthChildRequestDto;
 import com.project.growfit.domain.User.dto.request.FindChildPasswordRequestDto;
 import com.project.growfit.domain.User.service.AuthChildService;
 import com.project.growfit.global.response.ResultResponse;
@@ -30,7 +30,7 @@ public class AuthChildController {
     @Operation(summary = "아이 회원가입 시 아이디 & 비밀번호 & 닉네임 등록")
     @PostMapping("/register/{child_id}/credentials")
     public ResponseEntity<?> registerChildCredentials(@PathVariable Long child_id,
-                                                      @RequestBody ChildCredentialsRequestDto request) {
+                                                      @RequestBody AuthChildRequestDto request) {
         ResultResponse<?> resultResponse = authChildService.registerChildCredentials(child_id, request);
 
         return ResponseEntity.status(HttpStatus.OK).body(resultResponse);
@@ -38,7 +38,7 @@ public class AuthChildController {
 
     @Operation(summary = "아이 로그인")
     @PostMapping("/login")
-    public ResponseEntity<?> loginChild(@RequestBody ChildCredentialsRequestDto request, HttpServletResponse response) {
+    public ResponseEntity<?> loginChild(@RequestBody AuthChildRequestDto request, HttpServletResponse response) {
         ResultResponse<?> resultResponse = authChildService.login(request, response);
 
         return ResponseEntity.status(HttpStatus.OK).body(resultResponse);

@@ -1,8 +1,7 @@
 package com.project.growfit.domain.User.controller;
 
 import com.google.zxing.WriterException;
-import com.project.growfit.domain.User.dto.request.RegisterChildRequest;
-import com.project.growfit.domain.User.dto.request.UpdateNicknameRequestDto;
+import com.project.growfit.domain.User.dto.request.AuthParentRequestDto;
 import com.project.growfit.domain.User.service.AuthParentService;
 import com.project.growfit.global.auth.dto.CustomUserDetails;
 import com.project.growfit.global.response.ResultResponse;
@@ -22,19 +21,10 @@ public class AuthParentController {
 
     private final AuthParentService parentService;
 
-    @Operation(summary = "부모 닉네임 설정")
-    @PostMapping("/nickname")
-    public ResponseEntity<?> setParentNickname(@AuthenticationPrincipal CustomUserDetails user,
-                                               @RequestBody UpdateNicknameRequestDto request) {
-        ResultResponse<?> resultResponse = parentService.updateParentNickname(user, request);
-
-        return ResponseEntity.status(HttpStatus.OK).body(resultResponse);
-    }
-
     @Operation(summary = "부모 회원가입 시 아이 등록")
     @PostMapping("/child")
     public ResponseEntity<?> registerChild(@AuthenticationPrincipal CustomUserDetails user,
-                                           @RequestBody RegisterChildRequest request){
+                                           @RequestBody AuthParentRequestDto request){
         ResultResponse<?> resultResponse = parentService.registerChild(user, request);
 
         return ResponseEntity.status(HttpStatus.OK).body(resultResponse);

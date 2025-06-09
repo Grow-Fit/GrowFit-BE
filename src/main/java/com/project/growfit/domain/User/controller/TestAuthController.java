@@ -35,7 +35,7 @@ public class TestAuthController {
         jwtProvider.saveAccessTokenToCookie(response, newAccessToken);
 
         log.info("로그인 성공: email={}, accessToken 저장 완료", email);
-        ParentLoginResponseDto dto = new ParentLoginResponseDto(newAccessToken, email);
+        ParentLoginResponseDto dto = new ParentLoginResponseDto(email, true);
         return new ResultResponse<>(ResultCode.PARENT_LOGIN_SUCCESS, dto);
     }
 }

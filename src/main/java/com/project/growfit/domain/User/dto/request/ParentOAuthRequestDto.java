@@ -5,7 +5,7 @@ import com.project.growfit.domain.User.entity.ROLE;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 
-public record ParentSignUpRequest(
+public record ParentOAuthRequestDto(
         @Schema(description = "이메일", example = "example@naver.com")
         @NotBlank(message = "이메일을 입력해주세요.")
         String email,

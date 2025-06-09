@@ -6,7 +6,10 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-public record RegisterChildRequest(
+public record AuthParentRequestDto(
+        @Schema(description = "등록할 부모 닉네임", example = "건강한 엄마")
+        @NotBlank(message = "닉네임은 필수 입력값입니다.")
+        String nickname,
 
         @Schema(description = "아이 이름", example = "김민준")
         @NotBlank(message = "아이 이름을 입력해주세요.")

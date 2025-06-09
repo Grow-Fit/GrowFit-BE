@@ -1,6 +1,6 @@
 package com.project.growfit.domain.auth.service.impl;
 
-import com.project.growfit.domain.User.dto.request.ChildCredentialsRequestDto;
+import com.project.growfit.domain.User.dto.request.AuthChildRequestDto;
 import com.project.growfit.domain.User.dto.request.FindChildPasswordRequestDto;
 import com.project.growfit.domain.User.dto.response.ChildInfoResponseDto;
 import com.project.growfit.domain.User.entity.Child;
@@ -95,7 +95,7 @@ class AuthChildServiceImplTest {
     void registerChildCredentials_Success() {
         // Given
         Long childId = 1L;
-        ChildCredentialsRequestDto request = new ChildCredentialsRequestDto("childTestId", "password123", "민준콩");
+        AuthChildRequestDto request = new AuthChildRequestDto("childTestId", "password123", "민준콩");
         when(childRepository.findById(childId)).thenReturn(Optional.of(mockChild));
         when(passwordEncoder.encode(request.childPassword())).thenReturn("encodedPassword");
 
@@ -112,7 +112,7 @@ class AuthChildServiceImplTest {
     void registerChildCredentials_NotFound() {
         // Given
         Long childId = 999L;
-        ChildCredentialsRequestDto request = new ChildCredentialsRequestDto("childTestId", "password123", "민준콩");
+        AuthChildRequestDto request = new AuthChildRequestDto("childTestId", "password123", "민준콩");
         when(childRepository.findById(childId)).thenReturn(Optional.empty());
 
         // When & Then

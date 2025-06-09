@@ -3,7 +3,7 @@ package com.project.growfit.domain.User.dto.request;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 
-public record ChildCredentialsRequestDto(
+public record AuthChildRequestDto(
 
         @Schema(description = "아이 로그인 ID", example = "child123")
         @NotBlank(message = "아이디를 입력해주세요.")

@@ -5,8 +5,7 @@ import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
-import com.project.growfit.domain.User.dto.request.RegisterChildRequest;
-import com.project.growfit.domain.User.dto.request.UpdateNicknameRequestDto;
+import com.project.growfit.domain.User.dto.request.AuthParentRequestDto;
 import com.project.growfit.domain.User.dto.response.ChildInfoResponseDto;
 import com.project.growfit.domain.User.dto.response.ChildQrCodeResponseDto;
 import com.project.growfit.domain.User.entity.Child;
@@ -40,18 +39,7 @@ public class AuthParentServiceImpl implements AuthParentService {
     private final AuthenticatedUserProvider authenticatedProvider;
 
     @Override
-    public ResultResponse<?> updateParentNickname(CustomUserDetails user, UpdateNicknameRequestDto request) {
-        log.info("[updateParentNickname] 부모 닉네임 변경 요청: user_id={}, new_nickname={}", user.getUserId(), request.nickname());
-
-        Parent parent = getParent(user);
-        parent.updateNickname(request.nickname());
-
-        log.info("[updateParentNickname] 부모 닉네임 변경 완료: user_id={}, new_nickname={}", user.getUserId(), request.nickname());
-        return new ResultResponse<>(ResultCode.PARENT_NICKNAME_SET_SUCCESS, null);
-    }
-
-    @Override
-    public ResultResponse<?> registerChild(CustomUserDetails user, RegisterChildRequest request) {
+    public ResultResponse<?> registerChild(CustomUserDetails user, AuthParentRequestDto request) {
         log.info("[registerChild] 자녀 등록 요청: user_id={}, child_name={}", user.getUserId(), request.child_name());
         Parent parent = getParent(user);
         Child child = createChild(request);
@@ -62,14 +50,13 @@ public class AuthParentServiceImpl implements AuthParentService {
             throw new BusinessException(ErrorCode.CHILD_ALREADY_EXISTS);
         }
 
+        updateNickname(request, parent);
         parent.addChild(child);
-        child.addRegister(parent);
         childRepository.save(child);
-
         ChildInfoResponseDto dto = ChildInfoResponseDto.toDto(child);
 
         log.info("[registerChild] 자녀 등록 완료: child_id={}, parent_id={}", child.getId(), parent.getId());
-        return new ResultResponse<>(ResultCode.CHILD_REGISTRATION_SUCCESS, dto);
+        return new ResultResponse<>(ResultCode.PARENT_SIGNUP_SUCCESS, dto);
     }
 
     @Override
@@ -106,7 +93,7 @@ public class AuthParentServiceImpl implements AuthParentService {
     }
 
     @Transactional
-    protected Child createChild(RegisterChildRequest request){
+    protected Child createChild(AuthParentRequestDto request){
         log.info("[createChild] 자녀 객체 생성: child_name={}, gender={}, age={}, height={}, weight={}",
                 request.child_name(), request.child_gender(), request.child_age(), request.child_height(), request.child_weight());
 
@@ -136,5 +123,9 @@ public class AuthParentServiceImpl implements AuthParentService {
                     log.warn("[createQR] 아이 정보 조회 실패: 존재하지 않는 아이 child_id={}", child_id);
                     return new BusinessException(ErrorCode.USER_NOT_FOUND);
                 });
+    }
+
+    private static void updateNickname(AuthParentRequestDto request, Parent parent) {
+        parent.updateNickname(request.nickname());
     }
 }

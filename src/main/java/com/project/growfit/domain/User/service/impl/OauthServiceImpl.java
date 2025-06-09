@@ -3,7 +3,7 @@ package com.project.growfit.domain.User.service.impl;
 import com.nimbusds.jose.shaded.gson.JsonElement;
 import com.nimbusds.jose.shaded.gson.JsonObject;
 import com.nimbusds.jose.shaded.gson.JsonParser;
-import com.project.growfit.domain.User.dto.request.ParentSignUpRequest;
+import com.project.growfit.domain.User.dto.request.ParentOAuthRequestDto;
 import com.project.growfit.domain.User.dto.response.ParentLoginResponseDto;
 import com.project.growfit.domain.User.dto.response.ParentResponse;
 import com.project.growfit.domain.User.entity.Parent;
@@ -25,7 +25,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
@@ -117,7 +116,7 @@ public class OauthServiceImpl implements OauthService {
     public ResultResponse<?> kakaoLogin(String accessToken, HttpServletResponse response) {
         log.info("[kakaoLogin] 카카오 로그인 요청 시작");
         boolean isNewUser = false;
-        ParentSignUpRequest requestDto = getUserKakaoSignupRequestDto(getUserKakaoInfo(accessToken));
+        ParentOAuthRequestDto requestDto = getUserKakaoSignupRequestDto(getUserKakaoInfo(accessToken));
         ParentResponse parentResponse = findByUserKakaoIdentifier(requestDto.id());
 
         if (parentResponse == null) {
@@ -156,7 +155,7 @@ public class OauthServiceImpl implements OauthService {
 
     @Override
     @Transactional
-    public Long signUp(ParentSignUpRequest requestDto) {
+    public Long signUp(ParentOAuthRequestDto requestDto) {
         try {
             log.info("[signUp] 부모 회원가입 요청: email={}", requestDto.email());
             Long parentId = parentRepository.save(requestDto.toEntity(requestDto.email(), requestDto.nickname(), requestDto.id())).getId();
@@ -168,8 +167,8 @@ public class OauthServiceImpl implements OauthService {
         }
     }
 
-    private ParentSignUpRequest getUserKakaoSignupRequestDto(HashMap<String, Object> userInfo) {
-        return new ParentSignUpRequest(
+    private ParentOAuthRequestDto getUserKakaoSignupRequestDto(HashMap<String, Object> userInfo) {
+        return new ParentOAuthRequestDto(
                 (String) userInfo.get("email"),
                 (String) userInfo.get("nickname"),
                 (String) userInfo.get("id")

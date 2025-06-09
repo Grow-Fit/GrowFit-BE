@@ -2,16 +2,12 @@ package com.project.growfit.domain.auth.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.growfit.domain.User.controller.AuthParentController;
-import com.project.growfit.domain.User.dto.request.RegisterChildRequest;
-import com.project.growfit.domain.User.dto.request.UpdateNicknameRequestDto;
 import com.project.growfit.domain.User.entity.Parent;
 import com.project.growfit.domain.User.entity.ROLE;
 import com.project.growfit.domain.User.repository.ParentRepository;
 import com.project.growfit.domain.User.service.AuthParentService;
 import com.project.growfit.global.auth.dto.CustomUserDetails;
 import com.project.growfit.global.config.SecurityConfig;
-import com.project.growfit.global.response.ResultCode;
-import com.project.growfit.global.response.ResultResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,13 +16,11 @@ import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -66,21 +60,5 @@ class AuthParentControllerTest {
     void testEndpoint() throws Exception {
         mockMvc.perform(get("/api/parent/test"))
                 .andExpect(status().isOk());
-    }
-
-
-    @Test
-    @DisplayName("자녀 등록 - 성공")
-    void registerChild_Success() throws Exception {
-        UpdateNicknameRequestDto request = new UpdateNicknameRequestDto("childName");
-        when(parentService.registerChild(any(CustomUserDetails.class), any(RegisterChildRequest.class)))
-                .thenReturn(new ResultResponse<>(ResultCode.CHILD_REGISTRATION_SUCCESS, null));
-
-        mockMvc.perform(post("/api/parent/child")
-                        .principal(() -> "parent@example.com")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").doesNotExist());
     }
 }

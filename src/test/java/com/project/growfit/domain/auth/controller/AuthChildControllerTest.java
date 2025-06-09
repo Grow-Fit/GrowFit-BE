@@ -2,9 +2,9 @@ package com.project.growfit.domain.auth.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.growfit.domain.User.controller.AuthChildController;
-import com.project.growfit.domain.User.dto.request.ChildCredentialsRequestDto;
+import com.project.growfit.domain.User.dto.request.AuthChildRequestDto;
 import com.project.growfit.domain.User.dto.request.FindChildPasswordRequestDto;
-import com.project.growfit.domain.User.dto.request.UpdateNicknameRequestDto;
+
 import com.project.growfit.domain.User.service.AuthChildService;
 import com.project.growfit.global.auth.jwt.excpetion.CustomAuthenticationEntryPoint;
 import com.project.growfit.global.config.SecurityConfig;
@@ -68,40 +68,24 @@ class AuthChildControllerTest {
     @DisplayName("[registerChildCredentials 성공 테스트] - 자녀 계정 등록")
     void registerChildCredentials_Success() throws Exception {
         Long childId = 1L;
-        ChildCredentialsRequestDto request = new ChildCredentialsRequestDto("childTestId", "password123", "민준콩");
+        AuthChildRequestDto request = new AuthChildRequestDto("childTestId", "password123", "민준콩");
 
-        when(authChildService.registerChildCredentials(anyLong(), any(ChildCredentialsRequestDto.class)))
-                .thenReturn(new ResultResponse<>(ResultCode.CHILD_REGISTRATION_SUCCESS, null));
+        when(authChildService.registerChildCredentials(anyLong(), any(AuthChildRequestDto.class)))
+                .thenReturn(new ResultResponse<>(ResultCode.PARENT_SIGNUP_SUCCESS, null));
 
         mockMvc.perform(post("/api/child/register/{child_id}/credentials", childId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value(ResultCode.CHILD_REGISTRATION_SUCCESS.getMessage()));
-    }
-
-    @Test
-    @DisplayName("[registerChildPreferences 성공 테스트] - 자녀 닉네임 등록")
-    void registerChildPreferences_Success() throws Exception {
-        Long childId = 1L;
-        UpdateNicknameRequestDto request = new UpdateNicknameRequestDto("newNickname");
-
-        when(authChildService.updateNickname(anyLong(), any(UpdateNicknameRequestDto.class)))
-                .thenReturn(new ResultResponse<>(ResultCode.PARENT_NICKNAME_SET_SUCCESS, null));
-
-        mockMvc.perform(put("/api/child/{child_id}/nickname", childId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value(ResultCode.PARENT_NICKNAME_SET_SUCCESS.getMessage()));
+                .andExpect(jsonPath("$.message").value(ResultCode.PARENT_SIGNUP_SUCCESS.getMessage()));
     }
 
     @Test
     @DisplayName("[loginChild 성공 테스트] - 자녀 로그인")
     void loginChild_Success() throws Exception {
-        ChildCredentialsRequestDto request = new ChildCredentialsRequestDto("childTestId", "password123", "민준콩");
+        AuthChildRequestDto request = new AuthChildRequestDto("childTestId", "password123", "민준콩");
 
-        when(authChildService.login(any(ChildCredentialsRequestDto.class), any(HttpServletResponse.class)))
+        when(authChildService.login(any(AuthChildRequestDto.class), any(HttpServletResponse.class)))
                 .thenReturn(new ResultResponse<>(ResultCode.CHILD_LOGIN_SUCCESS, null));
 
         mockMvc.perform(post("/api/child/login")
