@@ -8,6 +8,7 @@ import com.project.growfit.global.redis.repository.TokenRedisRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -31,6 +32,8 @@ import java.util.List;
 @Component
 public class JwtProvider {
 
+    @Value("${app.cookie.secure}")
+    private boolean isProdSecure;
     private static final String AUTHORITIES_KEY = "role";
 
     private SecretKey secretKey;
@@ -51,6 +54,11 @@ public class JwtProvider {
         this.childRepository = childRepository;
         log.info("[JwtProvider] JwtProvider 초기화 완료. AccessToken 유효시간: {}ms, RefreshToken 유효시간: {}ms",
                 accessTokenValidityMilliSeconds, refreshTokenValidityMilliSeconds);
+    }
+
+    @PostConstruct
+    public void init() {
+        log.info("[JwtProvider] isProdSecure: {}", isProdSecure); // ← 여기를 확인
     }
 
     public String createAccessToken(String userId, String role, String loginType) {
@@ -189,24 +197,22 @@ public class JwtProvider {
     public void saveAccessTokenToCookie(HttpServletResponse response, String token) {
         Cookie cookie = new Cookie("accessToken", token);
         cookie.setPath("/");
-        cookie.setHttpOnly(true);
-        cookie.setSecure(false);
+        cookie.setHttpOnly(false);
+        cookie.setSecure(isProdSecure);
         cookie.setMaxAge((int) (accessTokenValidityMilliSeconds / 1000));
         response.addCookie(cookie);
-        //response.setHeader("Set-Cookie", "accessToken=" + token + "; Path=/; HttpOnly; Secure; SameSite=None");
         log.info("[saveAccessTokenToCookie] Access Token이 쿠키에 저장되었습니다.");
     }
 
     public void saveEmailToCookie(HttpServletResponse response, String email) {
-        log.info("[saveEmailToCookie] 이메일이 쿠키에 저장되었습니다.");
         ResponseCookie cookie = ResponseCookie.from("email", email)
                 .httpOnly(false)
-                .secure(true)
-                .sameSite("None")
+                .secure(isProdSecure)
                 .maxAge(60)
                 .path("/")
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+        log.info("[saveEmailToCookie] 이메일이 쿠키에 저장되었습니다.");
     }
 
 

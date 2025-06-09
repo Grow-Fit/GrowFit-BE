@@ -135,10 +135,6 @@ public class OauthServiceImpl implements OauthService {
 
             log.info("[kakaoLogin] 신규 사용자 accessToken 저장 완료");
         }
-/*        String newAccessToken = jwtProvider.createAccessToken(parentResponse.email(), parentResponse.roles(), "SOCIAL_KAKAO");
-        String newRefreshToken = jwtProvider.createRefreshToken(parentResponse.email());
-        tokenRedisRepository.save(new TokenRedis(parentResponse.email(), newAccessToken, newRefreshToken));
-        jwtProvider.saveAccessTokenToCookie(response, newAccessToken);*/
         generateAndSaveTokens(response, parentResponse);
 
         log.info("[kakaoLogin] 카카오 로그인 성공: email={}, accessToken 저장 완료", parentResponse.email());
