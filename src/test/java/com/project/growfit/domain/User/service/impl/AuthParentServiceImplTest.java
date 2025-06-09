@@ -78,7 +78,6 @@ class AuthParentServiceImplTest {
         // Given
         Long childId = 999L;
         when(childRepository.findById(childId)).thenReturn(Optional.empty());
-
         // When & Then
         /*assertThatThrownBy(() -> authParentService.createQR(mockUserDetails, childId))
                 .isInstanceOf(BusinessException.class)
