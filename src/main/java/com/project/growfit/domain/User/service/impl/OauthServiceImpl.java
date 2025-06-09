@@ -9,6 +9,7 @@ import com.project.growfit.domain.User.dto.response.ParentResponse;
 import com.project.growfit.domain.User.entity.Parent;
 import com.project.growfit.domain.User.repository.ParentRepository;
 import com.project.growfit.domain.User.service.OauthService;
+import com.project.growfit.global.auth.cookie.CookieService;
 import com.project.growfit.global.auth.jwt.JwtProvider;
 import com.project.growfit.global.exception.BusinessException;
 import com.project.growfit.global.exception.ErrorCode;
@@ -37,6 +38,7 @@ public class OauthServiceImpl implements OauthService {
 
     private final JwtProvider jwtProvider;
     private final ParentRepository parentRepository;
+    private final CookieService cookieService;
     private final RestTemplate restTemplate = new RestTemplate();
     private final TokenRedisRepository tokenRedisRepository;
 
@@ -125,7 +127,7 @@ public class OauthServiceImpl implements OauthService {
             isNewUser = true;
             signUp(requestDto);
             parentResponse = findByUserKakaoIdentifier(requestDto.id());
-            jwtProvider.saveEmailToCookie(response, email);
+            cookieService.saveEmailToCookie(response, email);
             if (parentResponse == null) {
                 log.error("[kakaoLogin] 회원가입 후 사용자 정보 조회 실패: email={}", requestDto.email());
                 throw new BusinessException(ErrorCode.USER_REGISTRATION_FAILED);
@@ -179,6 +181,6 @@ public class OauthServiceImpl implements OauthService {
         String accessToken = jwtProvider.createAccessToken(parentResponse.email(), parentResponse.roles(), "SOCIAL_KAKAO");
         String refreshToken = jwtProvider.createRefreshToken(parentResponse.email());
         tokenRedisRepository.save(new TokenRedis(parentResponse.email(), accessToken, refreshToken));
-        jwtProvider.saveAccessTokenToCookie(response, accessToken);
+        cookieService.saveAccessTokenToCookie(response, accessToken);
     }
 }

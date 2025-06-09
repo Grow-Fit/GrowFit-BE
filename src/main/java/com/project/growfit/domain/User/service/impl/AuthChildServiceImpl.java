@@ -7,6 +7,7 @@ import com.project.growfit.domain.User.dto.response.ChildInfoResponseDto;
 import com.project.growfit.domain.User.entity.Child;
 import com.project.growfit.domain.User.repository.ChildRepository;
 import com.project.growfit.domain.User.service.AuthChildService;
+import com.project.growfit.global.auth.cookie.CookieService;
 import com.project.growfit.global.auth.jwt.JwtProvider;
 import com.project.growfit.global.auth.service.CustomAuthenticationProvider;
 import com.project.growfit.global.exception.BusinessException;
@@ -32,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuthChildServiceImpl implements AuthChildService {
     private final ChildRepository childRepository;
     private final PasswordEncoder passwordEncoder;
+    private final CookieService cookieService;
     private final JwtProvider jwtProvider;
     private final TokenRedisRepository tokenRedisRepository;
     private final CustomAuthenticationProvider authenticationProvider;
@@ -47,7 +49,7 @@ public class AuthChildServiceImpl implements AuthChildService {
 
     @Override
     public ResultResponse<?> registerChildCredentials(Long child_id, AuthChildRequestDto request) {
-        log.info("[registerChildCredentials] 아이 계정 정보 등록 요청: child_id={}, child_login_id={}", child_id, request.childId());
+        log.debug("[registerChildCredentials] 아이 계정 정보 등록 요청: child_id={}, child_login_id={}", child_id, request.childId());
         boolean isExists = childRepository.existsByLoginIdOrPassword(request.childId(), request.childPassword());
 
         if (isExists) {
@@ -88,10 +90,10 @@ public class AuthChildServiceImpl implements AuthChildService {
         String newRefreshToken = jwtProvider.createRefreshToken(child.getLoginId());
 
         tokenRedisRepository.save(new TokenRedis(child.getLoginId(), newAccessToken, newRefreshToken));
-        log.info("[login] 새 AccessToken 및 RefreshToken 저장 완료: child_login_id={}", request.childId());
+        log.debug("[login] 새 AccessToken 및 RefreshToken 저장 완료: child_login_id={}", request.childId());
 
-        jwtProvider.saveAccessTokenToCookie(response, newAccessToken);
-        log.info("[login] AccessToken을 쿠키에 저장 완료: child_login_id={}", request.childId());
+        cookieService.saveAccessTokenToCookie(response, newAccessToken);
+        log.debug("[login] AccessToken을 쿠키에 저장 완료: child_login_id={}", request.childId());
 
         return new ResultResponse<>(ResultCode.CHILD_LOGIN_SUCCESS, null);
     }
