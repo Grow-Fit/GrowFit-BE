@@ -3,7 +3,7 @@ package com.project.growfit.domain.User.service.impl;
 import com.nimbusds.jose.shaded.gson.JsonElement;
 import com.nimbusds.jose.shaded.gson.JsonObject;
 import com.nimbusds.jose.shaded.gson.JsonParser;
-import com.project.growfit.domain.User.dto.request.ParentSignUpRequest;
+import com.project.growfit.domain.User.dto.request.ParentOAuthRequestDto;
 import com.project.growfit.domain.User.dto.response.ParentLoginResponseDto;
 import com.project.growfit.domain.User.dto.response.ParentResponse;
 import com.project.growfit.domain.User.entity.Parent;
@@ -25,7 +25,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
@@ -116,27 +115,29 @@ public class OauthServiceImpl implements OauthService {
     @Override
     public ResultResponse<?> kakaoLogin(String accessToken, HttpServletResponse response) {
         log.info("[kakaoLogin] 카카오 로그인 요청 시작");
-
-        ParentSignUpRequest requestDto = getUserKakaoSignupRequestDto(getUserKakaoInfo(accessToken));
+        boolean isNewUser = false;
+        ParentOAuthRequestDto requestDto = getUserKakaoSignupRequestDto(getUserKakaoInfo(accessToken));
         ParentResponse parentResponse = findByUserKakaoIdentifier(requestDto.id());
 
         if (parentResponse == null) {
-            log.info("[kakaoLogin] 신규 사용자, 회원가입 진행: email={}", requestDto.email());
+            String email = requestDto.email();
+            log.info("[kakaoLogin] 신규 사용자, 회원가입 진행: email={}", email);
+            isNewUser = true;
             signUp(requestDto);
             parentResponse = findByUserKakaoIdentifier(requestDto.id());
-
+            jwtProvider.saveEmailToCookie(response, email);
             if (parentResponse == null) {
                 log.error("[kakaoLogin] 회원가입 후 사용자 정보 조회 실패: email={}", requestDto.email());
                 throw new BusinessException(ErrorCode.USER_REGISTRATION_FAILED);
             }
+            generateAndSaveTokens(response, parentResponse);
+
+            log.info("[kakaoLogin] 신규 사용자 accessToken 저장 완료");
         }
-        String newAccessToken = jwtProvider.createAccessToken(parentResponse.email(), parentResponse.roles(), "SOCIAL_KAKAO");
-        String newRefreshToken = jwtProvider.createRefreshToken(parentResponse.email());
-        tokenRedisRepository.save(new TokenRedis(parentResponse.email(), newAccessToken, newRefreshToken));
-        jwtProvider.saveAccessTokenToCookie(response, newAccessToken);
+        generateAndSaveTokens(response, parentResponse);
 
         log.info("[kakaoLogin] 카카오 로그인 성공: email={}, accessToken 저장 완료", parentResponse.email());
-        ParentLoginResponseDto dto = new ParentLoginResponseDto(newAccessToken, parentResponse.email());
+        ParentLoginResponseDto dto = new ParentLoginResponseDto(parentResponse.email(), isNewUser);
         return new ResultResponse<>(ResultCode.PARENT_LOGIN_SUCCESS, dto);
     }
 
@@ -154,7 +155,7 @@ public class OauthServiceImpl implements OauthService {
 
     @Override
     @Transactional
-    public Long signUp(ParentSignUpRequest requestDto) {
+    public Long signUp(ParentOAuthRequestDto requestDto) {
         try {
             log.info("[signUp] 부모 회원가입 요청: email={}", requestDto.email());
             Long parentId = parentRepository.save(requestDto.toEntity(requestDto.email(), requestDto.nickname(), requestDto.id())).getId();
@@ -166,11 +167,18 @@ public class OauthServiceImpl implements OauthService {
         }
     }
 
-    private ParentSignUpRequest getUserKakaoSignupRequestDto(HashMap<String, Object> userInfo) {
-        return new ParentSignUpRequest(
+    private ParentOAuthRequestDto getUserKakaoSignupRequestDto(HashMap<String, Object> userInfo) {
+        return new ParentOAuthRequestDto(
                 (String) userInfo.get("email"),
                 (String) userInfo.get("nickname"),
                 (String) userInfo.get("id")
         );
+    }
+
+    private void generateAndSaveTokens(HttpServletResponse response, ParentResponse parentResponse) {
+        String accessToken = jwtProvider.createAccessToken(parentResponse.email(), parentResponse.roles(), "SOCIAL_KAKAO");
+        String refreshToken = jwtProvider.createRefreshToken(parentResponse.email());
+        tokenRedisRepository.save(new TokenRedis(parentResponse.email(), accessToken, refreshToken));
+        jwtProvider.saveAccessTokenToCookie(response, accessToken);
     }
 }

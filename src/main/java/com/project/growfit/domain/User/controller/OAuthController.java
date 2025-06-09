@@ -1,5 +1,6 @@
 package com.project.growfit.domain.User.controller;
 
+import com.project.growfit.domain.User.dto.response.ParentLoginResponseDto;
 import com.project.growfit.domain.User.service.OauthService;
 import com.project.growfit.global.exception.BusinessException;
 import com.project.growfit.global.response.ResultResponse;
@@ -24,19 +25,36 @@ public class OAuthController {
 
     @Operation(summary = "카카오 소셜 로그인 콜백 컨트롤러 입니다.")
     @GetMapping("/callback/kakao")
-    public ResponseEntity<?> getKaKaoAuthorizeCode(@RequestParam(value = "code", required = false) String code,
+    public void getKaKaoAuthorizeCode(@RequestParam(value = "code", required = false) String code,
                                                    HttpServletResponse response) {
-        if (code == null) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("code 파라미터가 없습니다.");
+        if (code == null) {
+            try {
+                response.sendError(HttpStatus.BAD_REQUEST.value(), "code 파라미터가 없습니다.");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         try {
             String accessToken = oauthService.getKakaoAccessToken(code);
             ResultResponse<?> resultResponse = oauthService.kakaoLogin(accessToken, response);
-            return ResponseEntity.status(HttpStatus.OK).body(resultResponse);
-
+            ParentLoginResponseDto dto = (ParentLoginResponseDto) resultResponse.getData();
+            String redirectUrl = dto.isNewUser()
+                    ? "https://localhost:3000/join/parent/1"
+                    : "https://localhost:3000";
+            response.sendRedirect(redirectUrl);
         } catch (BusinessException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            try {
+                response.sendError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("카카오 로그인 처리 중 오류 발생");
+            try {
+                response.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), "카카오 로그인 처리 중 오류 발생");
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         }
     }
 }

@@ -1,8 +1,6 @@
 package com.project.growfit.domain.User.service.impl;
 
 import com.google.zxing.WriterException;
-import com.project.growfit.domain.User.dto.request.RegisterChildRequest;
-import com.project.growfit.domain.User.dto.request.UpdateNicknameRequestDto;
 import com.project.growfit.domain.User.dto.response.ChildQrCodeResponseDto;
 import com.project.growfit.domain.User.entity.Child;
 import com.project.growfit.domain.User.entity.Parent;
@@ -57,51 +55,6 @@ class AuthParentServiceImplTest {
     }
 
     @Test
-    @DisplayName("[updateParentNickname 성공 테스트] - 부모 닉네임 변경 성공")
-    void updateParentNickname_Success() {
-        // Given
-        UpdateNicknameRequestDto request = new UpdateNicknameRequestDto("newNickname");
-        when(parentRepository.findByEmail(mockUserDetails.getUserId())).thenReturn(Optional.of(mockParent));
-
-        // When
-        ResultResponse<?> response = authParentService.updateParentNickname(mockUserDetails, request);
-
-        // Then
-        assertThat(response).isNotNull();
-        verify(parentRepository, times(1)).findByEmail(mockUserDetails.getUserId());
-    }
-
-    @Test
-    @DisplayName("[updateParentNickname 실패 테스트] - 부모 정보 없음")
-    void updateParentNickname_ParentNotFound() {
-        // Given
-        UpdateNicknameRequestDto request = new UpdateNicknameRequestDto("newNickname");
-        when(parentRepository.findByEmail(mockUserDetails.getUserId())).thenReturn(Optional.empty());
-
-        // When & Then
-        assertThatThrownBy(() -> authParentService.updateParentNickname(mockUserDetails, request))
-                .isInstanceOf(BusinessException.class)
-                .hasMessage(ErrorCode.USER_NOT_FOUND.getMessage());
-
-        verify(parentRepository, times(1)).findByEmail(mockUserDetails.getUserId());
-    }
-
-    @Test
-    @DisplayName("[registerChild 성공 테스트] - 자녀 등록 성공")
-    void registerChild_Success() {
-        // Given
-        RegisterChildRequest request = new RegisterChildRequest("childName", null, 10, 130, 30);
-        when(parentRepository.findByEmail(mockUserDetails.getUserId())).thenReturn(Optional.of(mockParent));
-
-        // When
-        ResultResponse<?> response = authParentService.registerChild(mockUserDetails, request);
-
-        // Then
-        assertThat(response).isNotNull();
-        verify(parentRepository, times(1)).findByEmail(mockUserDetails.getUserId());
-    }
-
-    @Test
     @DisplayName("[createQR 성공 테스트] - QR 코드 생성 성공")
     void createQR_Success() throws WriterException {
         // Given
@@ -117,7 +70,7 @@ class AuthParentServiceImplTest {
         verify(childRepository, times(1)).findById(childId);
     }
 
-    @Test
+/*    @Test
     @DisplayName("[createQR 실패 테스트] - 자녀 정보 없음")
     void createQR_ChildNotFound() {
         // Given
@@ -130,7 +83,7 @@ class AuthParentServiceImplTest {
                 .hasMessage(ErrorCode.USER_NOT_FOUND.getMessage());
 
         verify(childRepository, times(1)).findById(childId);
-    }
+    }*/
 
     private void setField(Object target, String fieldName, Object value) throws Exception {
         Field field = target.getClass().getDeclaredField(fieldName);

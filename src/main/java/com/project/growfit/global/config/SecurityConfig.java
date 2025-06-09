@@ -51,7 +51,7 @@ public class SecurityConfig {
 
                 .cors(cors -> cors.configurationSource(request -> {
                     CorsConfiguration configuration = new CorsConfiguration();
-                    configuration.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:8080", "https://api.growfit.co.kr"));
+                    configuration.setAllowedOrigins(List.of("http://localhost:3000","https://localhost:3000", "http://localhost:8080", "https://api.growfit.co.kr"));
                     configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                     configuration.setAllowCredentials(true);
                     configuration.setAllowedHeaders(List.of("*"));

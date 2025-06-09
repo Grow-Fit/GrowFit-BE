@@ -91,6 +91,7 @@ public class Parent extends BaseEntity {
 
     public void addChild(Child child) {
         this.children.add(child);
+        child.addRegister(this);
     }
 
     public void updateCommunityInfo(ProfileRequestDto dto, String photo) {

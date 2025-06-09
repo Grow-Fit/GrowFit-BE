@@ -10,7 +10,7 @@ public enum ResultCode {
     RESPONSE_TEST(HttpStatus.OK, "응답 테스트 성공"),
 
     PARENT_NICKNAME_SET_SUCCESS(HttpStatus.OK, "부모 닉네임이 성공적으로 설정되었습니다."),
-    CHILD_REGISTRATION_SUCCESS(HttpStatus.OK,  "자녀 정보가 성공적으로 등록되었습니다."),
+    PARENT_SIGNUP_SUCCESS(HttpStatus.OK,  "부모 회원가입이 완료되었습니다."),
     CHILD_INFO_RETRIEVAL_SUCCESS(HttpStatus.OK,  "자녀 정보가 성공적으로 조회되었습니다."),
     QR_GENERATION_SUCCESS(HttpStatus.OK, "아이등록 QR코드를 성공적으로 생성하였습니다."),
     ID_AVAILABLE(HttpStatus.OK, "사용 가능한 아이디입니다."),
