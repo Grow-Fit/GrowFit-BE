@@ -1,11 +1,10 @@
 package com.project.growfit.domain.Goal.entity;
 
+import com.project.growfit.domain.User.entity.Parent;
 import com.project.growfit.global.entity.BaseEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -23,13 +22,13 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@Table(name = "goal_type")
+@Table(name = "weekly_goal")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class GoalType extends BaseEntity {
+public class WeeklyGoal extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "goal_type_id")
+    @Column(name = "weekly_goal_id")
     private Long id;
 
     @Column(name = "start_date", nullable = false)
@@ -38,14 +37,16 @@ public class GoalType extends BaseEntity {
     @Column(name = "end_date", nullable = false)
     private LocalDate endDate;
 
-    @Column(name = "type", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private PeriodType type;
+    @Column(name = "certification_count", nullable = false)
+    private int certificationCount;
+
+    @Column(name = "is_letter_sent", nullable = false)
+    private boolean isLetterSent = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "goal_board_id")
-    private GoalBoard goalBoard;
+    @JoinColumn(name = "parent_id", nullable = false)
+    private Parent parent;
 
-    @OneToMany(mappedBy = "goalType", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "weeklyGoal", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Goal> goalList = new ArrayList<>();
 }

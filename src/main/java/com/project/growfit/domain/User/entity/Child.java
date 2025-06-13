@@ -1,7 +1,6 @@
 package com.project.growfit.domain.User.entity;
 
 import com.project.growfit.domain.Diet.entity.Diet;
-import com.project.growfit.domain.Goal.entity.GoalBoard;
 import com.project.growfit.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -56,10 +55,6 @@ public class Child extends BaseEntity {
 
     @OneToMany(mappedBy = "child", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Diet> dietList = new ArrayList<>();
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "goal_board_id")
-    private GoalBoard goalBoard;
 
     @OneToMany(mappedBy = "child", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BmiAnalysis> analysisList = new ArrayList<>();
