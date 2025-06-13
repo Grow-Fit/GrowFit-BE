@@ -31,26 +31,20 @@ public class Goal extends BaseEntity {
     @Column(name = "goal_id")
     private Long id;
 
-    @Column(name = "name", nullable = false, length = 100)
+    @Column(name = "name", length = 100, nullable = false)
     private String name;
 
-    @Column(name = "count", nullable = false)
-    private int count;
+    @Column(name = "icon_id", nullable = false)
+    private int iconId;
 
-    @Column(name = "cert_type", nullable = false)
+    @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
-    private CertType certType;
-
-    @Column(name = "state", nullable = false)
-    private GoalState state;
+    private GoalStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "goal_type_id")
-    private GoalType goalType;
+    @JoinColumn(name = "weekly_goal_id", nullable = false)
+    private WeeklyGoal weeklyGoal;
 
     @OneToMany(mappedBy = "goal", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<GoalCertDays> certDaysList = new ArrayList<>();
-
-    @OneToMany(mappedBy = "goal", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<GoalAcc> goalAccList = new ArrayList<>();
+    private List<Certification> certificationList = new ArrayList<>();
 }
