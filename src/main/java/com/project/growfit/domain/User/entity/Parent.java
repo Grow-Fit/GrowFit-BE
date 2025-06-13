@@ -1,5 +1,6 @@
 package com.project.growfit.domain.User.entity;
 
+import com.project.growfit.domain.Goal.entity.WeeklyGoal;
 import com.project.growfit.domain.board.dto.request.ProfileRequestDto;
 import com.project.growfit.domain.board.entity.Bookmark;
 import com.project.growfit.domain.board.entity.Comment;
@@ -62,6 +63,9 @@ public class Parent extends BaseEntity {
 
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Bookmark> bookmarkList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<WeeklyGoal> weeklyGoalList = new ArrayList<>();
 
     public Parent(String email, String name, String profileImage, String provider, ROLE role) {
         this.email = email;
