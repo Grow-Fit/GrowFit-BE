@@ -11,6 +11,7 @@ import com.project.growfit.domain.User.repository.ParentRepository;
 import com.project.growfit.domain.User.service.OauthService;
 import com.project.growfit.global.auth.cookie.CookieService;
 import com.project.growfit.global.auth.jwt.JwtProvider;
+import com.project.growfit.global.auth.service.AuthenticatedUserProvider;
 import com.project.growfit.global.exception.BusinessException;
 import com.project.growfit.global.exception.ErrorCode;
 import com.project.growfit.global.redis.entity.TokenRedis;
@@ -26,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
@@ -39,6 +41,7 @@ public class OauthServiceImpl implements OauthService {
     private final JwtProvider jwtProvider;
     private final ParentRepository parentRepository;
     private final CookieService cookieService;
+    private final AuthenticatedUserProvider authenticatedUser;
     private final RestTemplate restTemplate = new RestTemplate();
     private final TokenRedisRepository tokenRedisRepository;
 
@@ -52,6 +55,8 @@ public class OauthServiceImpl implements OauthService {
     private String kakaoClientSecret;
     @Value("${spring.security.oauth2.client.registration.kakao.redirect-uri}")
     private String kakaoRedirectUri;
+    @Value("${custom.oauth2.kakao.logout-uri}")
+    private String kakaoLogoutUri;
 
 
     @Override
@@ -141,6 +146,25 @@ public class OauthServiceImpl implements OauthService {
         log.info("[kakaoLogin] 카카오 로그인 성공: email={}, accessToken 저장 완료", parentResponse.email());
         ParentLoginResponseDto dto = new ParentLoginResponseDto(parentResponse.email(), isNewUser);
         return new ResultResponse<>(ResultCode.PARENT_LOGIN_SUCCESS, dto);
+    }
+
+    @Override
+    public ResultResponse<String> kakaoLogout(String access_token, HttpServletResponse response) {
+        Parent user = authenticatedUser.getAuthenticatedParent();
+        tokenRedisRepository.deleteById(user.getId().toString());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(access_token);
+        HttpEntity<Void> request = new HttpEntity<>(headers);
+
+        cookieService.clearCookie(response, "accessToken");
+
+        try {
+            restTemplate.postForEntity(kakaoLogoutUri, request, String.class);
+        } catch (HttpClientErrorException e) {
+            System.err.println("카카오 로그아웃 실패: " + e.getMessage());
+        }
+        return ResultResponse.of(ResultCode.PARENT_LOGOUT_SUCCESS, "");
     }
 
     @Override

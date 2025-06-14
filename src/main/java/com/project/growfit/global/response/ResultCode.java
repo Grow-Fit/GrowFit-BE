@@ -17,6 +17,7 @@ public enum ResultCode {
 
     CHILD_LOGIN_SUCCESS(HttpStatus.OK, "아이 계정 로그인 성공."),
     PARENT_LOGIN_SUCCESS(HttpStatus.OK, "부모 계정 로그인 성공."),
+    PARENT_LOGOUT_SUCCESS(HttpStatus.OK, "부모 계정 로그인 성공."),
 
     //Diet
     STICKER_DELETE_SUCCESS(HttpStatus.OK, "스티커 삭제에 성공했습니다."),

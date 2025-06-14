@@ -13,6 +13,9 @@ public interface OauthService {
     String getKakaoAccessToken(String code);
     HashMap<String, Object> getUserKakaoInfo(String access_token);
     ResultResponse<?> kakaoLogin(String access_token, HttpServletResponse response);
+    ResultResponse<String> kakaoLogout(String access_token, HttpServletResponse response);
     ParentResponse findByUserKakaoIdentifier(String kakaoIdentifier);
     Long signUp(ParentOAuthRequestDto requestDto);
+
+
 }
