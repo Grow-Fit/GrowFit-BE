@@ -151,7 +151,7 @@ public class OauthServiceImpl implements OauthService {
     @Override
     public ResultResponse<String> kakaoLogout(String access_token, HttpServletResponse response) {
         Parent user = authenticatedUser.getAuthenticatedParent();
-        tokenRedisRepository.deleteById(user.getId().toString());
+        tokenRedisRepository.deleteById(user.getEmail());
 
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(access_token);

@@ -11,10 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/oauth")
@@ -60,7 +57,7 @@ public class OAuthController {
     }
 
     @Operation(summary = "카카오 소셜 로그아웃 API")
-    @GetMapping("/logout")
+    @PostMapping("/logout")
     public ResultResponse<String> kakaoLogout(@RequestParam(value = "code", required = false) String code,
                                                         HttpServletResponse response) {
         return oauthService.kakaoLogout(code, response);
