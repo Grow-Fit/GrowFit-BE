@@ -145,7 +145,7 @@ public class OauthServiceImpl implements OauthService {
 
         log.info("[kakaoLogin] 카카오 로그인 성공: email={}, accessToken 저장 완료", parentResponse.email());
         ParentLoginResponseDto dto = new ParentLoginResponseDto(parentResponse.email(), isNewUser);
-        return new ResultResponse<>(ResultCode.PARENT_LOGIN_SUCCESS, dto);
+        return new ResultResponse<>(ResultCode.LOGIN_SUCCESS, dto);
     }
 
     @Override
@@ -164,7 +164,7 @@ public class OauthServiceImpl implements OauthService {
         } catch (HttpClientErrorException e) {
             System.err.println("카카오 로그아웃 실패: " + e.getMessage());
         }
-        return ResultResponse.of(ResultCode.PARENT_LOGOUT_SUCCESS, "");
+        return ResultResponse.of(ResultCode.LOGOUT_SUCCESS, "");
     }
 
     @Override

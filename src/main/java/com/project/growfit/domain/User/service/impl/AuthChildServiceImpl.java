@@ -46,7 +46,7 @@ public class AuthChildServiceImpl implements AuthChildService {
         Long childPid = child.getId();
 
         log.info("[findByCode] 아이 정보 PID 조회 성공: {}", childPid);
-        return new ResultResponse<>(ResultCode.CHILD_INFO_RETRIEVAL_SUCCESS, new ChildIdResponse(childPid));
+        return new ResultResponse<>(ResultCode.INFO_SUCCESS, new ChildIdResponse(childPid));
     }
 
     @Override
@@ -64,7 +64,7 @@ public class AuthChildServiceImpl implements AuthChildService {
         }
 
         log.info("[registerChildCredentials] 아이 계정 정보 등록 완료: child_id={}", child_id);
-        return new ResultResponse<>(ResultCode.PARENT_SIGNUP_SUCCESS, null);
+        return new ResultResponse<>(ResultCode.INFO_REGISTRATION_SUCCESS, null);
     }
 
 
@@ -119,7 +119,7 @@ public class AuthChildServiceImpl implements AuthChildService {
         ChildInfoResponseDto dto = ChildInfoResponseDto.toDto(child);
 
         log.info("[findChildID] 아이 ID 찾기 성공: {}", dto);
-        return new ResultResponse<>(ResultCode.CHILD_INFO_RETRIEVAL_SUCCESS, dto);
+        return new ResultResponse<>(ResultCode.INFO_SUCCESS, dto);
     }
 
     @Override
@@ -136,7 +136,7 @@ public class AuthChildServiceImpl implements AuthChildService {
         childRepository.save(child);
 
         log.info("[findChildPassword] 비밀번호 변경 완료: user_id={}", request.user_id());
-        return new ResultResponse<>(ResultCode.PARENT_SIGNUP_SUCCESS, null);
+        return new ResultResponse<>(ResultCode.INFO_REGISTRATION_SUCCESS, null);
     }
 
     private Child getChild(Long child_id) {
