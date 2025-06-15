@@ -42,7 +42,14 @@ public class AuthChildController {
         ResultResponse<?> resultResponse = authChildService.login(request, response);
 
         return ResponseEntity.status(HttpStatus.OK).body(resultResponse);
+    }
 
+    @Operation(summary = "아이 로그아웃")
+    @PostMapping("/logout")
+    public ResponseEntity<?> logoutChild(HttpServletResponse response) {
+        ResultResponse<String> resultResponse = authChildService.logout(response);
+
+        return ResponseEntity.status(HttpStatus.OK).body(resultResponse);
     }
 
     @Operation(summary = "아이 인증코드로 ID 찾기")
@@ -51,7 +58,6 @@ public class AuthChildController {
         ResultResponse<?> resultResponse = authChildService.findChildID(code);
 
         return ResponseEntity.status(HttpStatus.OK).body(resultResponse);
-
     }
 
     @Operation(summary = "아이 비밀번호 재설정")
