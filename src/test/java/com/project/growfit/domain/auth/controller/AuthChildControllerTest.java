@@ -86,13 +86,13 @@ class AuthChildControllerTest {
         AuthChildRequestDto request = new AuthChildRequestDto("childTestId", "password123", "민준콩");
 
         when(authChildService.login(any(AuthChildRequestDto.class), any(HttpServletResponse.class)))
-                .thenReturn(new ResultResponse<>(ResultCode.CHILD_LOGIN_SUCCESS, null));
+                .thenReturn(new ResultResponse<>(ResultCode.LOGIN_SUCCESS, null));
 
         mockMvc.perform(post("/api/child/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value(ResultCode.CHILD_LOGIN_SUCCESS.getMessage()));
+                .andExpect(jsonPath("$.message").value(ResultCode.LOGIN_SUCCESS.getMessage()));
     }
 
     @Test
@@ -114,12 +114,12 @@ class AuthChildControllerTest {
         FindChildPasswordRequestDto request = new FindChildPasswordRequestDto("childTestId", "testCode", "newPassword");
 
         when(authChildService.findChildPassword(any(FindChildPasswordRequestDto.class)))
-                .thenReturn(new ResultResponse<>(ResultCode.CHILD_LOGIN_SUCCESS, null));
+                .thenReturn(new ResultResponse<>(ResultCode.LOGIN_SUCCESS, null));
 
         mockMvc.perform(post("/api/child/find/password")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value(ResultCode.CHILD_LOGIN_SUCCESS.getMessage()));
+                .andExpect(jsonPath("$.message").value(ResultCode.LOGIN_SUCCESS.getMessage()));
     }
 }
