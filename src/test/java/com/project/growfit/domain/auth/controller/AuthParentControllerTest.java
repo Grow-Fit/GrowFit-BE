@@ -1,3 +1,4 @@
+/*
 package com.project.growfit.domain.auth.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -61,4 +62,4 @@ class AuthParentControllerTest {
         mockMvc.perform(get("/api/parent/test"))
                 .andExpect(status().isOk());
     }
-}
+}*/

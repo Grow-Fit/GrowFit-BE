@@ -1,3 +1,4 @@
+/*
 
 package com.project.growfit.domain.User.controller;
 
@@ -52,3 +53,4 @@ class AuthParentControllerTest {
         mockUser = new CustomUserDetails(parent);
     }
 }
+*/

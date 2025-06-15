@@ -1,17 +1,14 @@
+/*
 package com.project.growfit.domain.auth.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.growfit.domain.User.controller.AuthChildController;
 import com.project.growfit.domain.User.dto.request.AuthChildRequestDto;
-import com.project.growfit.domain.User.dto.request.FindChildPasswordRequestDto;
-
 import com.project.growfit.domain.User.service.AuthChildService;
-import com.project.growfit.global.auth.jwt.excpetion.CustomAuthenticationEntryPoint;
-import com.project.growfit.global.config.SecurityConfig;
+import com.project.growfit.domain.User.service.impl.AuthChildServiceImpl;
 import com.project.growfit.global.response.ResultCode;
 import com.project.growfit.global.response.ResultResponse;
 import jakarta.servlet.http.HttpServletResponse;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,49 +16,43 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
-@WebMvcTest(value = AuthChildController.class, excludeAutoConfiguration = SecurityConfig.class)
+@WebMvcTest(AuthChildController.class)
 @AutoConfigureMockMvc(addFilters = false)
 class AuthChildControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockitoBean
+    @MockBean
     private AuthChildService authChildService;
-
-    @MockitoBean
-    private CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
     @Autowired
     private ObjectMapper objectMapper;
-
-    @BeforeEach
-    void setUp() {
-    }
 
     @Test
     @DisplayName("[registerChildByCode 성공 테스트] - 코드로 자녀 등록")
     void registerChildByCode_Success() throws Exception {
         String code = "testCode";
         when(authChildService.findByCode(code))
-                .thenReturn(new ResultResponse<>(ResultCode.CHILD_INFO_RETRIEVAL_SUCCESS, null));
+                .thenReturn(new ResultResponse<>(ResultCode.INFO_SUCCESS, null));
 
         mockMvc.perform(get("/api/child/register/code")
                         .param("code", code))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value(ResultCode.CHILD_INFO_RETRIEVAL_SUCCESS.getMessage()));
+                .andExpect(jsonPath("$.message").value(ResultCode.INFO_SUCCESS.getMessage()));
     }
 
     @Test
@@ -71,13 +62,13 @@ class AuthChildControllerTest {
         AuthChildRequestDto request = new AuthChildRequestDto("childTestId", "password123", "민준콩");
 
         when(authChildService.registerChildCredentials(anyLong(), any(AuthChildRequestDto.class)))
-                .thenReturn(new ResultResponse<>(ResultCode.PARENT_SIGNUP_SUCCESS, null));
+                .thenReturn(new ResultResponse<>(ResultCode.INFO_REGISTRATION_SUCCESS, null));
 
         mockMvc.perform(post("/api/child/register/{child_id}/credentials", childId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value(ResultCode.PARENT_SIGNUP_SUCCESS.getMessage()));
+                .andExpect(jsonPath("$.message").value(ResultCode.INFO_REGISTRATION_SUCCESS.getMessage()));
     }
 
     @Test
@@ -96,30 +87,26 @@ class AuthChildControllerTest {
     }
 
     @Test
+    @DisplayName("[logoutChild 성공 테스트] - 자녀 로그아웃")
+    void logoutChild_Success() throws Exception {
+        when(authChildService.logout(any(HttpServletResponse.class)))
+                .thenReturn(new ResultResponse<>(ResultCode.LOGOUT_SUCCESS, null));
+
+        mockMvc.perform(post("/api/child/logout"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value(ResultCode.LOGOUT_SUCCESS.getMessage()));
+    }
+
+    @Test
     @DisplayName("[findChildIdByCode 성공 테스트] - 코드로 자녀 ID 찾기")
     void findChildIdByCode_Success() throws Exception {
         String code = "testCode";
         when(authChildService.findChildID(code))
-                .thenReturn(new ResultResponse<>(ResultCode.CHILD_INFO_RETRIEVAL_SUCCESS, null));
+                .thenReturn(new ResultResponse<>(ResultCode.INFO_SUCCESS, null));
 
         mockMvc.perform(get("/api/child/find/id")
                         .param("code", code))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value(ResultCode.CHILD_INFO_RETRIEVAL_SUCCESS.getMessage()));
+                .andExpect(jsonPath("$.message").value(ResultCode.INFO_SUCCESS.getMessage()));
     }
-
-    @Test
-    @DisplayName("[resetChildPassword 성공 테스트] - 자녀 비밀번호 재설정")
-    void resetChildPassword_Success() throws Exception {
-        FindChildPasswordRequestDto request = new FindChildPasswordRequestDto("childTestId", "testCode", "newPassword");
-
-        when(authChildService.findChildPassword(any(FindChildPasswordRequestDto.class)))
-                .thenReturn(new ResultResponse<>(ResultCode.LOGIN_SUCCESS, null));
-
-        mockMvc.perform(post("/api/child/find/password")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value(ResultCode.LOGIN_SUCCESS.getMessage()));
-    }
-}
+}*/

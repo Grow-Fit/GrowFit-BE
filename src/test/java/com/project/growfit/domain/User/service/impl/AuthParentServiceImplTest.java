@@ -55,7 +55,6 @@ class AuthParentServiceImplTest {
     @Test
     @DisplayName("자녀 등록 성공 테스트")
     void 자녀_등록을_성공한다() {
-        // Given
         AuthParentRequestDto request = new AuthParentRequestDto("김아이","아이", MALE, 10, 130, 30);
         when(parentRepository.findByEmail(anyString())).thenReturn(Optional.of(mockParent));
 
@@ -64,7 +63,7 @@ class AuthParentServiceImplTest {
 
         // Then
         assertThat(response).isNotNull();
-        assertThat(response.getStatus()).isEqualTo(ResultCode.PARENT_SIGNUP_SUCCESS.getStatus().value());
+        assertThat(response.getStatus()).isEqualTo(ResultCode.SIGNUP_SUCCESS.getStatus().value());
         verify(childRepository, times(1)).save(any(Child.class));
     }
 
