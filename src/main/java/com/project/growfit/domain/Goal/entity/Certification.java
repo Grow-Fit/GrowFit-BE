@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@Table(name = "goal")
+@Table(name = "cert_goal")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Certification {
 

@@ -9,6 +9,7 @@ public interface AuthChildService {
     ResultResponse<?> findByCode(String code);
     ResultResponse<?> registerChildCredentials(Long child_id, AuthChildRequestDto request);
     ResultResponse<?> login(AuthChildRequestDto request, HttpServletResponse response);
+    ResultResponse<String> logout(HttpServletResponse response);
     ResultResponse<?> findChildID(String code);
     ResultResponse<?> findChildPassword(FindChildPasswordRequestDto request);
 }

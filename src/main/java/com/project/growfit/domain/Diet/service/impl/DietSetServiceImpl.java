@@ -87,7 +87,7 @@ public class DietSetServiceImpl implements DietSetService {
         ).toList();
 
         DietSetDetailResponseDto response = new DietSetDetailResponseDto(set.getSetName(), foodDetails);
-        return ResultResponse.of(ResultCode.DIET_SET_DETAIL_SUCCESS, response);
+        return ResultResponse.of(ResultCode.DIET_SET_RETRIEVAL_SUCCESS, response);
     }
 
     @Override

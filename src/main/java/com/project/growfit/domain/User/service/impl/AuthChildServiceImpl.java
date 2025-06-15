@@ -9,6 +9,7 @@ import com.project.growfit.domain.User.repository.ChildRepository;
 import com.project.growfit.domain.User.service.AuthChildService;
 import com.project.growfit.global.auth.cookie.CookieService;
 import com.project.growfit.global.auth.jwt.JwtProvider;
+import com.project.growfit.global.auth.service.AuthenticatedUserProvider;
 import com.project.growfit.global.auth.service.CustomAuthenticationProvider;
 import com.project.growfit.global.exception.BusinessException;
 import com.project.growfit.global.exception.ErrorCode;
@@ -37,6 +38,7 @@ public class AuthChildServiceImpl implements AuthChildService {
     private final JwtProvider jwtProvider;
     private final TokenRedisRepository tokenRedisRepository;
     private final CustomAuthenticationProvider authenticationProvider;
+    private final AuthenticatedUserProvider authenticatedUser;
 
     public ResultResponse<?> findByCode(String code) {
         log.info("[findByCode] 코드로 아이 정보 조회 요청: {}", code);
@@ -44,7 +46,7 @@ public class AuthChildServiceImpl implements AuthChildService {
         Long childPid = child.getId();
 
         log.info("[findByCode] 아이 정보 PID 조회 성공: {}", childPid);
-        return new ResultResponse<>(ResultCode.CHILD_INFO_RETRIEVAL_SUCCESS, new ChildIdResponse(childPid));
+        return new ResultResponse<>(ResultCode.INFO_SUCCESS, new ChildIdResponse(childPid));
     }
 
     @Override
@@ -62,7 +64,7 @@ public class AuthChildServiceImpl implements AuthChildService {
         }
 
         log.info("[registerChildCredentials] 아이 계정 정보 등록 완료: child_id={}", child_id);
-        return new ResultResponse<>(ResultCode.PARENT_SIGNUP_SUCCESS, null);
+        return new ResultResponse<>(ResultCode.INFO_REGISTRATION_SUCCESS, null);
     }
 
 
@@ -95,7 +97,20 @@ public class AuthChildServiceImpl implements AuthChildService {
         cookieService.saveAccessTokenToCookie(response, newAccessToken);
         log.debug("[login] AccessToken을 쿠키에 저장 완료: child_login_id={}", request.childId());
 
-        return new ResultResponse<>(ResultCode.CHILD_LOGIN_SUCCESS, null);
+        return new ResultResponse<>(ResultCode.LOGIN_SUCCESS, null);
+    }
+
+    public ResultResponse<String> logout(HttpServletResponse response) {
+        String loginId = authenticatedUser.getAuthenticatedChild().getLoginId();
+        log.info("[logout] 아이 로그아웃 요청: loginId={}", loginId);
+
+        tokenRedisRepository.deleteById(loginId);
+        log.debug("[logout] Redis에서 리프레시 토큰 삭제 완료: loginId={}", loginId);
+
+        cookieService.clearCookie(response, "accessToken");
+        log.debug("[logout] accessToken 쿠키 만료 처리 완료: loginId={}", loginId);
+
+        return new ResultResponse<>(ResultCode.LOGOUT_SUCCESS, null);
     }
 
     public ResultResponse<?> findChildID(String code) {
@@ -104,7 +119,7 @@ public class AuthChildServiceImpl implements AuthChildService {
         ChildInfoResponseDto dto = ChildInfoResponseDto.toDto(child);
 
         log.info("[findChildID] 아이 ID 찾기 성공: {}", dto);
-        return new ResultResponse<>(ResultCode.CHILD_INFO_RETRIEVAL_SUCCESS, dto);
+        return new ResultResponse<>(ResultCode.INFO_SUCCESS, dto);
     }
 
     @Override
@@ -121,7 +136,7 @@ public class AuthChildServiceImpl implements AuthChildService {
         childRepository.save(child);
 
         log.info("[findChildPassword] 비밀번호 변경 완료: user_id={}", request.user_id());
-        return new ResultResponse<>(ResultCode.PARENT_SIGNUP_SUCCESS, null);
+        return new ResultResponse<>(ResultCode.INFO_REGISTRATION_SUCCESS, null);
     }
 
     private Child getChild(Long child_id) {

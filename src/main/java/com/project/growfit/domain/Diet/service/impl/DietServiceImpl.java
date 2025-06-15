@@ -207,7 +207,7 @@ public class DietServiceImpl implements DietService {
         Diet diet = getDietOrThrow(dietId);
         String imageUrl = s3UploadService.saveFile(image, imageUploadPath);
         diet.updateImage(imageUrl);
-        return ResultResponse.of(ResultCode.CHILD_PHOTO_UPLOAD_SUCCESS, null);
+        return ResultResponse.of(ResultCode.DIET_ADD_IMAGE_SUCCESS, null);
     }
 
     @Override
@@ -235,7 +235,7 @@ public class DietServiceImpl implements DietService {
         authenticatedProvider.getAuthenticatedParent();
         Diet diet = getDietOrThrow(dietId);
         diet.updateTime(parseTimeOrThrow(newTime));
-        return ResultResponse.of(ResultCode.DIET_TIME_UPDATE_SUCCESS, null);
+        return ResultResponse.of(ResultCode.DIET_EDIT_SUCCESS, null);
     }
 
 

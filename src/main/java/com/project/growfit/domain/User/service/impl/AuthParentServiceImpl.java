@@ -56,7 +56,7 @@ public class AuthParentServiceImpl implements AuthParentService {
         ChildInfoResponseDto dto = ChildInfoResponseDto.toDto(child);
 
         log.info("[registerChild] 자녀 등록 완료: child_id={}, parent_id={}", child.getId(), parent.getId());
-        return new ResultResponse<>(ResultCode.PARENT_SIGNUP_SUCCESS, dto);
+        return new ResultResponse<>(ResultCode.SIGNUP_SUCCESS, dto);
     }
 
     @Override

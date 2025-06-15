@@ -9,42 +9,51 @@ import org.springframework.http.HttpStatus;
 public enum ResultCode {
     RESPONSE_TEST(HttpStatus.OK, "응답 테스트 성공"),
 
-    PARENT_NICKNAME_SET_SUCCESS(HttpStatus.OK, "부모 닉네임이 성공적으로 설정되었습니다."),
-    PARENT_SIGNUP_SUCCESS(HttpStatus.OK,  "부모 회원가입이 완료되었습니다."),
-    CHILD_INFO_RETRIEVAL_SUCCESS(HttpStatus.OK,  "자녀 정보가 성공적으로 조회되었습니다."),
-    QR_GENERATION_SUCCESS(HttpStatus.OK, "아이등록 QR코드를 성공적으로 생성하였습니다."),
+    INFO_REGISTRATION_SUCCESS(HttpStatus.OK, "사용자 정보가 성공적으로 등록되었습니다."),
+    SIGNUP_SUCCESS(HttpStatus.OK,  "회원가입이 완료되었습니다."),
+    QR_GENERATION_SUCCESS(HttpStatus.OK, "성공적으로 QR코드를 생성하였습니다."),
     ID_AVAILABLE(HttpStatus.OK, "사용 가능한 아이디입니다."),
 
-    CHILD_LOGIN_SUCCESS(HttpStatus.OK, "아이 계정 로그인 성공."),
-    PARENT_LOGIN_SUCCESS(HttpStatus.OK, "부모 계정 로그인 성공."),
+
+    LOGIN_SUCCESS(HttpStatus.OK, "성공적으로 로그인하였습니다."),
+    LOGOUT_SUCCESS(HttpStatus.OK, "성공적으로 로그아웃하였습니다."),
+
+    INFO_SUCCESS(HttpStatus.OK,  "성공적으로 정보가 조회되었습니다."),
 
     //Diet
-    STICKER_DELETE_SUCCESS(HttpStatus.OK, "스티커 삭제에 성공했습니다."),
-    CHILD_PHOTO_DELETE_SUCCESS(HttpStatus.OK, "아이 식단 사진 삭제에 성공했습니다."),
-    DIET_SET_LIST_SUCCESS(HttpStatus.OK, "식단 세트 목록 조회에 성공하였습니다."),
-    DIET_SET_SAVE_SUCCESS(HttpStatus.CREATED, "식단 세트 저장에 성공하였습니다."),
-    DIET_SET_DETAIL_SUCCESS(HttpStatus.OK, "식단 세트 상세 조회에 성공하였습니다."),
-    DIET_OVERRIDE_SUCCESS(HttpStatus.OK, "식단 불이행 정보 입력에 성공했습니다."),
-    DIET_TIME_UPDATE_SUCCESS(HttpStatus.OK, "식단 시간 수정에 성공하였습니다."),
-    CHILD_PHOTO_UPLOAD_SUCCESS(HttpStatus.OK, "식단 이미지 업로드를 성공했습니다."),
-    CHILD_STATE_UPLOAD_SUCCESS(HttpStatus.OK, "식단 이행 상태 업데이트를 성공했습니다."),
+    STICKER_MARK_SUCCESS(HttpStatus.OK, "스티커가 성공적으로 등록되었습니다."),
+    STICKER_UPDATE_SUCCESS(HttpStatus.OK, "스티커가 수정되었습니다."),
+    STICKER_DELETE_SUCCESS(HttpStatus.OK, "스티커 삭제를 성공하였습니다."),
+
     DIET_RETRIEVAL_SUCCESS(HttpStatus.OK, "식단을 성공적으로 조회했습니다."),
+    DIET_EDIT_SUCCESS(HttpStatus.OK, "식단 정보가 성공적으로 수정되었습니다."),
+    DIET_ADD_SUCCESS(HttpStatus.OK, "식단을 성공적으로 추가하였습니다."),
+    DIET_DELETE_SUCCESS(HttpStatus.NO_CONTENT, "식단이 성공적으로 삭제되었습니다."),
+
+    DAILY_DIET_RETRIEVAL_SUCCESS(HttpStatus.OK, "일일 식단 조회에 성공하였습니다."),
+    DIET_DETAIL_RETRIEVAL_SUCCESS(HttpStatus.OK, "음식 상세 정보를 성공적으로 조회하였습니다."),
+
     DIET_SEARCH_SUCCESS(HttpStatus.OK, "식단 음식 검색에 성공하였습니다."),
     DIET_SEARCH_RESULT_EMPTY(HttpStatus.OK, "검색 결과가 없습니다."),
-    DIET_DETAIL_RETRIEVAL_SUCCESS(HttpStatus.OK, "음식 상세 정보를 성공적으로 조회하였습니다."),
-    DIET_ADD_SUCCESS(HttpStatus.OK, "식단이 성공적으로 추가되었습니다."),
+
     DIET_ADD_IMAGE_SUCCESS(HttpStatus.OK, "식단 사진이 성공적으로 업로드되었습니다."),
-    DAILY_DIET_RETRIEVAL_SUCCESS(HttpStatus.OK, "일일 식단 조회에 성공하였습니다."),
-    DIET_FOOD_DELETE_SUCCESS(HttpStatus.OK, "식단에서 음식이 성공적으로 삭제되었습니다."),
-    DIET_DELETE_SUCCESS(HttpStatus.NO_CONTENT, "식단이 성공적으로 삭제되었습니다."),
-    DIET_EDIT_SUCCESS(HttpStatus.OK, "식단 정보가 성공적으로 수정되었습니다."),
-    STICKER_MARK_SUCCESS(HttpStatus.OK, "스티커가 성공적으로 등록되었습니다."),
-    CALENDAR_OVERVIEW_SUCCESS(HttpStatus.OK, "식단 캘린더 조회에 성공했습니다."),
-    DIET_COPY_SUCCESS(HttpStatus.OK, "식단 복사에 성공했습니다."),
+    CHILD_PHOTO_DELETE_SUCCESS(HttpStatus.OK, "식단 사진을 삭제하였습니다."),
+    //DIET_TIME_UPDATE_SUCCESS(HttpStatus.OK, "식단 시간 수정에 성공하였습니다."),
+
+    DIET_SET_LIST_SUCCESS(HttpStatus.OK, "식단 세트 목록 조회에 성공하였습니다."),
+    DIET_SET_SAVE_SUCCESS(HttpStatus.CREATED, "식단 세트 저장에 성공하였습니다."),
+    //DIET_SET_DETAIL_SUCCESS(HttpStatus.OK, "식단 세트 상세 조회에 성공하였습니다."),
     DIET_SET_RETRIEVAL_SUCCESS(HttpStatus.OK, "식단 세트 조회에 성공했습니다."),
     DIET_SET_DELETE_SUCCESS(HttpStatus.OK, "식단 세트 삭제에 성공했습니다."),
     DIET_SET_EDIT_SUCCESS(HttpStatus.OK, "식단 세트 수정에 성공했습니다." ),
-    STICKER_UPDATE_SUCCESS(HttpStatus.OK, "스티커가 수정되었습니다."),
+
+    DIET_OVERRIDE_SUCCESS(HttpStatus.OK, "식단 불이행 정보 입력에 성공했습니다."),
+    CHILD_STATE_UPLOAD_SUCCESS(HttpStatus.OK, "식단 이행 상태 업데이트를 성공했습니다."),
+    DIET_FOOD_DELETE_SUCCESS(HttpStatus.OK, "식단에서 음식이 성공적으로 삭제되었습니다."),
+
+    CALENDAR_OVERVIEW_SUCCESS(HttpStatus.OK, "식단 캘린더 조회에 성공했습니다."),
+
+
     // Community
     CREATE_POST_SUCCESS(HttpStatus.OK, "글 등록 성공."),
     GET_POST_SUCCESS(HttpStatus.OK, "글 조회 성공"),

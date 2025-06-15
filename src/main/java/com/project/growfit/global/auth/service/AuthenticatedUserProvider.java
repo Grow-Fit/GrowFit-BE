@@ -38,12 +38,16 @@ public class AuthenticatedUserProvider {
         };
     }
 
-    public CustomUserDetails getCurrentDetails() {
-        return (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    }
-
     private CustomUserDetails getCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated()) {
+            throw new BusinessException(ErrorCode.FORBIDDEN_ACCESS);
+        }
+        Object principal = auth.getPrincipal();
+
+        if (!(principal instanceof CustomUserDetails)) {
+            throw new BusinessException(ErrorCode.FORBIDDEN_ACCESS);
+        }
         return (CustomUserDetails) auth.getPrincipal();
     }
 
