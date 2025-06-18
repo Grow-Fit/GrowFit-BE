@@ -50,7 +50,9 @@ out/
 .mtj.tmp/
 
 ### yml파일 ###
-# 1. resources 하위 전체 무시
-/src/main/resources/**
+
+# 2. static, templates는 다시 포함시킴
+!/src/main/resources/static/**
+!/src/main/resources/templates/**
 
 
