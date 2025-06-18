@@ -31,6 +31,11 @@ public class JwtCookieAuthenticationFilter extends GenericFilterBean {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
 
+        if (request.getRequestURI().startsWith("/admin")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         Optional<Cookie> accessTokenCookie = CookieUtils.getCookie(request, "accessToken");
         if (accessTokenCookie.isPresent()) {
             String accessToken = accessTokenCookie.get().getValue();
