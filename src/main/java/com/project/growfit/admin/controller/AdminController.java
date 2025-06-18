@@ -35,9 +35,19 @@ public class AdminController {
     }
 
     @GetMapping("/users")
-    public String memberManagement(@RequestParam(defaultValue = "0") int page, Model model) {
+    public String userListPage(
+            @RequestParam(value = "email", required = false) String email,
+            @RequestParam(defaultValue = "0") int page,
+            Model model) {
         Pageable pageable = PageRequest.of(page, 20, Sort.by("createdAt").descending());
-        Page<Parent> userPage = adminUserService.findAllMembers(pageable);
+        Page<Parent> userPage;
+
+        if (email != null && !email.isEmpty()) {
+            userPage = adminUserService.findMembersByEmailContaining(email, pageable);
+        } else {
+            userPage = adminUserService.findAllMembers(pageable);
+        }
+        model.addAttribute("email", email);
         model.addAttribute("userPage", userPage);
         return "pages/users";
     }
