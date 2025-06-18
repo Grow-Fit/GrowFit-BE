@@ -53,10 +53,4 @@ out/
 # 1. resources 하위 전체 무시
 /src/main/resources/**
 
-# 2. static, templates는 다시 포함시킴
-!/src/main/resources/static/**
-!/src/main/resources/templates/**
 
-# 3. application.yml, application-*.yml 파일은 계속 무시
-/src/main/resources/*.yml
-.DS_Store
