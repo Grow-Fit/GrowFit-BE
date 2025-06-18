@@ -1,7 +1,8 @@
-package com.project.growfit.admin.service;
+package com.project.growfit.admin.service.impl;
 
 import com.project.growfit.admin.domain.Admin;
 import com.project.growfit.admin.repository.AdminRepository;
+import com.project.growfit.admin.service.AdminService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
