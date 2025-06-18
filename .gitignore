@@ -51,8 +51,8 @@ out/
 
 ### yml파일 ###
 
-# 2. static, templates는 다시 포함시킴
-!/src/main/resources/static/**
-!/src/main/resources/templates/**
+# 3. application.yml, application-*.yml 파일은 계속 무시
+/src/main/resources/*.yml
+.DS_Store
 
 
