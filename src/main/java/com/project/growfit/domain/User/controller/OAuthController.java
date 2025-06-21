@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +19,12 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Tag(name = "Social OAuth API", description = "소셜 로그인 관련 API (카카오)")
 public class OAuthController {
+
+    @Value("${custom.oauth2.kakao.redirect.new-user}")
+    private String newUserRedirectUrl;
+
+    @Value("${custom.oauth2.kakao.redirect.existing-user}")
+    private String existingUserRedirectUrl;
 
     private final OauthService oauthService;
 
@@ -37,8 +44,8 @@ public class OAuthController {
             ResultResponse<?> resultResponse = oauthService.kakaoLogin(accessToken, response);
             ParentLoginResponseDto dto = (ParentLoginResponseDto) resultResponse.getData();
             String redirectUrl = dto.isNewUser()
-                    ? "https://localhost:3000/join/parent/1"
-                    : "https://localhost:3000";
+                    ? newUserRedirectUrl
+                    : existingUserRedirectUrl;
             response.sendRedirect(redirectUrl);
         } catch (BusinessException e) {
             try {
