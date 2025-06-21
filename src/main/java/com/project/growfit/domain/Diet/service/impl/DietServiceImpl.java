@@ -54,44 +54,198 @@ public class DietServiceImpl implements DietService {
 
     @Override
     @Transactional(readOnly = true)
-    public ResultResponse<?> searchFoods(String keyword, int page, int size) {
+    public List<FoodResponseDto> searchFoods(String keyword, int page, int size) {
         authenticatedProvider.getAuthenticatedParent();
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<FoodApi> foodPage = foodApiRepository.findByFoodNmContaining(keyword, pageRequest);
 
-        List<FoodResponseDto> response = foodPage.stream()
+        return foodPage.stream()
                 .map(FoodResponseDto::toDto)
                 .toList();
-
-        return response.isEmpty()
-                ? ResultResponse.of(ResultCode.DIET_SEARCH_RESULT_EMPTY, response)
-                : ResultResponse.of(ResultCode.DIET_SEARCH_SUCCESS, response);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public ResultResponse<?> getFoodDetail(Long foodId) {
+    public FoodResponseDto getFoodDetail(Long foodId) {
         authenticatedProvider.getAuthenticatedParent();
         FoodApi foodApi = findFoodOrThrow(foodId);
-        FoodResponseDto response = FoodResponseDto.toDto(foodApi);
 
-        return ResultResponse.of(ResultCode.DIET_DETAIL_RETRIEVAL_SUCCESS, response);
+        return FoodResponseDto.toDto(foodApi);
     }
 
 
     @Override
     @Transactional
-    public ResultResponse<?> addDiet(AddDietRequestDto dto) {
+    public DietBasicDto addDiet(AddDietRequestDto dto) {
         Parent parent = authenticatedProvider.getAuthenticatedParent();
         Child child = authenticatedProvider.getAuthenticatedChild();
         DailyDiet dailyDiet = getOrCreateDailyDiet(child, dto.date());
         List<Food> foodList = createFoodListFromDto(dto.foodList(), parent);
-
         Diet diet = Diet.create(dto.eatTime(), dto.mealType(), dailyDiet, child, foodList);
+
         dailyDiet.addDiet(diet);
         dailyDietRepository.save(dailyDiet);
 
-        return ResultResponse.of(ResultCode.DIET_ADD_SUCCESS, null);
+        return DietBasicDto.toDto(diet);
+    }
+
+    @Override
+    @Transactional
+    public DietBasicDto updateDiet(Long dietId, UpdateDietRequestDto dto) {
+        Parent parent = authenticatedProvider.getAuthenticatedParent();
+        Diet diet = getDietOrThrow(dietId);
+        DailyDiet dailyDiet = diet.getDailyDiet();
+        List<Food> foodList = createFoodListFromDto(dto.foodList(), parent);
+
+        applyNewFoodList(diet, dailyDiet, foodList, dto);
+
+        return DietBasicDto.toDto(diet);
+    }
+    @Override
+    @Transactional
+    public DietBasicDto deleteDiet(Long dietId) {
+        authenticatedProvider.getAuthenticatedParent();
+        Diet diet = getDietOrThrow(dietId);
+        DietBasicDto dto = DietBasicDto.toDto(diet);
+
+        dietRepository.delete(diet);
+        return dto;
+    }
+
+    @Transactional(readOnly = true)
+    public DietResponseDto getDietDetail(Long dietId) {
+        authenticatedProvider.getAuthenticatedChild();
+        Diet diet = getDietOrThrow(dietId);
+        return toDietResponseDto(diet);
+    }
+
+    @Override
+    @Transactional
+    public DietBasicDto uploadPhoto(Long dietId, MultipartFile image) {
+        authenticatedProvider.getAuthenticatedChild();
+        Diet diet = getDietOrThrow(dietId);
+        String imageUrl = s3UploadService.saveFile(image, imageUploadPath);
+        diet.updateImage(imageUrl);
+        return DietBasicDto.toDto(diet);
+    }
+
+    @Override
+    @Transactional
+    public DietBasicDto deletePhoto(Long dietId) {
+        authenticatedProvider.getAuthenticatedChild();
+        Diet diet = getDietOrThrow(dietId);
+
+        if (diet.getImageUrl() != null) {
+            s3UploadService.deleteFile(diet.getImageUrl());
+            diet.updateImage(null);
+        }
+
+        return DietBasicDto.toDto(diet);
+    }
+
+    @Override
+    @Transactional
+    public DietBasicDto updateDietState(Long dietId, DietState dietState){
+        authenticatedProvider.getAuthenticatedChild();
+        Diet diet = getDietOrThrow(dietId);
+        diet.updateState(dietState);
+        return DietBasicDto.toDto(diet);
+    }
+
+    @Override
+    @Transactional
+    public DietBasicDto overrideDietNutrition(Long dietId, UpdateFoodListRequestDto dto) {
+        Parent parent = authenticatedProvider.getAuthenticatedParent();
+        Diet diet = getDietOrThrow(dietId);
+        DailyDiet dailyDiet = diet.getDailyDiet();
+        List<Food> foodList = createFoodListFromDto(dto.foodList(), parent);
+
+        applyNewFoodList(diet, dailyDiet, foodList);
+        diet.updateState(DietState.MODIFIED);
+
+        return DietBasicDto.toDto(diet);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public MonthlyStickerResponseDto getMonthlyStickersByParent(String month) {
+        Child child = authenticatedProvider.getAuthenticatedChild();
+        List<DailyDiet> diets = dailyDietRepository.findByChild(child);
+
+        Map<String, Map<String, Sticker>> monthlyStickers = new HashMap<>();
+
+        for (DailyDiet diet : diets) {
+            String dietMonth = diet.getDate().format(DateTimeFormatter.ofPattern("yyyy-MM"));
+            if (dietMonth.equals(month)) {
+                Sticker sticker = diet.getSticker();
+                monthlyStickers
+                        .computeIfAbsent(dietMonth, k -> new HashMap<>())
+                        .put(diet.getDate().toString(), sticker);
+            }
+        }
+        return MonthlyStickerResponseDto.toDto(child.getName(), monthlyStickers);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public DailyDietResponseDto getDailyDietByDate(String date) {
+        Child child = authenticatedProvider.getAuthenticatedChild();
+        LocalDate parsedDate = LocalDate.parse(date);
+        DailyDiet dailyDiet = dailyDietRepository.findByChildAndDate(child, parsedDate)
+                .orElseThrow(() -> new BusinessException(ErrorCode.DAILY_DIET_NOT_FOUND));
+
+        return new DailyDietResponseDto(
+                dailyDiet.getId(),
+                dailyDiet.getDate().toString(),
+                dailyDiet.getTotalCalorie(),
+                groupDietsByMeal(dailyDiet.getDiets()
+                ));
+    }
+
+    @Override
+    @Transactional
+    public DailyDietResponseDto markSticker(Long dailyDietId, Sticker sticker) {
+        authenticatedProvider.getAuthenticatedParent();
+        DailyDiet dailyDiet = 	getDailyDietOrThrow(dailyDietId);
+        validateHasFood(dailyDiet);
+        dailyDiet.markSticker(sticker);
+
+        return new DailyDietResponseDto(
+                dailyDiet.getId(),
+                dailyDiet.getDate().toString(),
+                dailyDiet.getTotalCalorie(),
+                groupDietsByMeal(dailyDiet.getDiets())
+        );
+    }
+    @Override
+    @Transactional
+    public DailyDietResponseDto updateSticker(Long dailyDietId, Sticker sticker) {
+        DailyDiet dailyDiet = getDailyDietOrThrow(dailyDietId);
+        extractedSticker(dailyDiet);
+        validateHasFood(dailyDiet);
+        dailyDiet.markSticker(sticker);
+
+        return new DailyDietResponseDto(
+                dailyDiet.getId(),
+                dailyDiet.getDate().toString(),
+                dailyDiet.getTotalCalorie(),
+                groupDietsByMeal(dailyDiet.getDiets())
+        );
+    }
+    @Override
+    @Transactional
+    public DailyDietResponseDto deleteSticker(Long dailyDietId) {
+        authenticatedProvider.getAuthenticatedParent();
+        DailyDiet dailyDiet = getDailyDietOrThrow(dailyDietId);
+        extractedSticker(dailyDiet);
+        dailyDiet.markSticker(null);
+
+        return new DailyDietResponseDto(
+                dailyDiet.getId(),
+                dailyDiet.getDate().toString(),
+                dailyDiet.getTotalCalorie(),
+                groupDietsByMeal(dailyDiet.getDiets())
+        );
     }
 
     @Override
@@ -116,169 +270,12 @@ public class DietServiceImpl implements DietService {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public ResultResponse<?> getDailyDietByDate(String date) {
-        Child child = authenticatedProvider.getAuthenticatedChild();
-        LocalDate parsedDate = LocalDate.parse(date);
-        DailyDiet dailyDiet = dailyDietRepository.findByChildAndDate(child, parsedDate)
-                .orElseThrow(() -> new BusinessException(ErrorCode.DAILY_DIET_NOT_FOUND));
-
-        return ResultResponse.of(
-                ResultCode.DAILY_DIET_RETRIEVAL_SUCCESS,
-                new DailyDietResponseDto(
-                        dailyDiet.getId(),
-                        dailyDiet.getDate().toString(),
-                        dailyDiet.getTotalCalorie(),
-                        groupDietsByMeal(dailyDiet.getDiets())
-                )
-        );
-    }
-
-    @Override
-    @Transactional
-    public ResultResponse<?> deleteDiet(Long dietId) {
-        authenticatedProvider.getAuthenticatedParent();
-        Diet diet = getDietOrThrow(dietId);
-        dietRepository.delete(diet);
-        return ResultResponse.of(ResultCode.DIET_DELETE_SUCCESS, null);
-
-    }
-
-    @Override
-    @Transactional
-    public ResultResponse<?> updateDiet(Long dietId, UpdateDietRequestDto dto) {
-        Parent parent = authenticatedProvider.getAuthenticatedParent();
-        Diet diet = getDietOrThrow(dietId);
-        DailyDiet dailyDiet = diet.getDailyDiet();
-        List<Food> foodList = createFoodListFromDto(dto.foodList(), parent);
-
-        applyNewFoodList(diet, dailyDiet, foodList, dto);
-        return ResultResponse.of(ResultCode.DIET_EDIT_SUCCESS, null);
-    }
-
-    @Override
-    @Transactional
-    public ResultResponse<?> overrideDietNutrition(Long dietId, UpdateFoodListRequestDto dto) {
-        Parent parent = authenticatedProvider.getAuthenticatedParent();
-        Diet diet = getDietOrThrow(dietId);
-        DailyDiet dailyDiet = diet.getDailyDiet();
-        List<Food> foodList = createFoodListFromDto(dto.foodList(), parent);
-
-        applyNewFoodList(diet, dailyDiet, foodList);
-        diet.updateState(DietState.MODIFIED);
-        return ResultResponse.of(ResultCode.DIET_OVERRIDE_SUCCESS, null);
-    }
-
-    @Override
-    @Transactional
-    public ResultResponse<?> markSticker(Long dailyDietId, Sticker sticker) {
-        authenticatedProvider.getAuthenticatedParent();
-        DailyDiet dailyDiet = 	getDailyDietOrThrow(dailyDietId);
-        validateHasFood(dailyDiet);
-        dailyDiet.markSticker(sticker);
-
-        return ResultResponse.of(ResultCode.STICKER_MARK_SUCCESS, null);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public ResultResponse<?> getMonthlyStickersByParent(String month) {
-        Child child = authenticatedProvider.getAuthenticatedChild();
-        List<DailyDiet> diets = dailyDietRepository.findByChild(child);
-
-        Map<String, Map<String, Sticker>> monthlyStickers = new HashMap<>();
-
-        for (DailyDiet diet : diets) {
-            String dietMonth = diet.getDate().format(DateTimeFormatter.ofPattern("yyyy-MM"));
-            if (dietMonth.equals(month)) {
-                Sticker sticker = diet.getSticker();
-                monthlyStickers
-                        .computeIfAbsent(dietMonth, k -> new HashMap<>())
-                        .put(diet.getDate().toString(), sticker);
-            }
-        }
-        return ResultResponse.of(ResultCode.CALENDAR_OVERVIEW_SUCCESS, new MonthlyStickerResponseDto(child.getName(), monthlyStickers));
-    }
-
-    @Override
-    @Transactional
-    public ResultResponse<?> uploadPhoto(Long dietId, MultipartFile image) {
-        authenticatedProvider.getAuthenticatedChild();
-        Diet diet = getDietOrThrow(dietId);
-        String imageUrl = s3UploadService.saveFile(image, imageUploadPath);
-        diet.updateImage(imageUrl);
-        return ResultResponse.of(ResultCode.DIET_ADD_IMAGE_SUCCESS, null);
-    }
-
-    @Override
-    @Transactional
-    public ResultResponse<?> updateDietState(Long dietId, DietState dietState){
-        authenticatedProvider.getAuthenticatedChild();
-        Diet diet = getDietOrThrow(dietId);
-        diet.updateState(dietState);
-        return ResultResponse.of(ResultCode.CHILD_STATE_UPLOAD_SUCCESS, null);
-    }
-
-    @Transactional
-    DailyDiet getOrCreateDailyDiet(Child child, String dtoDate) {
-        LocalDate date = LocalDate.parse(dtoDate);
-        return dailyDietRepository.findByChildAndDate(child, date)
-                .orElseGet(() -> {
-                    DailyDiet newDailyDiet = new DailyDiet(child, date);
-                    return dailyDietRepository.save(newDailyDiet);
-                });
-    }
-
-    @Override
     @Transactional
     public ResultResponse<?> updateDietTime(Long dietId, String newTime) {
         authenticatedProvider.getAuthenticatedParent();
         Diet diet = getDietOrThrow(dietId);
         diet.updateTime(parseTimeOrThrow(newTime));
         return ResultResponse.of(ResultCode.DIET_EDIT_SUCCESS, null);
-    }
-
-
-    @Transactional(readOnly = true)
-    public ResultResponse<?> getDietDetail(Long dietId) {
-        authenticatedProvider.getAuthenticatedChild();
-        Diet diet = getDietOrThrow(dietId);
-        DietResponseDto response = toDietResponseDto(diet);
-        return ResultResponse.of(ResultCode.DIET_DETAIL_RETRIEVAL_SUCCESS, response);
-    }
-
-    @Override
-    @Transactional
-    public ResultResponse<?> deletePhoto(Long dietId) {
-        authenticatedProvider.getAuthenticatedChild();
-        Diet diet = getDietOrThrow(dietId);
-
-        if (diet.getImageUrl() != null) {
-            s3UploadService.deleteFile(diet.getImageUrl());
-            diet.updateImage(null);
-        }
-
-        return ResultResponse.of(ResultCode.CHILD_PHOTO_DELETE_SUCCESS, null);
-    }
-
-    @Override
-    @Transactional
-    public ResultResponse<?> deleteSticker(Long dailyDietId) {
-        authenticatedProvider.getAuthenticatedParent();
-        DailyDiet dailyDiet = getDailyDietOrThrow(dailyDietId);
-        extractedSticker(dailyDiet);
-        dailyDiet.markSticker(null);
-        return ResultResponse.of(ResultCode.STICKER_DELETE_SUCCESS, null);
-    }
-
-    @Override
-    @Transactional
-    public ResultResponse<?> updateSticker(Long dailyDietId, Sticker sticker) {
-        DailyDiet dailyDiet = getDailyDietOrThrow(dailyDietId);
-        extractedSticker(dailyDiet);
-        validateHasFood(dailyDiet);
-        dailyDiet.markSticker(sticker);
-        return ResultResponse.of(ResultCode.STICKER_UPDATE_SUCCESS, null);
     }
 
     private Diet getDietOrThrow(Long dietId) {
@@ -290,6 +287,16 @@ public class DietServiceImpl implements DietService {
             throw new BusinessException(ErrorCode.FORBIDDEN_ACCESS);
 
         return diet;
+    }
+
+    @Transactional
+    DailyDiet getOrCreateDailyDiet(Child child, String dtoDate) {
+        LocalDate date = LocalDate.parse(dtoDate);
+        return dailyDietRepository.findByChildAndDate(child, date)
+                .orElseGet(() -> {
+                    DailyDiet newDailyDiet = new DailyDiet(child, date);
+                    return dailyDietRepository.save(newDailyDiet);
+                });
     }
 
     private DailyDiet getDailyDietOrThrow(Long dailyId) {
