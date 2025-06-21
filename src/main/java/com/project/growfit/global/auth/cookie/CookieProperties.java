@@ -14,4 +14,5 @@ public class CookieProperties {
     private boolean httpOnly;
     private String sameSite;
     private int maxAge;
+    private String domain;
 }
