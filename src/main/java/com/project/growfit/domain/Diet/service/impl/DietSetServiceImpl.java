@@ -1,6 +1,7 @@
 package com.project.growfit.domain.Diet.service.impl;
 
 import com.project.growfit.domain.Diet.dto.request.SaveDietSetRequestDto;
+import com.project.growfit.domain.Diet.dto.response.DietSetBasicDto;
 import com.project.growfit.domain.Diet.dto.response.DietSetDetailResponseDto;
 import com.project.growfit.domain.Diet.dto.response.DietSetResponseDto;
 import com.project.growfit.domain.Diet.dto.response.FoodResponseDto;
@@ -38,7 +39,7 @@ public class DietSetServiceImpl implements DietSetService {
 
     @Override
     @Transactional
-    public ResultResponse<?> saveDietSet(SaveDietSetRequestDto dto) {
+    public DietSetBasicDto saveDietSet(SaveDietSetRequestDto dto) {
         Parent parent = authenticatedProvider.getAuthenticatedParent();
 
         List<DietSetFood> foods = dto.foodList().stream()
@@ -48,30 +49,61 @@ public class DietSetServiceImpl implements DietSetService {
         DietSet dietSet = DietSet.create(dto, parent, foods);
         dietSetRepository.save(dietSet);
 
-        return ResultResponse.of(ResultCode.DIET_SET_SAVE_SUCCESS, null);
+        return DietSetBasicDto.toDto(dietSet);
     }
 
     @Override
+    @Transactional
+    public DietSetBasicDto updateDietSet(Long dietSetId, SaveDietSetRequestDto dto) {
+        Parent parent = authenticatedProvider.getAuthenticatedParent();
+        DietSet dietSet = getDietSetOrThrow(dietSetId);
+
+        dietSet.clearFoods();
+
+        List<DietSetFood> updatedFoods = dto.foodList().stream()
+                .map(foodItem -> DietSetFood.create(foodItem, foodApiRepository, customFoodRepository, parent))
+                .toList();
+
+        dietSet.update(dto.setName(), updatedFoods);
+
+        return DietSetBasicDto.toDto(dietSet);
+    }
+
+    @Override
+    @Transactional
+    public DietSetBasicDto deleteDietSet(Long dietSetId) {
+        DietSet dietSet = getDietSetOrThrow(dietSetId);
+        dietSetRepository.delete(dietSet);
+        return DietSetBasicDto.toDto(dietSet);
+    }
+
+    private DietSet getDietSetOrThrow(Long dietSetId) {
+        Parent parent = authenticatedProvider.getAuthenticatedParent();
+        DietSet dietSet = dietSetRepository.findById(dietSetId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.DIET_SET_NOT_FOUND));
+        if (!dietSet.getParent().equals(parent))
+            throw new BusinessException(ErrorCode.FORBIDDEN_ACCESS);
+        return dietSet;
+    }
+    @Override
     @Transactional(readOnly = true)
-    public ResultResponse<?> getAllDietSets(int page, int size) {
+    public Page<DietSetResponseDto> getAllDietSets(int page, int size) {
         Parent parent = authenticatedProvider.getAuthenticatedParent();
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         Page<DietSet> sets = dietSetRepository.findByParent(parent, pageable);
 
-        Page<DietSetResponseDto> response = sets.map(set -> new DietSetResponseDto(
+        return sets.map(set -> new DietSetResponseDto(
                 set.getId(),
                 set.getSetName(),
                 set.getTotalCalorie(),
                 set.getFoods().stream().map(DietSetFood::getName).toList()
         ));
-
-        return ResultResponse.of(ResultCode.DIET_SET_LIST_SUCCESS, response);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public ResultResponse<?> getDietSetDetail(Long dietSetId) {
+    public DietSetDetailResponseDto getDietSetDetail(Long dietSetId) {
         authenticatedProvider.getAuthenticatedParent();
 
         DietSet set = getDietSetOrThrow(dietSetId);
@@ -86,42 +118,6 @@ public class DietSetServiceImpl implements DietSetService {
                 )
         ).toList();
 
-        DietSetDetailResponseDto response = new DietSetDetailResponseDto(set.getSetName(), foodDetails);
-        return ResultResponse.of(ResultCode.DIET_SET_RETRIEVAL_SUCCESS, response);
-    }
-
-    @Override
-    @Transactional
-    public ResultResponse<?> updateDietSet(Long dietSetId, SaveDietSetRequestDto dto) {
-        Parent parent = authenticatedProvider.getAuthenticatedParent();
-        DietSet set = getDietSetOrThrow(dietSetId);
-
-        set.clearFoods();
-
-        List<DietSetFood> updatedFoods = dto.foodList().stream()
-                .map(foodItem -> DietSetFood.create(foodItem, foodApiRepository, customFoodRepository, parent))
-                .toList();
-
-        set.update(dto.setName(), updatedFoods);
-
-        return ResultResponse.of(ResultCode.DIET_SET_EDIT_SUCCESS, null);
-    }
-
-    @Override
-    @Transactional
-    public ResultResponse<?> deleteDietSet(Long dietSetId) {
-        DietSet set = getDietSetOrThrow(dietSetId);
-        dietSetRepository.delete(set);
-        return ResultResponse.of(ResultCode.DIET_SET_DELETE_SUCCESS, null);
-    }
-
-    private DietSet getDietSetOrThrow(Long dietSetId) {
-        Parent parent = authenticatedProvider.getAuthenticatedParent();
-        DietSet set = dietSetRepository.findById(dietSetId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.DIET_SET_NOT_FOUND));
-        if (!set.getParent().equals(parent))
-            throw new BusinessException(ErrorCode.FORBIDDEN_ACCESS);
-
-        return set;
+        return new DietSetDetailResponseDto(set.getSetName(), foodDetails);
     }
 }

@@ -98,9 +98,10 @@ public class DietServiceImpl implements DietService {
         List<Food> foodList = createFoodListFromDto(dto.foodList(), parent);
 
         applyNewFoodList(diet, dailyDiet, foodList, dto);
-
+        diet.updateTime(parseTimeOrThrow(dto.eatTime()));
         return DietBasicDto.toDto(diet);
     }
+
     @Override
     @Transactional
     public DietBasicDto deleteDiet(Long dietId) {
@@ -267,15 +268,6 @@ public class DietServiceImpl implements DietService {
                         groupDietsByMeal(dailyDiet.getDiets())
                 )
         );
-    }
-
-    @Override
-    @Transactional
-    public ResultResponse<?> updateDietTime(Long dietId, String newTime) {
-        authenticatedProvider.getAuthenticatedParent();
-        Diet diet = getDietOrThrow(dietId);
-        diet.updateTime(parseTimeOrThrow(newTime));
-        return ResultResponse.of(ResultCode.DIET_EDIT_SUCCESS, null);
     }
 
     private Diet getDietOrThrow(Long dietId) {
