@@ -41,6 +41,7 @@ public class CookieService {
                 .secure(cookieProperties.isSecure())
                 .sameSite(cookieProperties.getSameSite())
                 .maxAge(cookieProperties.getMaxAge())
+                .domain(cookieProperties.getDomain())
                 .path("/")
                 .build();
     }
