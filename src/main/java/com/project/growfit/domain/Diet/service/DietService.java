@@ -19,7 +19,6 @@ public interface DietService {
 
     DietBasicDto addDiet(AddDietRequestDto dto);
     DietBasicDto updateDiet(Long dietId, UpdateDietRequestDto dto);
-
     DietBasicDto deleteDiet(Long dietId);
     DietResponseDto getDietDetail(Long dietId);
     DietBasicDto uploadPhoto(Long dietId, MultipartFile image);
@@ -32,6 +31,4 @@ public interface DietService {
     DailyDietResponseDto updateSticker(Long dailyDietId, Sticker sticker);
     DailyDietResponseDto deleteSticker(Long dailyDietId);
     ResultResponse<?> getDailyDietById(Long dailyId);
-
-    ResultResponse<?> updateDietTime(Long dietId, String newTime);
 }

@@ -60,24 +60,13 @@ public class DietController {
     }
 
     @Operation(summary = "식단 수정", description = "식단을 수정합니다.")
-    @PutMapping("/food/{dietId}")
+    @PatchMapping("/food/{dietId}")
     public ResultResponse<DietBasicDto> updateDiet(@PathVariable Long dietId,
                                         @Valid @RequestBody UpdateDietRequestDto request){
         DietBasicDto dto = dietService.updateDiet(dietId, request);
 
         return ResultResponse.of(ResultCode.DIET_EDIT_SUCCESS, dto);
     }
-
-    //식단 수정이랑 합치기
-/*
-    @Operation(summary = "식단 시간 수정", description = "식단의 섭취 시간을 수정합니다.")
-    @PatchMapping("/food/{dietId}/time")
-    public ResponseEntity<?> updateDietTime(@PathVariable Long dietId,
-                                            @RequestParam String updateTime) {
-        ResultResponse<?> resultResponse = dietService.updateDietTime(dietId, updateTime);
-        return ResponseEntity.status(HttpStatus.OK).body(resultResponse);
-    }
-*/
 
     @Operation(summary = "식단 제거", description = "식단을 제거합니다.")
     @DeleteMapping("/food/{dietId}")
