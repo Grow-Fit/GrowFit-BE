@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/oauth")
 @RequiredArgsConstructor
-@Tag(name = "Social OAuth API", description = "소셜 로그인 관련 API (카카오)")
+@Tag(name = "부모 소셜 로그인 API", description = "부모 소셜 로그인(카카오) 관련 API입니다.")
 public class OAuthController {
 
     private final OauthService oauthService;

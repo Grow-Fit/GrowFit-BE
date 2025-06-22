@@ -30,7 +30,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/diet")
-@Tag(name = "Diet API", description = "식단일지 관련 API")
+@Tag(name = "식단 관련 API", description = "식단일지 관련 API입니다.")
 public class DietController {
 
     private final DietService dietService;

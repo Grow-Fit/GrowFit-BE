@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/parent")
 @RequiredArgsConstructor
-@Tag(name = "Parent Auth API", description = "부모 회원 관련 API")
+@Tag(name = "부모 로그인 및 회원가입 API", description = "부모 회원가입/로그인 관련 API입니다.")
 public class AuthParentController {
 
     private final AuthParentService parentService;
