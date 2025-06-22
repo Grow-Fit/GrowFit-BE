@@ -5,7 +5,7 @@ import com.nimbusds.jose.shaded.gson.JsonObject;
 import com.nimbusds.jose.shaded.gson.JsonParser;
 import com.project.growfit.domain.User.dto.request.ParentOAuthRequestDto;
 import com.project.growfit.domain.User.dto.response.ParentLoginResponseDto;
-import com.project.growfit.domain.User.dto.response.ParentResponse;
+import com.project.growfit.domain.User.dto.response.ParentResponseDto;
 import com.project.growfit.domain.User.entity.Parent;
 import com.project.growfit.domain.User.repository.ParentRepository;
 import com.project.growfit.domain.User.service.OauthService;
@@ -120,11 +120,12 @@ public class OauthServiceImpl implements OauthService {
     }
 
     @Override
+    @Transactional
     public ResultResponse<?> kakaoLogin(String accessToken, HttpServletResponse response) {
         log.info("[kakaoLogin] 카카오 로그인 요청 시작");
         boolean isNewUser = false;
         ParentOAuthRequestDto requestDto = getUserKakaoSignupRequestDto(getUserKakaoInfo(accessToken));
-        ParentResponse parentResponse = findByUserKakaoIdentifier(requestDto.id());
+        ParentResponseDto parentResponse = findByUserKakaoIdentifier(requestDto.id());
 
         if (parentResponse == null) {
             String email = requestDto.email();
@@ -149,7 +150,7 @@ public class OauthServiceImpl implements OauthService {
     }
 
     @Override
-    public ResultResponse<String> kakaoLogout(String access_token, HttpServletResponse response) {
+    public String kakaoLogout(String access_token, HttpServletResponse response) {
         Parent user = authenticatedUser.getAuthenticatedParent();
         tokenRedisRepository.deleteById(user.getEmail());
 
@@ -164,11 +165,11 @@ public class OauthServiceImpl implements OauthService {
         } catch (HttpClientErrorException e) {
             System.err.println("카카오 로그아웃 실패: " + e.getMessage());
         }
-        return ResultResponse.of(ResultCode.LOGOUT_SUCCESS, "");
+        return "Parent Id [" + user.getId() + "] 로그아웃 완료";
     }
 
     @Override
-    public ParentResponse findByUserKakaoIdentifier(String kakaoIdentifier) {
+    public ParentResponseDto findByUserKakaoIdentifier(String kakaoIdentifier) {
         log.info("[findByUserKakaoIdentifier] 카카오 ID로 부모 정보 조회: kakao_id={}", kakaoIdentifier);
         List<Parent> parents = parentRepository.findParentByProviderId(kakaoIdentifier).orElse(List.of());
 
@@ -176,7 +177,7 @@ public class OauthServiceImpl implements OauthService {
             log.warn("[findByUserKakaoIdentifier] 부모 정보 없음: kakao_id={}", kakaoIdentifier);
             return null;
         }
-        return new ParentResponse(parents.get(0));
+        return new ParentResponseDto(parents.get(0));
     }
 
     @Override
@@ -201,7 +202,7 @@ public class OauthServiceImpl implements OauthService {
         );
     }
 
-    private void generateAndSaveTokens(HttpServletResponse response, ParentResponse parentResponse) {
+    private void generateAndSaveTokens(HttpServletResponse response, ParentResponseDto parentResponse) {
         String accessToken = jwtProvider.createAccessToken(parentResponse.email(), parentResponse.roles(), "SOCIAL_KAKAO");
         String refreshToken = jwtProvider.createRefreshToken(parentResponse.email());
         tokenRedisRepository.save(new TokenRedis(parentResponse.email(), accessToken, refreshToken));

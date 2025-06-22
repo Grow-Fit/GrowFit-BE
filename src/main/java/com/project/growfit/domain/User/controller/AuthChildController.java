@@ -2,69 +2,76 @@ package com.project.growfit.domain.User.controller;
 
 import com.project.growfit.domain.User.dto.request.AuthChildRequestDto;
 import com.project.growfit.domain.User.dto.request.FindChildPasswordRequestDto;
+import com.project.growfit.domain.User.dto.response.ChildInfoResponseDto;
+import com.project.growfit.domain.User.dto.response.ChildResponseDto;
 import com.project.growfit.domain.User.service.AuthChildService;
+import com.project.growfit.global.response.ResultCode;
 import com.project.growfit.global.response.ResultResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+@Validated
 @RestController
 @RequestMapping("/api/child")
 @RequiredArgsConstructor
-@Tag(name = "Child Auth API", description = "아이 회원가입/로그인 관련 API")
+@Tag(name = "아이 로그인 및 회원가입 API", description = "아이 회원가입/로그인 관련 API입니다.")
 public class AuthChildController {
 
     private final AuthChildService authChildService;
 
     @Operation(summary = "아이 회원가입 시 인증 코드로 정보 조회")
     @GetMapping("/register/code")
-    public ResponseEntity<?> registerChildByCode(@RequestParam String code) {
-        ResultResponse<?> resultResponse = authChildService.findByCode(code);
-        return ResponseEntity.status(HttpStatus.OK).body(resultResponse);
+    public ResultResponse<ChildResponseDto> registerChildByCode(@NotBlank @RequestParam String code) {
+        ChildResponseDto dto = authChildService.findByCode(code);
+
+        return ResultResponse.of(ResultCode.INFO_SUCCESS, dto);
     }
 
     @Operation(summary = "아이 회원가입 시 아이디 & 비밀번호 & 닉네임 등록")
     @PostMapping("/register/{child_id}/credentials")
-    public ResponseEntity<?> registerChildCredentials(@PathVariable Long child_id,
-                                                      @RequestBody AuthChildRequestDto request) {
-        ResultResponse<?> resultResponse = authChildService.registerChildCredentials(child_id, request);
+    public ResultResponse<ChildInfoResponseDto> registerChildCredentials(@PathVariable Long child_id,
+                                                                         @Valid @RequestBody AuthChildRequestDto request) {
+        ChildInfoResponseDto dto = authChildService.registerChildCredentials(child_id, request);
 
-        return ResponseEntity.status(HttpStatus.OK).body(resultResponse);
+        return ResultResponse.of(ResultCode.INFO_REGISTRATION_SUCCESS, dto);
     }
 
     @Operation(summary = "아이 로그인")
     @PostMapping("/login")
-    public ResponseEntity<?> loginChild(@RequestBody AuthChildRequestDto request, HttpServletResponse response) {
-        ResultResponse<?> resultResponse = authChildService.login(request, response);
+    public ResultResponse<ChildResponseDto> loginChild(@Valid @RequestBody AuthChildRequestDto request, HttpServletResponse response) {
+        ChildResponseDto dto = authChildService.login(request, response);
 
-        return ResponseEntity.status(HttpStatus.OK).body(resultResponse);
+        return ResultResponse.of(ResultCode.LOGIN_SUCCESS, dto);
     }
 
     @Operation(summary = "아이 로그아웃")
     @PostMapping("/logout")
-    public ResponseEntity<?> logoutChild(HttpServletResponse response) {
-        ResultResponse<String> resultResponse = authChildService.logout(response);
+    public ResultResponse<ChildResponseDto> logoutChild(HttpServletResponse response) {
+        ChildResponseDto dto = authChildService.logout(response);
 
-        return ResponseEntity.status(HttpStatus.OK).body(resultResponse);
+        return ResultResponse.of(ResultCode.LOGOUT_SUCCESS, dto);
     }
 
     @Operation(summary = "아이 인증코드로 ID 찾기")
     @GetMapping("/find/id")
-    public ResponseEntity<?> findChildIdByCode(@RequestParam String code) {
-        ResultResponse<?> resultResponse = authChildService.findChildID(code);
+    public ResultResponse<ChildResponseDto> findChildIdByCode(
+            @RequestParam @NotBlank(message = "인증 코드는 필수입니다.") String code){
+        ChildResponseDto dto = authChildService.findChildID(code);
 
-        return ResponseEntity.status(HttpStatus.OK).body(resultResponse);
+        return ResultResponse.of(ResultCode.INFO_SUCCESS, dto);
     }
 
     @Operation(summary = "아이 비밀번호 재설정")
     @PostMapping("/find/password")
-    public ResponseEntity<?> resetChildPassword(@RequestBody FindChildPasswordRequestDto request) {
-        ResultResponse<?> resultResponse = authChildService.findChildPassword(request);
+    public ResultResponse<ChildInfoResponseDto> resetChildPassword(@Valid @RequestBody FindChildPasswordRequestDto request) {
+        ChildInfoResponseDto dto = authChildService.findChildPassword(request);
 
-        return ResponseEntity.status(HttpStatus.OK).body(resultResponse);
+        return ResultResponse.of(ResultCode.INFO_REGISTRATION_SUCCESS, dto);
     }
 }

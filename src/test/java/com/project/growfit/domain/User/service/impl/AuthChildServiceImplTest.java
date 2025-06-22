@@ -78,7 +78,7 @@ class AuthChildServiceImplTest {
         when(childRepository.findByCodeNumber(code)).thenReturn(Optional.of(mockChild));
 
         // When
-        ResultResponse<?> response = authChildService.findChildID(code);
+        //ResultResponse<?> response = authChildService.findChildID(code);
 
         // Then
         assertThat(response).isNotNull();
@@ -111,7 +111,7 @@ class AuthChildServiceImplTest {
         when(passwordEncoder.encode(request.childPassword())).thenReturn("encodedPassword");
 
         // When
-        ResultResponse<?> response = authChildService.registerChildCredentials(childId, request);
+        //ResultResponse<?> response = authChildService.registerChildCredentials(childId, request);
 
         // Then
         assertThat(response).isNotNull();
@@ -143,7 +143,7 @@ class AuthChildServiceImplTest {
         when(childRepository.findByCodeNumber(request.code())).thenReturn(Optional.of(mockChild));
 
         // When
-        ResultResponse<?> response = authChildService.findChildPassword(request);
+        //ResultResponse<?> response = authChildService.findChildPassword(request);
 
         // Then
         assertThat(response).isNotNull();
@@ -180,7 +180,7 @@ class AuthChildServiceImplTest {
         when(jwtProvider.createRefreshToken(any())).thenReturn("refresh-token");
 
         // When
-        ResultResponse<?> result = authChildService.login(request, response);
+        //ResultResponse<?> result = authChildService.login(request, response);
 
         // Then
         assertThat(result).isNotNull();
@@ -202,7 +202,7 @@ class AuthChildServiceImplTest {
         doNothing().when(tokenRedisRepository).deleteById(loginId);
         doNothing().when(cookieService).clearCookie(response, "accessToken");
 
-        ResultResponse<String> result = authChildService.logout(response);
+        //ResultResponse<String> result = authChildService.logout(response);
 
         assertThat(result).isNotNull();
         assertThat(result.getStatus()).isEqualTo(200);

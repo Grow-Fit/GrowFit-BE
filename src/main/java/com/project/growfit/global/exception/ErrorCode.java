@@ -21,6 +21,9 @@ public enum ErrorCode {
     USER_REGISTRATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "사용자 등록에 실패했습니다."),
     INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "아이디 또는 비밀번호가 올바르지 않습니다."),
     PASSWORD_UPDATE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "비밀번호 변경에 실패했습니다."),
+    UNAUTHORIZED_CHILD(HttpStatus.UNAUTHORIZED, "로그인된 아이 정보가 없습니다."),
+    ALREADY_LOGGED_OUT(HttpStatus.BAD_REQUEST, "이미 로그아웃된 상태입니다."),
+    WEAK_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호는 영문자와 숫자를 포함해 8자 이상이어야 합니다."),
 
     CHILD_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 등록된 아이입니다."),
     CHILD_NOT_FOUND(HttpStatus.NOT_FOUND, "아이 정보를 찾을 수 없습니다."),

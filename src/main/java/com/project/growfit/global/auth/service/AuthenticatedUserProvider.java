@@ -28,6 +28,9 @@ public class AuthenticatedUserProvider {
 
     public Child getAuthenticatedChild() {
         CustomUserDetails user = getCurrentUser();
+        if (user == null) {
+            throw new BusinessException(ErrorCode.UNAUTHORIZED_CHILD); // 인증되지 않은 사용자
+        }
         return switch (user.getRole()) {
             case "ROLE_CHILD" -> getChildByLoginId(user.getUserId());
             case "ROLE_PARENT" -> {

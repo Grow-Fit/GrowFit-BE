@@ -10,7 +10,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -60,7 +59,8 @@ public class OAuthController {
     @PostMapping("/logout")
     public ResultResponse<String> kakaoLogout(@RequestParam(value = "code", required = false) String code,
                                                         HttpServletResponse response) {
-        return oauthService.kakaoLogout(code, response);
+        String message = oauthService.kakaoLogout(code, response);
+        return ResultResponse.of(ResultCode.LOGOUT_SUCCESS, message);
 
     }
 }
