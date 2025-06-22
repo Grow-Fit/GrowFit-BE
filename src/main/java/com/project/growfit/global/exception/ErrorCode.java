@@ -21,6 +21,9 @@ public enum ErrorCode {
     USER_REGISTRATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "사용자 등록에 실패했습니다."),
     INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "아이디 또는 비밀번호가 올바르지 않습니다."),
     PASSWORD_UPDATE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "비밀번호 변경에 실패했습니다."),
+    UNAUTHORIZED_CHILD(HttpStatus.UNAUTHORIZED, "로그인된 아이 정보가 없습니다."),
+    ALREADY_LOGGED_OUT(HttpStatus.BAD_REQUEST, "이미 로그아웃된 상태입니다."),
+    WEAK_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호는 영문자와 숫자를 포함해 8자 이상이어야 합니다."),
 
     CHILD_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 등록된 아이입니다."),
     CHILD_NOT_FOUND(HttpStatus.NOT_FOUND, "아이 정보를 찾을 수 없습니다."),
@@ -50,7 +53,8 @@ public enum ErrorCode {
     WRONG_TARGET_TYPE(HttpStatus.BAD_REQUEST, "대상 타입이 잘못되었습니다"),
 
     //Diet
-    INVALID_TIME_FORMAT(HttpStatus.BAD_REQUEST, "유효하지 않은 시간 형식입니다."),
+    INVALID_MONTH_FORMAT(HttpStatus.BAD_REQUEST, "조회할 월의 형식이 잘못되었습니다. (yyyy-MM) 형식을 사용해주세요."),
+    INVALID_DATETIME_FORMAT(HttpStatus.BAD_REQUEST, "유효하지 않은 날짜 또는 시간 형식입니다."),
     STICKER_NOT_FOUND(HttpStatus.NOT_FOUND, "등록된 스티커가 존재하지 않습니다."),
     DIET_NOT_FOUND(HttpStatus.NOT_FOUND, "요청한 식단을 찾을 수 없습니다."),
     DAILY_DIET_NOT_FOUND(HttpStatus.NOT_FOUND, "요청한 날짜의 식단 정보가 존재하지 않습니다."),
@@ -63,6 +67,13 @@ public enum ErrorCode {
     DIET_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 등록된 식단입니다."),
     INVALID_DIET_TIME_SLOT(HttpStatus.BAD_REQUEST, "잘못된 식사 시간대입니다."),
     DUPLICATE_MEALTYPE(HttpStatus.CONFLICT, "이미 해당 끼니의 식단이 존재합니다."),
+
+    KEYWORD_TOO_SHORT(HttpStatus.BAD_REQUEST, "검색 키워드는 최소 2자 이상 입력해주세요."),
+    INVALID_FOOD_ID(HttpStatus.BAD_REQUEST, "유효하지 않은 음식 ID입니다."),
+    EMPTY_FOOD_LIST(HttpStatus.BAD_REQUEST, "음식 리스트는 비어 있을 수 없습니다. 음식을 한 개 이상 추가해주세요."),
+    EMPTY_IMAGE_FILE(HttpStatus.BAD_REQUEST, "이미지를 첨부해주세요."),
+    NO_IMAGE_TO_DELETE(HttpStatus.BAD_REQUEST, "삭제할 이미지가 존재하지 않습니다."),
+
     NO_FOOD_FOR_STICKER(HttpStatus.BAD_REQUEST, "음식이 등록되어야 스티커를 남길 수 있습니다.");
     private final HttpStatus status;
     private final String message;

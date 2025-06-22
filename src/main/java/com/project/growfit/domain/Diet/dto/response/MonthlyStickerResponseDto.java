@@ -12,4 +12,8 @@ public record MonthlyStickerResponseDto(
 
         @Schema(description = "날짜별 스티커 정보")
         Map<String, Map<String, Sticker>> monthlyStickers
-) {}
+) {
+        public static MonthlyStickerResponseDto toDto(String childName, Map<String, Map<String, Sticker>> monthlyStickers) {
+                return new MonthlyStickerResponseDto(childName, monthlyStickers);
+        }
+}

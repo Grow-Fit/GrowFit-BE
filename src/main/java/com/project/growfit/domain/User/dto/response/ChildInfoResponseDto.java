@@ -1,7 +1,6 @@
 package com.project.growfit.domain.User.dto.response;
 
 import com.project.growfit.domain.User.entity.Child;
-import com.project.growfit.domain.User.entity.ChildBodyInfo;
 import com.project.growfit.domain.User.entity.ChildGender;
 
 public record ChildInfoResponseDto(

@@ -2,40 +2,43 @@ package com.project.growfit.domain.User.controller;
 
 import com.google.zxing.WriterException;
 import com.project.growfit.domain.User.dto.request.AuthParentRequestDto;
+import com.project.growfit.domain.User.dto.response.ChildInfoResponseDto;
+import com.project.growfit.domain.User.dto.response.ChildQrCodeResponseDto;
 import com.project.growfit.domain.User.service.AuthParentService;
 import com.project.growfit.global.auth.dto.CustomUserDetails;
+import com.project.growfit.global.response.ResultCode;
 import com.project.growfit.global.response.ResultResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+@Validated
 @RestController
 @RequestMapping("/api/parent")
 @RequiredArgsConstructor
-@Tag(name = "Parent Auth API", description = "부모 회원 관련 API")
+@Tag(name = "부모 로그인 및 회원가입 API", description = "부모 회원가입/로그인 관련 API입니다.")
 public class AuthParentController {
 
     private final AuthParentService parentService;
 
     @Operation(summary = "부모 회원가입 시 아이 등록")
     @PostMapping("/child")
-    public ResponseEntity<?> registerChild(@AuthenticationPrincipal CustomUserDetails user,
-                                           @RequestBody AuthParentRequestDto request){
-        ResultResponse<?> resultResponse = parentService.registerChild(user, request);
+    public ResultResponse<ChildInfoResponseDto> registerChild(@Valid @RequestBody AuthParentRequestDto request){
+        ChildInfoResponseDto dto = parentService.registerChild(request);
 
-        return ResponseEntity.status(HttpStatus.OK).body(resultResponse);
+        return ResultResponse.of(ResultCode.SIGNUP_SUCCESS, dto);
     }
 
     @Operation(summary = "아이 QR 코드 생성")
     @GetMapping("/child/qr")
-    public ResponseEntity<?> createQrCode(@AuthenticationPrincipal CustomUserDetails user) throws WriterException {
-        ResultResponse<?> resultResponse = parentService.createQR(user);
+    public ResultResponse<ChildQrCodeResponseDto> createQrCode(@AuthenticationPrincipal CustomUserDetails user) throws WriterException {
+        ChildQrCodeResponseDto dto = parentService.createQR();
 
-        return ResponseEntity.status(HttpStatus.OK).body(resultResponse);
+        return ResultResponse.of(ResultCode.QR_GENERATION_SUCCESS, dto);
 
     }
 }

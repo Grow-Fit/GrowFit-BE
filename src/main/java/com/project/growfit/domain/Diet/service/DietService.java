@@ -3,43 +3,29 @@ package com.project.growfit.domain.Diet.service;
 import com.project.growfit.domain.Diet.dto.request.AddDietRequestDto;
 import com.project.growfit.domain.Diet.dto.request.UpdateDietRequestDto;
 import com.project.growfit.domain.Diet.dto.request.UpdateFoodListRequestDto;
+import com.project.growfit.domain.Diet.dto.response.*;
 import com.project.growfit.domain.Diet.entity.DietState;
 import com.project.growfit.domain.Diet.entity.Sticker;
 import com.project.growfit.global.response.ResultResponse;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 public interface DietService {
 
-    ResultResponse<?> searchFoods(String keyword, int page, int size);
-
-    ResultResponse<?> getFoodDetail(Long foodId);
-
-    ResultResponse<?> addDiet(AddDietRequestDto dto);
-
+    List<FoodResponseDto> searchFoods(String keyword, int page, int size);
+    FoodResponseDto getFoodDetail(Long foodId);
+    DietBasicDto addDiet(AddDietRequestDto dto);
+    DietBasicDto updateDiet(Long dietId, UpdateDietRequestDto dto);
+    DietBasicDto deleteDiet(Long dietId);
+    DietResponseDto getDietDetail(Long dietId);
+    DietBasicDto submitDiet(Long dietId, MultipartFile image, DietState dietState);
+    DietBasicDto deletePhoto(Long dietId);
+    DietBasicDto overrideDietNutrition(Long dietId, UpdateFoodListRequestDto dto);
+    MonthlyStickerResponseDto getMonthlyStickersByParent(String month);
+    DailyDietResponseDto getDailyDietByDate(String date);
+    DailyDietResponseDto markSticker(Long dailyDietId, Sticker sticker);
+    DailyDietResponseDto updateSticker(Long dailyDietId, Sticker sticker);
+    DailyDietResponseDto deleteSticker(Long dailyDietId);
     ResultResponse<?> getDailyDietById(Long dailyId);
-
-    ResultResponse<?> getDailyDietByDate(String date);
-
-    ResultResponse<?> deleteDiet(Long dietId);
-
-    ResultResponse<?> updateDiet(Long dietId, UpdateDietRequestDto dto);
-
-    ResultResponse<?> overrideDietNutrition(Long dietId, UpdateFoodListRequestDto dto);
-
-    ResultResponse<?> markSticker(Long dailyDietId, Sticker sticker);
-
-    ResultResponse<?> getMonthlyStickersByParent(String month);
-
-    ResultResponse<?> uploadPhoto(Long dietId, MultipartFile image);
-    ResultResponse<?> updateDietState(Long dietId, DietState dietState);
-
-    ResultResponse<?> updateDietTime(Long dietId, String newTime);
-
-    ResultResponse<?> getDietDetail(Long dietId);
-
-    ResultResponse<?> deletePhoto(Long dietId);
-
-    ResultResponse<?> deleteSticker(Long dailyDietId);
-
-    ResultResponse<?> updateSticker(Long dailyDietId, Sticker sticker);
 }

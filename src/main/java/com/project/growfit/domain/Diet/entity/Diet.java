@@ -61,9 +61,9 @@ public class Diet extends BaseEntity {
     @Column(nullable = false)
     private double totalFat;
 
-    public static Diet create(String time, MealType mealType, DailyDiet dailyDiet, Child child, @NotBlank(message = "음식을 입력해주세요.") List<Food> foodList) {
+    public static Diet create(LocalTime time, MealType mealType, DailyDiet dailyDiet, Child child, @NotBlank(message = "음식을 입력해주세요.") List<Food> foodList) {
         Diet diet = new Diet();
-        diet.time = LocalTime.parse(time);
+        diet.time = time;
         diet.mealType = mealType;
         diet.dailyDiet = dailyDiet;
         diet.child = child;

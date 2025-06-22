@@ -11,13 +11,12 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/oauth")
 @RequiredArgsConstructor
-@Tag(name = "Social OAuth API", description = "소셜 로그인 관련 API (카카오)")
+@Tag(name = "부모 소셜 로그인 API", description = "부모 소셜 로그인(카카오) 관련 API입니다.")
 public class OAuthController {
 
     @Value("${custom.oauth2.kakao.redirect.new-user}")
@@ -67,7 +66,8 @@ public class OAuthController {
     @PostMapping("/logout")
     public ResultResponse<String> kakaoLogout(@RequestParam(value = "code", required = false) String code,
                                                         HttpServletResponse response) {
-        return oauthService.kakaoLogout(code, response);
+        String message = oauthService.kakaoLogout(code, response);
+        return ResultResponse.of(ResultCode.LOGOUT_SUCCESS, message);
 
     }
 }
