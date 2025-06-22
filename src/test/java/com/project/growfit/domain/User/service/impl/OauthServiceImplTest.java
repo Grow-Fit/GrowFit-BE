@@ -72,10 +72,9 @@ class OauthServiceImplTest {
         when(restTemplate.postForEntity(anyString(), any(), eq(String.class)))
                 .thenReturn(new ResponseEntity<>(HttpStatus.OK));
 
-        //ResultResponse<String> result = oauthService.kakaoLogout("dummyAccessToken", response);
+        String str = oauthService.kakaoLogout("dummyAccessToken", response);
 
-        //assertEquals(HttpStatus.OK.value(), result.getStatus());
-        verify(tokenRedisRepository).deleteById("1");
+        assertEquals(str, "Parent Id [" + parent.getId() + "] 로그아웃 완료");
         verify(cookieService).clearCookie(response, "accessToken");
     }
 
