@@ -13,15 +13,20 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
+@Validated
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/diet")
@@ -32,9 +37,9 @@ public class DietController {
 
     @Operation(summary = "음식 검색", description = "키워드로 음식을 검색합니다.")
     @GetMapping("/food/search")
-    public ResultResponse<List<FoodResponseDto>> searchFoods(@Parameter(description = "검색 키워드", example = "닭") @RequestParam String keyword,
-                                                             @Parameter(description = "페이지 번호", example = "0") @RequestParam(defaultValue = "0") int page,
-                                                             @Parameter(description = "페이지 크기", example = "10") @RequestParam(defaultValue = "10") int size) {
+    public ResultResponse<List<FoodResponseDto>> searchFoods(@Parameter(description = "검색 키워드", example = "닭") @RequestParam @NotBlank(message = "검색 키워드를 입력해주세요.") String keyword,
+                                                             @Parameter(description = "페이지 번호", example = "0") @RequestParam(defaultValue = "0") @Min(0) int page,
+                                                             @Parameter(description = "페이지 크기", example = "10") @RequestParam(defaultValue = "10") @Min(1) int size) {
 
         List<FoodResponseDto> dtos = dietService.searchFoods(keyword, page, size);
 
@@ -84,29 +89,15 @@ public class DietController {
         return ResultResponse.of(ResultCode.DIET_DETAIL_RETRIEVAL_SUCCESS, dto);
     }
 
-    @Operation(summary = "아이 식단 사진 추가", description = "아이가 저장된 식단에 사진을 추가합니다.")
-    @PostMapping(value = "/food/{dietId}/photo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResultResponse<DietBasicDto> uploadDietPhoto(@PathVariable Long dietId,
-                                                        @RequestPart MultipartFile image) {
-        DietBasicDto dto = dietService.uploadPhoto(dietId, image);
+    @Operation(summary = "식단 완료 제출", description = "식단 사진과 식단 상태(MATCH/UNMATCH)를 함께 제출합니다.")
+    @PostMapping(value = "/food/{dietId}/submit", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResultResponse<DietBasicDto> submitDiet(
+            @PathVariable Long dietId,
+            @RequestPart(name = "image", required = false) MultipartFile image,
+            @RequestPart(name = "dietState") DietState dietState) {
 
-        return ResultResponse.of(ResultCode.DIET_ADD_IMAGE_SUCCESS, dto);
-    }
-
-    @Operation(summary = "아이 식단 사진 삭제", description = "아이가 등록한 식단 사진을 삭제합니다.")
-    @DeleteMapping("/food/{dietId}/photo")
-    public ResultResponse<DietBasicDto> deleteDietPhoto(@PathVariable Long dietId) {
-        DietBasicDto dto = dietService.deletePhoto(dietId);
-
-        return ResultResponse.of(ResultCode.CHILD_PHOTO_DELETE_SUCCESS, dto);
-    }
-
-    @Operation(summary = "아이 식단 섭취 여부 등록", description = "식단 섭취 여부(MATCH/UNMATCH)를 등록합니다. 식단을 어길 시 UNMATCH, 식단을 지킬 시 MATCH")
-    @PatchMapping("/food/{dietId}/state")
-    public ResultResponse<DietBasicDto> updateDietState(@PathVariable Long dietId,
-                                             @RequestParam DietState dietState) {
-        DietBasicDto dto = dietService.updateDietState(dietId, dietState);
-        return ResultResponse.of(ResultCode.CHILD_STATE_UPLOAD_SUCCESS, dto);
+        DietBasicDto dto = dietService.submitDiet(dietId, image, dietState);
+        return ResultResponse.of(ResultCode.DIET_SUBMIT_SUCCESS, dto);
     }
 
     @Operation(summary = "식단 불이행 시 영양 정보 직접 입력", description = "아이 식단을 지키지 못한 경우 음식 리스트를 수정합니다.")
@@ -123,8 +114,9 @@ public class DietController {
     public ResultResponse<MonthlyStickerResponseDto> getCalendarOverview(@Parameter(description = "조회할 월 (yyyy-MM)", example = "2025-04")
                                                  @RequestParam("month") String month) {
         MonthlyStickerResponseDto dto = dietService.getMonthlyStickersByParent(month);
-        /* 상태코드 변경 해야함 */
-        return ResultResponse.of(ResultCode.DIET_OVERRIDE_SUCCESS, dto);
+        return dto.monthlyStickers().isEmpty()
+                ? ResultResponse.of(ResultCode.DIET_DATE_EMPTY, dto)
+                : ResultResponse.of(ResultCode.CALENDAR_OVERVIEW_SUCCESS, dto);
     }
 
     @Operation(summary = "날짜별 식단 조회", description = "선택한 날짜의 식단을 조회합니다.")

@@ -14,16 +14,13 @@ import java.util.List;
 public interface DietService {
 
     List<FoodResponseDto> searchFoods(String keyword, int page, int size);
-
     FoodResponseDto getFoodDetail(Long foodId);
-
     DietBasicDto addDiet(AddDietRequestDto dto);
     DietBasicDto updateDiet(Long dietId, UpdateDietRequestDto dto);
     DietBasicDto deleteDiet(Long dietId);
     DietResponseDto getDietDetail(Long dietId);
-    DietBasicDto uploadPhoto(Long dietId, MultipartFile image);
+    DietBasicDto submitDiet(Long dietId, MultipartFile image, DietState dietState);
     DietBasicDto deletePhoto(Long dietId);
-    DietBasicDto updateDietState(Long dietId, DietState dietState);
     DietBasicDto overrideDietNutrition(Long dietId, UpdateFoodListRequestDto dto);
     MonthlyStickerResponseDto getMonthlyStickersByParent(String month);
     DailyDietResponseDto getDailyDietByDate(String date);

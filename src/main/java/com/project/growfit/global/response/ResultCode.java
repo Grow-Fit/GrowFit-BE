@@ -38,19 +38,18 @@ public enum ResultCode {
 
     DIET_ADD_IMAGE_SUCCESS(HttpStatus.OK, "식단 사진이 성공적으로 업로드되었습니다."),
     CHILD_PHOTO_DELETE_SUCCESS(HttpStatus.OK, "식단 사진을 삭제하였습니다."),
-    //DIET_TIME_UPDATE_SUCCESS(HttpStatus.OK, "식단 시간 수정에 성공하였습니다."),
 
     DIET_SET_LIST_SUCCESS(HttpStatus.OK, "식단 세트 목록 조회에 성공하였습니다."),
     DIET_SET_SAVE_SUCCESS(HttpStatus.CREATED, "식단 세트 저장에 성공하였습니다."),
-    //DIET_SET_DETAIL_SUCCESS(HttpStatus.OK, "식단 세트 상세 조회에 성공하였습니다."),
     DIET_SET_RETRIEVAL_SUCCESS(HttpStatus.OK, "식단 세트 조회에 성공했습니다."),
     DIET_SET_DELETE_SUCCESS(HttpStatus.OK, "식단 세트 삭제에 성공했습니다."),
     DIET_SET_EDIT_SUCCESS(HttpStatus.OK, "식단 세트 수정에 성공했습니다." ),
 
+    DIET_SUBMIT_SUCCESS(HttpStatus.OK, "식단 사진과 섭취 여부가 성공적으로 제출되었습니다."),
     DIET_OVERRIDE_SUCCESS(HttpStatus.OK, "식단 불이행 정보 입력에 성공했습니다."),
     CHILD_STATE_UPLOAD_SUCCESS(HttpStatus.OK, "식단 이행 상태 업데이트를 성공했습니다."),
     DIET_FOOD_DELETE_SUCCESS(HttpStatus.OK, "식단에서 음식이 성공적으로 삭제되었습니다."),
-
+    DIET_DATE_EMPTY(HttpStatus.OK, "해당 날짜에 기록된 식단이 없습니다."),
     CALENDAR_OVERVIEW_SUCCESS(HttpStatus.OK, "식단 캘린더 조회에 성공했습니다."),
 
 
