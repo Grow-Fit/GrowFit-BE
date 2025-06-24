@@ -74,7 +74,23 @@ public enum ErrorCode {
     EMPTY_IMAGE_FILE(HttpStatus.BAD_REQUEST, "이미지를 첨부해주세요."),
     NO_IMAGE_TO_DELETE(HttpStatus.BAD_REQUEST, "삭제할 이미지가 존재하지 않습니다."),
 
-    NO_FOOD_FOR_STICKER(HttpStatus.BAD_REQUEST, "음식이 등록되어야 스티커를 남길 수 있습니다.");
+    NO_FOOD_FOR_STICKER(HttpStatus.BAD_REQUEST, "음식이 등록되어야 스티커를 남길 수 있습니다."),
+
+    // Goal
+
+    //Letter
+    NOT_COMPLETED_ALL_GOALS(HttpStatus.BAD_REQUEST, "아직 완료되지 않은 목표가 있습니다."),
+    LETTER_ALREADY_SENT(HttpStatus.BAD_REQUEST, "해당 주간 목표에는 이미 편지가 작성되었습니다."),
+    NOT_FOUND_LETTER(HttpStatus.NOT_FOUND, "편지를 찾을 수 없습니다."),
+
+    // 주간 목표 관련
+    DUPLICATE_WEEKLY_GOAL(HttpStatus.BAD_REQUEST, "해당 기간에 이미 주간 목표가 존재합니다."),
+    NOT_FOUND_WEEKLY_GOAL(HttpStatus.NOT_FOUND, "해당 날짜에 해당하는 주간 목표가 존재하지 않습니다."),
+    NOT_FOUND_GOAL(HttpStatus.NOT_FOUND, "해당 목표를 찾을 수 없습니다."),
+    CERTIFICATION_NOT_ALLOWED_DATE(HttpStatus.BAD_REQUEST, "해당 날짜에는 인증이 불가능합니다."),
+    ALREADY_CERTIFIED_TODAY(HttpStatus.BAD_REQUEST, "오늘은 이미 목표를 인증했습니다."),
+    CANNOT_UPDATE_CERTIFIED_GOAL(HttpStatus.BAD_REQUEST, "이미 인증이 시작된 목표는 수정할 수 없습니다.");
+
     private final HttpStatus status;
     private final String message;
 }

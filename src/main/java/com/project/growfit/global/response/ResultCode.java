@@ -52,6 +52,17 @@ public enum ResultCode {
     DIET_DATE_EMPTY(HttpStatus.OK, "해당 날짜에 기록된 식단이 없습니다."),
     CALENDAR_OVERVIEW_SUCCESS(HttpStatus.OK, "식단 캘린더 조회에 성공했습니다."),
 
+    // Goal
+    WEEKLY_GOAL_CREATE_SUCCESS(HttpStatus.CREATED, "주간 목표가 성공적으로 생성되었습니다."),
+    GOAL_UPDATE_SUCCESS(HttpStatus.OK, "목표가 성공적으로 수정되었습니다."),
+    WEEKLY_GOAL_FETCH_SUCCESS(HttpStatus.OK, "주간 목표 조회에 성공했습니다."),
+    GOAL_CERTIFICATION_SUCCESS(HttpStatus.CREATED, "목표 인증이 성공적으로 완료되었습니다."),
+    CERTIFICATION_LIST_FETCH_SUCCESS(HttpStatus.OK, "인증샷 목록 조회에 성공했습니다."),
+
+    // Letter
+    LETTER_CREATE_SUCCESS(HttpStatus.CREATED, "편지가 성공적으로 작성되었습니다."),
+    LETTER_FETCH_SUCCESS(HttpStatus.OK, "편지를 성공적으로 조회했습니다."),
+    LETTER_LIST_FETCH_SUCCESS(HttpStatus.OK, "모든 편지를 성공적으로 조회했습니다."),
 
     // Community
     CREATE_POST_SUCCESS(HttpStatus.OK, "글 등록 성공."),
