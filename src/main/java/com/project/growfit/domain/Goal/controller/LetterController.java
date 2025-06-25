@@ -7,8 +7,10 @@ import com.project.growfit.domain.Goal.service.LetterService;
 import com.project.growfit.global.response.ResultCode;
 import com.project.growfit.global.response.ResultResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,15 +35,16 @@ public class LetterController {
 
     @GetMapping("/{weeklyGoalId}")
     @Operation(summary = "편지 조회", description = "아이 또는 부모가 주간 목표에 작성된 편지를 조회합니다.")
-    public ResultResponse<LetterBasicResponseDto> getLetter(@PathVariable Long weeklyGoalId) {
-        LetterBasicResponseDto dto = letterService.getLetterByWeeklyGoalId(weeklyGoalId);
+    public ResultResponse<LetterResponseDto> getLetter(@PathVariable Long weeklyGoalId) {
+        LetterResponseDto dto = letterService.getLetterByWeeklyGoalId(weeklyGoalId);
         return ResultResponse.of(ResultCode.LETTER_FETCH_SUCCESS, dto);
     }
 
-    @GetMapping()
+    @GetMapping
     @Operation(summary = "모든 편지 페이징 조회", description = "부모가 지금까지 작성한 모든 편지를 페이징으로 조회합니다.")
-    public ResultResponse<Page<LetterResponseDto> > getAllLetters(@PageableDefault Pageable pageable) {
-        Page<LetterResponseDto>  dto = letterService.getAllLetters(pageable);
+    public ResultResponse<Page<LetterBasicResponseDto> > getAllLetters(@Parameter(description = "페이지 번호", example = "0") @RequestParam(defaultValue = "0") @Min(0) int page,
+                                                                  @Parameter(description = "페이지 크기", example = "10") @RequestParam(defaultValue = "10") @Min(1) int size){
+    Page<LetterBasicResponseDto>  dto = letterService.getAllLetters(page, size);
         return ResultResponse.of(ResultCode.LETTER_LIST_FETCH_SUCCESS, dto);
     }
 }

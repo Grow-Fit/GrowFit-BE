@@ -8,6 +8,6 @@ import org.springframework.data.domain.Pageable;
 
 public interface LetterService {
     LetterBasicResponseDto createLetter(Long weeklyGoalId, LetterRequestDto request);
-    LetterBasicResponseDto getLetterByWeeklyGoalId(Long weeklyGoalId);
-    Page<LetterResponseDto>  getAllLetters(Pageable pageable);
+    LetterResponseDto getLetterByWeeklyGoalId(Long weeklyGoalId);
+    Page<LetterBasicResponseDto> getAllLetters(int page, int size);
 }

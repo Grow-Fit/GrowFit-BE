@@ -15,6 +15,7 @@ import com.project.growfit.global.exception.BusinessException;
 import com.project.growfit.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,20 +45,23 @@ public class LetterServiceImpl implements LetterService {
     }
 
     @Override
-    public LetterBasicResponseDto getLetterByWeeklyGoalId(Long weeklyGoalId) {
+    @Transactional(readOnly = true)
+    public LetterResponseDto getLetterByWeeklyGoalId(Long weeklyGoalId) {
         WeeklyGoal weeklyGoal = getWeeklyGoalOrThrow(weeklyGoalId);
 
         Letter letter = letterRepository.findByWeeklyGoal(weeklyGoal)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_LETTER));
 
-        return LetterBasicResponseDto.toDto(letter);
+        return LetterResponseDto.toDto(letter);
     }
 
     @Override
-    public Page<LetterResponseDto> getAllLetters(Pageable pageable) {
+    @Transactional(readOnly = true)
+    public Page<LetterBasicResponseDto> getAllLetters(int page, int size) {
         Long parentId = auth.getAuthenticatedParent().getId();
+        Pageable pageable = PageRequest.of(page, size);
         return letterRepository.findAllByWeeklyGoal_Parent_Id(parentId, pageable)
-                .map(LetterResponseDto::toDto);
+                .map(LetterBasicResponseDto::toDto);
     }
 
     private WeeklyGoal getWeeklyGoalOrThrow(Long weeklyGoalId) {

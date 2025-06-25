@@ -2,10 +2,8 @@ package com.project.growfit.domain.Goal.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -26,9 +24,9 @@ public record CreateWeeklyGoalRequestDto(
         @Schema(description = "목표 달성 설정 갯수", example = "2")
         int certificationCount,
 
-        @NotEmpty
-        @Min(value = 1, message = "목표는 최소 1개 이상이어야 합니다.")
-        @Max(value = 10, message = "목표는 최대 10개까지 설정 가능합니다.")
+        @Valid
+        @Size(min = 1, max = 10, message = "목표는 최소 1개 이상, 최대 10개까지 설정 가능합니다.")
+        @NotEmpty(message = "목표 목록은 비어 있을 수 없습니다.")
         @Schema(description = "목표 목록")
         List<GoalItem> goals
 ) {
