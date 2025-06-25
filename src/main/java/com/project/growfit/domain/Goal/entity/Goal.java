@@ -47,4 +47,32 @@ public class Goal extends BaseEntity {
 
     @OneToMany(mappedBy = "goal", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Certification> certificationList = new ArrayList<>();
+
+    public static Goal create(String name, int iconId, WeeklyGoal weeklyGoal) {
+        Goal goal = new Goal();
+        goal.name = name;
+        goal.iconId = iconId;
+        goal.status = GoalStatus.PENDING;
+        goal.weeklyGoal = weeklyGoal;
+        return goal;
+    }
+    public void addCertification(Certification certification) {
+        this.certificationList.add(certification);
+        certification.assignToGoal(this); // 양방향 연관관계 설정
+        updateStatusByCertificationCount();
+    }
+
+    private void updateStatusByCertificationCount() {
+        int currentCount = this.certificationList.size();
+        int requiredCount = this.weeklyGoal.getCertificationCount();
+        if (currentCount == requiredCount) {
+            this.status = GoalStatus.COMPLETE;
+        } else {
+            this.status = GoalStatus.PROGRESS;
+        }
+    }
+
+    public void updateTitle(String title) {
+        this.name = title;
+    }
 }
