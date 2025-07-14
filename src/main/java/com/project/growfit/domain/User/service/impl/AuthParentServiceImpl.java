@@ -65,7 +65,7 @@ public class AuthParentServiceImpl implements AuthParentService {
         int height = 200;
         String uniqueCode = UUID.randomUUID().toString();
 
-        Child child = authenticatedProvider.getAuthenticatedChild();
+        Child child = authenticatedProvider.getAuthenticatedChildForRegistration();
         Long id = child.getId();
 
         log.info("[createQR] QR 코드 생성 요청: user_id={}", parent.getId());
