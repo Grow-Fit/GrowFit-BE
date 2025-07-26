@@ -1,8 +1,9 @@
 package com.project.growfit.domain.auth.controller;
 
+import com.project.growfit.domain.User.dto.response.ChildInfoResponseDto;
+import com.project.growfit.domain.auth.dto.request.AuthChildRegisterRequestDto;
 import com.project.growfit.domain.auth.dto.request.AuthChildRequestDto;
 import com.project.growfit.domain.auth.dto.request.FindChildPasswordRequestDto;
-import com.project.growfit.domain.User.dto.response.ChildInfoResponseDto;
 import com.project.growfit.domain.auth.dto.response.ChildResponseDto;
 import com.project.growfit.domain.auth.service.AuthChildService;
 import com.project.growfit.global.response.ResultCode;
@@ -36,7 +37,7 @@ public class AuthChildController {
     @Operation(summary = "아이 회원가입 시 아이디 & 비밀번호 & 닉네임 등록")
     @PostMapping("/register/{child_id}/credentials")
     public ResultResponse<ChildInfoResponseDto> registerChildCredentials(@PathVariable Long child_id,
-                                                                         @Valid @RequestBody AuthChildRequestDto request) {
+                                                                         @Valid @RequestBody AuthChildRegisterRequestDto request) {
         ChildInfoResponseDto dto = authChildService.registerChildCredentials(child_id, request);
 
         return ResultResponse.of(ResultCode.INFO_REGISTRATION_SUCCESS, dto);
@@ -56,6 +57,12 @@ public class AuthChildController {
         ChildResponseDto dto = authChildService.logout(response);
 
         return ResultResponse.of(ResultCode.LOGOUT_SUCCESS, dto);
+    }
+
+    @GetMapping("/check-id")
+    public ResultResponse<String> checkDuplicateLoginId(@RequestParam String loginId) {
+        String result = authChildService.isLoginIdDuplicate(loginId);
+        return ResultResponse.of(ResultCode.DUPLICATE_SUCCESS, result);
     }
 
     @Operation(summary = "아이 인증코드로 ID 찾기")

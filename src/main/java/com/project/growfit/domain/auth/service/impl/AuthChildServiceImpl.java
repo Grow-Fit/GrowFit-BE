@@ -1,5 +1,6 @@
 package com.project.growfit.domain.auth.service.impl;
 
+import com.project.growfit.domain.auth.dto.request.AuthChildRegisterRequestDto;
 import com.project.growfit.domain.auth.dto.request.AuthChildRequestDto;
 import com.project.growfit.domain.auth.dto.request.FindChildPasswordRequestDto;
 import com.project.growfit.domain.User.dto.response.ChildInfoResponseDto;
@@ -46,11 +47,9 @@ public class AuthChildServiceImpl implements AuthChildService {
 
     @Override
     @Transactional
-    public ChildInfoResponseDto registerChildCredentials(Long child_id, AuthChildRequestDto request) {
+    public ChildInfoResponseDto registerChildCredentials(Long child_id, AuthChildRegisterRequestDto request) {
         log.debug("[registerChildCredentials] 아이 계정 정보 등록 요청: child_id={}, child_login_id={}", child_id, request.childId());
-        if (childRepository.existsByLoginId(request.childId())) {
-            throw new BusinessException(ErrorCode.CHILD_ALREADY_EXISTS);
-        }
+        if (childRepository.existsByLoginId(request.childId())) throw new BusinessException(ErrorCode.DUPLICATED_ID);
         validatePasswordStrength(request.childPassword());
         Child child = getChild(child_id);
 
@@ -132,6 +131,13 @@ public class AuthChildServiceImpl implements AuthChildService {
         log.info("[findChildPassword] 비밀번호 변경 완료: user_id={}", request.user_id());
 
         return ChildInfoResponseDto.toDto(child);
+    }
+
+    @Override
+    @Transactional
+    public String isLoginIdDuplicate(String loginId) {
+        boolean isLoginDuplicate = childRepository.existsByLoginId(loginId);
+        return isLoginDuplicate ? "이미 사용 중인 아이디입니다." : "사용 가능한 아이디입니다.";
     }
 
     private Child getChild(Long child_id) {
