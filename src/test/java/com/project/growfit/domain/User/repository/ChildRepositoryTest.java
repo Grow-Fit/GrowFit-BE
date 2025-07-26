@@ -28,16 +28,17 @@ public class ChildRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        // 부모 저장
+        childRepository.deleteAll();
+        parentRepository.deleteAll();
+
         Parent parent = new Parent("parent@test.com", "부모", null, "kakao", "pid", ROLE.ROLE_PARENT);
         savedParent = parentRepository.save(parent);
 
         Child child = new Child("child123", "김아이", ChildGender.MALE, 10, 120, 50, "password123", ROLE.ROLE_CHILD);
-        savedParent.addChild(child); // 연관관계 설정
+        savedParent.addChild(child);
         savedChild = childRepository.save(child);
-        child.updateCode("codeXYZ");
+        savedChild.updateCode("codeXYZ");
     }
-
 
     @Test
     @DisplayName("[findByChildId 성공 테스트] 존재하는 Child 엔티티 반환")
