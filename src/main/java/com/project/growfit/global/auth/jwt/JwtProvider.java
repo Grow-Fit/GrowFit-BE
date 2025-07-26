@@ -78,6 +78,19 @@ public class JwtProvider {
         return jwt;
     }
 
+    public void regenerateToken(String previousEmail, String newEmail, String role, String loginType, HttpServletResponse response
+    ) {
+        String newAccessToken = createAccessToken(newEmail, role, loginType);
+        String newRefreshToken = createRefreshToken(newEmail);
+
+        tokenRedisRepository.deleteById(previousEmail);
+        tokenRedisRepository.save(new TokenRedis(newEmail, newAccessToken, newRefreshToken));
+
+        cookieService.saveAccessTokenToCookie(response, newAccessToken);
+
+        log.info("[regenerateToken] 이메일 변경으로 인해 토큰 재발급 및 저장 완료 (old: {}, new: {})", previousEmail, newEmail);
+    }
+
     public String getUserId(String token) {
         try {
             String userId = Jwts.parser().setSigningKey(secretKey).build()

@@ -108,7 +108,6 @@ public class Child extends BaseEntity {
 
     public void addRegister(Parent parent) {this.parent = parent;}
     public void updateCode(String code) {this.codeNumber = code;}
-    public void updateNickname(String nickname){this.nickname = nickname;}
     public void updatePassword(String password){
         this.password = password;}
 
@@ -119,7 +118,15 @@ public class Child extends BaseEntity {
     }
 
     public ChildBodyInfo getLatestBodyInfo() {
-        return bodyInfoList.isEmpty() ? null : bodyInfoList.get(0);
+        return bodyInfoList.isEmpty() ? null : bodyInfoList.getLast();
+    }
+
+    public void updateInfo(int age, ChildGender gender, String name, String nickname, long height, long weight) {
+        this.age = age;
+        this.gender = gender;
+        if (name != null) this.name = name;
+        if (nickname != null) this.nickname = nickname;
+        this.bodyInfoList.add(new ChildBodyInfo(height, weight, this));
     }
 
 }

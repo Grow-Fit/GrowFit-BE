@@ -1,18 +1,18 @@
-package com.project.growfit.domain.User.service.impl;
+package com.project.growfit.domain.auth.service.impl;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
-import com.project.growfit.domain.User.dto.request.AuthParentRequestDto;
+import com.project.growfit.domain.auth.dto.request.AuthParentRequestDto;
 import com.project.growfit.domain.User.dto.response.ChildInfoResponseDto;
-import com.project.growfit.domain.User.dto.response.ChildQrCodeResponseDto;
+import com.project.growfit.domain.auth.dto.response.ChildQrCodeResponseDto;
 import com.project.growfit.domain.User.entity.Child;
 import com.project.growfit.domain.User.entity.Parent;
 import com.project.growfit.domain.User.entity.ROLE;
 import com.project.growfit.domain.User.repository.ChildRepository;
-import com.project.growfit.domain.User.service.AuthParentService;
+import com.project.growfit.domain.auth.service.AuthParentService;
 import com.project.growfit.global.auth.service.AuthenticatedUserProvider;
 import com.project.growfit.global.exception.BusinessException;
 import com.project.growfit.global.exception.ErrorCode;
@@ -107,6 +107,6 @@ public class AuthParentServiceImpl implements AuthParentService {
                 ROLE.fromString("CHILD"));
     }
     private static void updateNickname(AuthParentRequestDto request, Parent parent) {
-        parent.updateNickname(request.nickname());
+        parent.updateInfo(request.nickname());
     }
 }

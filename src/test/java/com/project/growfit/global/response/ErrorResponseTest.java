@@ -23,7 +23,7 @@ class ErrorResponseTest {
 
         // then
         assertThat(response.getStatus()).isEqualTo(500);
-        assertThat(response.getMessage()).isEqualTo("internal server error");
+        assertThat(response.getMessage()).isEqualTo("서버 내부 오류가 발생했습니다.");
         assertThat(response.getErrors()).isEmpty();
     }
 
@@ -42,7 +42,7 @@ class ErrorResponseTest {
 
         // then
         assertThat(response.getStatus()).isEqualTo(400);
-        assertThat(response.getMessage()).isEqualTo("invalid input type");
+        assertThat(response.getMessage()).isEqualTo("잘못된 입력 값입니다.");
         assertThat(response.getErrors()).hasSize(2);
         assertThat(response.getErrors().get(0).getField()).isEqualTo("field1");
         assertThat(response.getErrors().get(0).getValue()).isEqualTo("value1");
@@ -63,7 +63,7 @@ class ErrorResponseTest {
 
         // then
         assertThat(response.getStatus()).isEqualTo(400);
-        assertThat(response.getMessage()).isEqualTo("invalid type value");
+        assertThat(response.getMessage()).isEqualTo("잘못된 타입 값입니다.");
         assertThat(response.getErrors()).isNotEmpty();
     }
 }

@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.growfit.domain.User.entity.Parent;
 import com.project.growfit.domain.User.entity.ROLE;
 import com.project.growfit.domain.User.repository.ParentRepository;
-import com.project.growfit.domain.User.service.AuthParentService;
+import com.project.growfit.domain.auth.service.AuthParentService;
 import com.project.growfit.global.auth.dto.CustomUserDetails;
 import com.project.growfit.global.config.SecurityConfig;
 import org.junit.jupiter.api.BeforeEach;

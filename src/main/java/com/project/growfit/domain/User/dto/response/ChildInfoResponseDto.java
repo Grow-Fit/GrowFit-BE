@@ -10,7 +10,6 @@ public record ChildInfoResponseDto(
         ChildGender child_gender,
         int child_age,
         ChildBodyInfoResponseDto child_BodyInfo
-
 ) {
     public static ChildInfoResponseDto toDto(Child child) {
         return new ChildInfoResponseDto(

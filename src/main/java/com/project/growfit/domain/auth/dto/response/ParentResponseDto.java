@@ -1,4 +1,4 @@
-package com.project.growfit.domain.User.dto.response;
+package com.project.growfit.domain.auth.dto.response;
 
 
 import com.project.growfit.domain.User.entity.Parent;
