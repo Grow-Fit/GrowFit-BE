@@ -1,6 +1,6 @@
 package com.project.growfit.domain.User.controller;
 
-import com.project.growfit.domain.User.dto.response.ParentLoginResponseDto;
+import com.project.growfit.domain.auth.dto.response.ParentLoginResponseDto;
 import com.project.growfit.global.auth.cookie.CookieService;
 import com.project.growfit.global.auth.jwt.JwtProvider;
 import com.project.growfit.global.redis.entity.TokenRedis;
