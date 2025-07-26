@@ -10,13 +10,17 @@ import com.project.growfit.domain.User.entity.Parent;
 import com.project.growfit.domain.User.entity.ROLE;
 import com.project.growfit.global.auth.jwt.JwtProvider;
 import com.project.growfit.global.auth.service.AuthenticatedUserProvider;
+import com.project.growfit.global.s3.service.S3UploadService;
+import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.web.multipart.MultipartFile;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -28,6 +32,9 @@ public class UserServiceImplTest {
 
     @Mock
     private AuthenticatedUserProvider userProvider;
+
+    @Mock
+    private S3UploadService s3UploadService;
 
     @Mock
     private JwtProvider jwtProvider;
@@ -75,11 +82,15 @@ public class UserServiceImplTest {
     @DisplayName("부모 정보 수정 - 이메일 변경 포함")
     void testUpdateParentInfo_withEmailChange() {
         when(userProvider.getAuthenticatedParent()).thenReturn(mockParent);
+        when(s3UploadService.saveFile(any(MultipartFile.class), anyString()))
+                .thenReturn("https://s3.com/profile.jpg");
+
         ParentInfoRequestDto request = new ParentInfoRequestDto(
                 "새엄마", "new@example.com", "지우", 11, ChildGender.FEMALE, 135, 32
         );
+        MultipartFile mockImage = new MockMultipartFile("image", "test.jpg", "image/jpeg", "dummy".getBytes());
 
-        userService.updateParentInfo(request, response);
+        userService.updateParentInfo(request, mockImage, response);
 
         verify(jwtProvider).regenerateToken(
                 eq("parent@example.com"),

@@ -14,14 +14,13 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -75,10 +74,27 @@ public class UserControllerTest {
         ParentInfoRequestDto requestDto = new ParentInfoRequestDto(
                 "새엄마", "new@example.com", "민준", 12, ChildGender.MALE, 140, 35
         );
+        MockMultipartFile infoPart = new MockMultipartFile(
+                "info",
+                "info.json",
+                MediaType.APPLICATION_JSON_VALUE,
+                objectMapper.writeValueAsBytes(requestDto)
+        );
 
-        mockMvc.perform(put("/api/parent")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requestDto)))
+        MockMultipartFile imagePart = new MockMultipartFile(
+                "image",
+                "profile.jpg",
+                MediaType.IMAGE_JPEG_VALUE,
+                "dummy-image-data".getBytes()
+        );
+
+        mockMvc.perform(multipart("/api/parent")
+                        .file(infoPart)
+                        .file(imagePart)
+                        .with(request -> {
+                            request.setMethod("PUT");
+                            return request;
+                        }))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("성공적으로 정보가 수정되었습니다."));
     }
@@ -87,7 +103,7 @@ public class UserControllerTest {
     @DisplayName("아이 정보 수정 API")
     void updateChildInfoTest() throws Exception {
         ChildInfoRequestDto requestDto = new ChildInfoRequestDto(
-                "짱이", "newpw123!", ChildGender.FEMALE, 13, 150L, 45L
+                "짱이", "newpw1233", ChildGender.FEMALE, 13, 150L, 45L
         );
 
         mockMvc.perform(put("/api/child")
