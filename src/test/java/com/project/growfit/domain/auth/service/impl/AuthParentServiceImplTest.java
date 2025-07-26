@@ -1,8 +1,8 @@
-package com.project.growfit.domain.User.service.impl;
+package com.project.growfit.domain.auth.service.impl;
 
-import com.project.growfit.domain.User.dto.request.AuthParentRequestDto;
+import com.project.growfit.domain.auth.dto.request.AuthParentRequestDto;
 import com.project.growfit.domain.User.dto.response.ChildInfoResponseDto;
-import com.project.growfit.domain.User.dto.response.ChildQrCodeResponseDto;
+import com.project.growfit.domain.auth.dto.response.ChildQrCodeResponseDto;
 import com.project.growfit.domain.User.entity.Child;
 import com.project.growfit.domain.User.entity.Parent;
 import com.project.growfit.domain.User.entity.ROLE;
@@ -19,8 +19,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.Optional;
 
 import static com.project.growfit.domain.User.entity.ChildGender.MALE;
 import static org.assertj.core.api.Assertions.assertThat;

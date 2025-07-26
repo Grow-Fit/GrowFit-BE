@@ -1,8 +1,8 @@
 /*
 package com.project.growfit.domain.auth.controller;
 
-import com.project.growfit.domain.User.controller.OAuthController;
-import com.project.growfit.domain.User.service.OauthService;
+import com.project.growfit.domain.auth.controller.OAuthController;
+import com.project.growfit.domain.auth.service.OauthService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

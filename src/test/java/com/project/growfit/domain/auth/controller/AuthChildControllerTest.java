@@ -2,10 +2,10 @@
 package com.project.growfit.domain.auth.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.project.growfit.domain.User.controller.AuthChildController;
-import com.project.growfit.domain.User.dto.request.AuthChildRequestDto;
-import com.project.growfit.domain.User.service.AuthChildService;
-import com.project.growfit.domain.User.service.impl.AuthChildServiceImpl;
+import com.project.growfit.domain.auth.controller.AuthChildController;
+import com.project.growfit.domain.auth.dto.request.AuthChildRequestDto;
+import com.project.growfit.domain.auth.service.AuthChildService;
+import com.project.growfit.domain.auth.service.impl.AuthChildServiceImpl;
 import com.project.growfit.global.response.ResultCode;
 import com.project.growfit.global.response.ResultResponse;
 import jakarta.servlet.http.HttpServletResponse;

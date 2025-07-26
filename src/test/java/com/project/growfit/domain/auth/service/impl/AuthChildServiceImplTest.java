@@ -1,9 +1,9 @@
-package com.project.growfit.domain.User.service.impl;
+package com.project.growfit.domain.auth.service.impl;
 
-import com.project.growfit.domain.User.dto.request.AuthChildRequestDto;
-import com.project.growfit.domain.User.dto.request.FindChildPasswordRequestDto;
+import com.project.growfit.domain.auth.dto.request.AuthChildRequestDto;
+import com.project.growfit.domain.auth.dto.request.FindChildPasswordRequestDto;
 import com.project.growfit.domain.User.dto.response.ChildInfoResponseDto;
-import com.project.growfit.domain.User.dto.response.ChildResponseDto;
+import com.project.growfit.domain.auth.dto.response.ChildResponseDto;
 import com.project.growfit.domain.User.entity.Child;
 import com.project.growfit.domain.User.entity.ROLE;
 import com.project.growfit.domain.User.repository.ChildRepository;
@@ -15,8 +15,6 @@ import com.project.growfit.global.exception.BusinessException;
 import com.project.growfit.global.exception.ErrorCode;
 import com.project.growfit.global.redis.entity.TokenRedis;
 import com.project.growfit.global.redis.repository.TokenRedisRepository;
-import com.project.growfit.global.response.ResultCode;
-import com.project.growfit.global.response.ResultResponse;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

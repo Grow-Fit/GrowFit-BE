@@ -1,7 +1,7 @@
-package com.project.growfit.domain.User.service.impl;
+package com.project.growfit.domain.auth.service.impl;
 
-import com.project.growfit.domain.User.dto.request.ParentOAuthRequestDto;
-import com.project.growfit.domain.User.dto.response.ParentResponseDto;
+import com.project.growfit.domain.auth.dto.request.ParentOAuthRequestDto;
+import com.project.growfit.domain.auth.dto.response.ParentResponseDto;
 import com.project.growfit.domain.User.entity.Parent;
 import com.project.growfit.domain.User.entity.ROLE;
 import com.project.growfit.domain.User.repository.ParentRepository;
