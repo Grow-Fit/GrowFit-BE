@@ -3,8 +3,7 @@ package com.project.growfit.domain.auth.dto.request;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 
-public record AuthChildRequestDto(
-
+public record AuthChildRegisterRequestDto(
         @Schema(description = "아이 로그인 ID", example = "child123")
         @NotBlank(message = "아이디를 입력해주세요.")
         @Size(min = 4, max = 20, message = "아이디는 4자 이상 20자 이하로 입력해주세요.")
