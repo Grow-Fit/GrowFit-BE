@@ -89,8 +89,13 @@ public class Parent extends BaseEntity {
                 .anyMatch(child -> child.getName().equals(childName));
     }
 
-    public void updateNickname(String nickname){
+    public void updateInfo(String nickname){
         this.nickname = nickname;
+    }
+
+    public void updateInfo(String nickname, String profile){
+        this.nickname = nickname;
+        this.photo = profile;
     }
 
     public void updateEmail(String email){

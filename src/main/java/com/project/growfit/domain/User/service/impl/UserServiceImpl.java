@@ -5,27 +5,30 @@ import com.project.growfit.domain.User.dto.request.ParentInfoRequestDto;
 import com.project.growfit.domain.User.dto.response.ChildInfoResponseDto;
 import com.project.growfit.domain.User.dto.response.ParentInfoResponseDto;
 import com.project.growfit.domain.User.entity.Child;
-import com.project.growfit.domain.User.entity.ChildGender;
 import com.project.growfit.domain.User.entity.Parent;
 import com.project.growfit.domain.User.service.UserService;
-import com.project.growfit.global.auth.cookie.CookieService;
 import com.project.growfit.global.auth.jwt.JwtProvider;
 import com.project.growfit.global.auth.service.AuthenticatedUserProvider;
+import com.project.growfit.global.exception.BusinessException;
+import com.project.growfit.global.exception.ErrorCode;
+import com.project.growfit.global.s3.service.S3UploadService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final AuthenticatedUserProvider userProvider;
+    private final S3UploadService s3UploadService;
     private final JwtProvider jwtProvider;
     private final PasswordEncoder passwordEncoder;
+
+    private String imageUploadPath = "user/";
 
     @Override
     @Transactional(readOnly = true)
@@ -44,13 +47,20 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void updateParentInfo(ParentInfoRequestDto request, HttpServletResponse response) {
+    public void updateParentInfo(ParentInfoRequestDto request, MultipartFile image, HttpServletResponse response) {
         Parent parent = userProvider.getAuthenticatedParent();
+
+        if (image == null || image.isEmpty()) throw new BusinessException(ErrorCode.EMPTY_IMAGE_FILE);
+        String imageUrl;
+        try {
+            imageUrl = s3UploadService.saveFile(image, imageUploadPath);
+        } catch (Exception e) {
+            throw new BusinessException(ErrorCode.FILE_UPLOAD_ERROR);
+        }
 
         boolean isEmailChanged = !parent.getEmail().equals(request.email());
         String oldEmail = parent.getEmail();
-        parent.updateNickname(request.nickname());
-
+        parent.updateInfo(request.nickname(), imageUrl);
         if (isEmailChanged) parent.updateEmail(request.email());
 
         Child child = parent.getChildren().get(0);
