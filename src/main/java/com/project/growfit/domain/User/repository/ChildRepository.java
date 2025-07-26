@@ -2,6 +2,7 @@ package com.project.growfit.domain.User.repository;
 
 import com.project.growfit.domain.User.entity.Child;
 import com.project.growfit.domain.User.entity.Parent;
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -18,4 +19,6 @@ public interface ChildRepository extends JpaRepository<Child, Long> {
 
     boolean existsByCodeNumberAndLoginId(String code, String login_id);
     boolean existsByCodeNumber(String code);
+
+    List<Child> findAllByParentOrderByCreatedAtDesc(Parent parent);
 }
