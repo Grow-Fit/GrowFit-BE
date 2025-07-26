@@ -93,6 +93,10 @@ public class Parent extends BaseEntity {
         this.nickname = nickname;
     }
 
+    public void updateEmail(String email){
+        this.email = email;
+    }
+
     public void addChild(Child child) {
         this.children.add(child);
         child.addRegister(this);
