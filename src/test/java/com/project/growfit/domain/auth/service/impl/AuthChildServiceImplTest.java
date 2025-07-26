@@ -1,12 +1,13 @@
 package com.project.growfit.domain.auth.service.impl;
 
-import com.project.growfit.domain.auth.dto.request.AuthChildRequestDto;
-import com.project.growfit.domain.auth.dto.request.FindChildPasswordRequestDto;
 import com.project.growfit.domain.User.dto.response.ChildInfoResponseDto;
-import com.project.growfit.domain.auth.dto.response.ChildResponseDto;
 import com.project.growfit.domain.User.entity.Child;
 import com.project.growfit.domain.User.entity.ROLE;
 import com.project.growfit.domain.User.repository.ChildRepository;
+import com.project.growfit.domain.auth.dto.request.AuthChildRegisterRequestDto;
+import com.project.growfit.domain.auth.dto.request.AuthChildRequestDto;
+import com.project.growfit.domain.auth.dto.request.FindChildPasswordRequestDto;
+import com.project.growfit.domain.auth.dto.response.ChildResponseDto;
 import com.project.growfit.global.auth.cookie.CookieService;
 import com.project.growfit.global.auth.jwt.JwtProvider;
 import com.project.growfit.global.auth.service.AuthenticatedUserProvider;
@@ -109,7 +110,7 @@ class AuthChildServiceImplTest {
     void 아이_계졍을_성공적으로_등록한다() {
         // Given
         Long childId = 1L;
-        AuthChildRequestDto request = new AuthChildRequestDto(loginId, password, nickname);
+        AuthChildRegisterRequestDto request = new AuthChildRegisterRequestDto(loginId, password, nickname);
         when(childRepository.findById(childId)).thenReturn(Optional.of(mockChild));
         when(passwordEncoder.encode(request.childPassword())).thenReturn("encodedPassword");
 
@@ -126,7 +127,7 @@ class AuthChildServiceImplTest {
     void 아이_정보가_없는_경우_아이_등록에_실패한다() {
         // Given
         Long childId = 999L;
-        AuthChildRequestDto request = new AuthChildRequestDto(loginId, password, nickname);
+        AuthChildRegisterRequestDto  request = new  AuthChildRegisterRequestDto (loginId, password,  nickname);
         when(childRepository.findById(childId)).thenReturn(Optional.empty());
 
         // When & Then
@@ -175,7 +176,7 @@ class AuthChildServiceImplTest {
     @DisplayName("[login 성공 테스트] 아이 로그인 성공")
     void 아이_로그인에_성공한다() {
         // Given
-        AuthChildRequestDto request = new AuthChildRequestDto(loginId, password, nickname);
+        AuthChildRequestDto request = new AuthChildRequestDto(loginId, password);
         Child mockChild = new Child(loginId, nickname, password, ROLE.ROLE_CHILD);
 
         Authentication mockAuthentication = mock(Authentication.class);
