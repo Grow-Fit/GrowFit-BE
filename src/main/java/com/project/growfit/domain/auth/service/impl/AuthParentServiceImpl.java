@@ -107,6 +107,6 @@ public class AuthParentServiceImpl implements AuthParentService {
                 ROLE.fromString("CHILD"));
     }
     private static void updateNickname(AuthParentRequestDto request, Parent parent) {
-        parent.updateNickname(request.nickname());
+        parent.updateInfo(request.nickname());
     }
 }

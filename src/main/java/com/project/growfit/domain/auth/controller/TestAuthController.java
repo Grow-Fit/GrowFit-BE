@@ -1,4 +1,4 @@
-package com.project.growfit.domain.auth;
+package com.project.growfit.domain.auth.controller;
 
 import com.project.growfit.domain.auth.dto.response.ParentLoginResponseDto;
 import com.project.growfit.global.auth.cookie.CookieService;

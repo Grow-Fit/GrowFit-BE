@@ -35,7 +35,7 @@ public class AuthParentController {
 
     @Operation(summary = "아이 QR 코드 생성")
     @GetMapping("/child/qr")
-    public ResultResponse<ChildQrCodeResponseDto> createQrCode(@AuthenticationPrincipal CustomUserDetails user) throws WriterException {
+    public ResultResponse<ChildQrCodeResponseDto> createQrCode() throws WriterException {
         ChildQrCodeResponseDto dto = parentService.createQR();
 
         return ResultResponse.of(ResultCode.QR_GENERATION_SUCCESS, dto);
