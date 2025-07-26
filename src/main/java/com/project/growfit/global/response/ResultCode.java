@@ -19,6 +19,7 @@ public enum ResultCode {
     LOGOUT_SUCCESS(HttpStatus.OK, "성공적으로 로그아웃하였습니다."),
 
     INFO_SUCCESS(HttpStatus.OK,  "성공적으로 정보가 조회되었습니다."),
+    UPDATE_SUCCESS(HttpStatus.OK,  "성공적으로 정보가 수정되었습니다."),
 
     //Diet
     STICKER_MARK_SUCCESS(HttpStatus.OK, "스티커가 성공적으로 등록되었습니다."),
