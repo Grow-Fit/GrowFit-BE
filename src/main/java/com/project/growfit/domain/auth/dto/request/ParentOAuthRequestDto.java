@@ -1,4 +1,4 @@
-package com.project.growfit.domain.User.dto.request;
+package com.project.growfit.domain.auth.dto.request;
 
 import com.project.growfit.domain.User.entity.Parent;
 import com.project.growfit.domain.User.entity.ROLE;
@@ -10,7 +10,7 @@ public record ParentOAuthRequestDto(
         @NotBlank(message = "이메일을 입력해주세요.")
         String email,
 
-        @Schema(description = "닉네임", example = "해윤맘")
+        @Schema(description = "닉네임", example = "맘맘맘")
         @NotBlank(message = "닉네임을 입력해주세요.")
         String nickname,
 

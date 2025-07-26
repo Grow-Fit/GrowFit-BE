@@ -1,4 +1,4 @@
-package com.project.growfit.domain.User.dto.request;
+package com.project.growfit.domain.auth.dto.request;
 
 import com.project.growfit.domain.User.entity.ChildGender;
 import io.swagger.v3.oas.annotations.media.Schema;

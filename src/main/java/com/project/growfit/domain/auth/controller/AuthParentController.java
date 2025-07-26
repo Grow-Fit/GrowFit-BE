@@ -1,10 +1,10 @@
-package com.project.growfit.domain.User.controller;
+package com.project.growfit.domain.auth.controller;
 
 import com.google.zxing.WriterException;
-import com.project.growfit.domain.User.dto.request.AuthParentRequestDto;
+import com.project.growfit.domain.auth.dto.request.AuthParentRequestDto;
 import com.project.growfit.domain.User.dto.response.ChildInfoResponseDto;
-import com.project.growfit.domain.User.dto.response.ChildQrCodeResponseDto;
-import com.project.growfit.domain.User.service.AuthParentService;
+import com.project.growfit.domain.auth.dto.response.ChildQrCodeResponseDto;
+import com.project.growfit.domain.auth.service.AuthParentService;
 import com.project.growfit.global.auth.dto.CustomUserDetails;
 import com.project.growfit.global.response.ResultCode;
 import com.project.growfit.global.response.ResultResponse;

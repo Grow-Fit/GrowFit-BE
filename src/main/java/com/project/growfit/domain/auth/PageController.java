@@ -1,4 +1,4 @@
-package com.project.growfit.domain.User.controller;
+package com.project.growfit.domain.auth;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

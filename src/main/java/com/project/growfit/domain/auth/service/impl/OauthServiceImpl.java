@@ -1,14 +1,14 @@
-package com.project.growfit.domain.User.service.impl;
+package com.project.growfit.domain.auth.service.impl;
 
 import com.nimbusds.jose.shaded.gson.JsonElement;
 import com.nimbusds.jose.shaded.gson.JsonObject;
 import com.nimbusds.jose.shaded.gson.JsonParser;
-import com.project.growfit.domain.User.dto.request.ParentOAuthRequestDto;
-import com.project.growfit.domain.User.dto.response.ParentLoginResponseDto;
-import com.project.growfit.domain.User.dto.response.ParentResponseDto;
+import com.project.growfit.domain.auth.dto.request.ParentOAuthRequestDto;
+import com.project.growfit.domain.auth.dto.response.ParentLoginResponseDto;
+import com.project.growfit.domain.auth.dto.response.ParentResponseDto;
 import com.project.growfit.domain.User.entity.Parent;
 import com.project.growfit.domain.User.repository.ParentRepository;
-import com.project.growfit.domain.User.service.OauthService;
+import com.project.growfit.domain.auth.service.OauthService;
 import com.project.growfit.global.auth.cookie.CookieService;
 import com.project.growfit.global.auth.jwt.JwtProvider;
 import com.project.growfit.global.auth.service.AuthenticatedUserProvider;
